@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="摇旗呐喊的热情,携光阴渐远去,人世间悲喜烂剧,昼夜轮播不停,纷飞的滥情男女,情仇爱恨别离,一代人终将老去，但总有人正年轻" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+     Nero 的个人博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      
+<section class="cover">
+    
+  <div class="cover-frame">
+    <div class="bg-box">
+      <img src="/images/back2.jpg" alt="image frame" />
+    </div>
+    <div class="cover-inner text-center text-white">
+      <h1><a href="/">Nero 的个人博客</a></h1>
+      <div id="subtitle-box">
+        
+        <span id="subtitle"></span>
+        
+      </div>
+      <div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="cover-learn-more">
+    <a href="javascript:void(0)" class="anchor"><i class="ri-arrow-down-line"></i></a>
+  </div>
+</section>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js"></script>
+
+
+<!-- Subtitle -->
+
+  <script>
+    try {
+      var typed = new Typed("#subtitle", {
+        strings: ['摇旗呐喊的热情,携光阴渐远去,', '人世间悲喜烂剧,昼夜轮播不停,', '纷飞的滥情男女, 情仇爱恨别离,一代人终将老去，但总有人正年轻'],
+        startDelay: 0,
+        typeSpeed: 200,
+        loop: true,
+        backSpeed: 100,
+        showCursor: true
+      });
+    } catch (err) {
+      console.log(err)
+    }
+  </script>
+  
+<div id="main">
+  <section class="outer">
+  
+  <article class="articles">
+    
+    
+    
+    
+    <article
+  id="post-1-指标类型"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
+    >1.指标类型</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
+<li><p>时间序列格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
+<li>Counter：递增的计数器 </li>
+<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
+<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
+<li>Summary：与Histogram类似</li>
+</ol>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-10-alertmanager部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
+    >10.alertmanager部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-2-作业和实例"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
+    >2.作业和实例</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
+<li><p>实例</p>
+<p>   可以抓取的目标称为实例（Instances）</p>
+</li>
+<li><p>作业</p>
+<p>具有相同目标的实例集合称为作业（Job）</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-11-告警规则与告警"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/"
+    >11.告警规则与告警</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="告警规则"><a href="#告警规则" class="headerlink" title="告警规则"></a>告警规则</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##prometheus.yml </span></span><br><span class="line"><span class="comment">#配置加载的文件  这个文件只要主配置中存在 就会定期去加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - <span class="string">&quot;rules/*.yml&quot;</span></span><br><span class="line"><span class="comment">##rules/node.yml 编写告警规则</span></span><br><span class="line">groups:</span><br><span class="line"><span class="comment"># 报警规则组名称</span></span><br><span class="line">- name: example   </span><br><span class="line">  rules:</span><br><span class="line">  <span class="comment">#规则名称</span></span><br><span class="line">  - alert: InstanceDown</span><br><span class="line">    <span class="comment">#指标阀值表达式</span></span><br><span class="line">    expr: up == 0</span><br><span class="line">    <span class="comment">#持续时间 ， 表示连续触发阀值达5分钟才触发报警</span></span><br><span class="line">    <span class="keyword">for</span>: 5m </span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment"># 自定义标签</span></span><br><span class="line">      severity: page</span><br><span class="line">    <span class="comment">#消息体</span></span><br><span class="line">    annotations:</span><br><span class="line">      <span class="comment"># 自定义摘要&#123;&#123; $labels.instance &#125;&#125; 是引用指标标签instance的值</span></span><br><span class="line">      summary: <span class="string">&quot;Instance &#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; down&quot;</span></span><br><span class="line">      <span class="comment"># 自定义具体描述 &#123;&#123; $labels.job &#125;&#125; 表示引用指标标签job的值</span></span><br><span class="line">      description: <span class="string">&quot;&#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; of job &#123;&#123; <span class="variable">$labels</span>.job &#125;&#125; has been down for more than 5 minutes.&quot;</span> </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="告警状态"><a href="#告警状态" class="headerlink" title="告警状态"></a>告警状态</h2><p>在prometheus 的web页面  alerts选项中可以常看状态</p>
+<p>⦁    Inactive：这里什么都没有发生。<br>⦁    Pending：已触发阈值，但未满足告警持续时间（即rule中的for字段）<br>⦁    Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，经过处理，发送给接受者。</p>
+<h2 id="用过标签分类告警以及分组告警"><a href="#用过标签分类告警以及分组告警" class="headerlink" title="用过标签分类告警以及分组告警"></a>用过标签分类告警以及分组告警</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">route:</span><br><span class="line">  <span class="comment">#通过标签进行分组 标签K/V结构 ,当K的值相等的时候将划分为一组一并发出</span></span><br><span class="line">  <span class="comment">#alertname是默认标签,表示告警名称</span></span><br><span class="line">  group_by: [cluster, alertname]</span><br><span class="line">  <span class="comment"># 告警等待时间 如果等待过程又收到告警并且属同一组将一并发出</span></span><br><span class="line">  group_wait: 10s</span><br><span class="line">  <span class="comment"># 告警间隔 如告警后又出现告警将判断间隔时间延迟发出</span></span><br><span class="line">  group_interval: 10s</span><br><span class="line">  <span class="comment"># 重复告警周期 同一个告警最少间隔时间 </span></span><br><span class="line">  repeat_interval: 20m</span><br><span class="line"><span class="comment"># 标签不匹配的告警都将保留在根节点，并发送到“default-receiver”</span></span><br><span class="line">  receiver: <span class="string">&#x27;default-receiver&#x27;</span> </span><br><span class="line">  routes: <span class="comment">#路由匹配标签来决定将告警发送到那个接收器上 接收器执行发送告警</span></span><br><span class="line"><span class="comment"># 标签service=mysql或者service=cassandra的告警分配到数据库接收端</span></span><br><span class="line">  - receiver: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">    group_wait: 10s</span><br><span class="line">    <span class="comment">#正则匹配标签</span></span><br><span class="line">    match_re:</span><br><span class="line">      service: mysql|cassandra</span><br><span class="line"><span class="comment"># 标签team=frontend的告警都与此子路由匹配</span></span><br><span class="line">  - receiver: <span class="string">&#x27;frontend-pager&#x27;</span></span><br><span class="line">    group_by: [product, environment]</span><br><span class="line">    <span class="comment">#精确匹配标签</span></span><br><span class="line">    match:</span><br><span class="line">      team: frontend </span><br><span class="line"><span class="comment">#定义接收器名称以及发送告警方式</span></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: <span class="string">&#x27;http://127.0.0.1:5001/&#x27;</span></span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">    - to: <span class="string">&#x27;******@163.com&#x27;</span> </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-3-二进制部署prometheus"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/"
+    >3.二进制部署Prometheus 服务端</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="相关包下载地址"><a href="#相关包下载地址" class="headerlink" title="相关包下载地址"></a>相关包下载地址</h2><p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
+<h2 id="部署Prometheus-服务端"><a href="#部署Prometheus-服务端" class="headerlink" title="部署Prometheus 服务端"></a>部署Prometheus 服务端</h2><ol>
+<li><p>下载和部署</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.22.0/prometheus-2.22.0.linux-amd64.tar.gz</span><br><span class="line">tar xf prometheus-2.22.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/prometheus-2.22.0.linux-amd64 /usr/<span class="built_in">local</span>/prometheus</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备UnitFile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/prometheus.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/prometheus/prometheus --config.file=/usr/<span class="built_in">local</span>/prometheus/prometheus.yml --storage.tsdb.retention=3d</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment">#这里只指定了一个配置文件选项,可以添加其它选项  使用 ./prometheus --help 查看其它选项</span></span><br><span class="line"><span class="comment">#常用选项</span></span><br><span class="line"><span class="comment"># --storage.tsdb.path=&quot;data/&quot; 指定数据目录 </span></span><br><span class="line"><span class="comment"># --storage.tsdb.retention=15d 指定留存数据时间范围</span></span><br><span class="line"><span class="comment"># --web.listen-address=&quot;0.0.0.0:9090&quot; 监听地址</span></span><br><span class="line"><span class="comment"># --web.max-connections=512 最大连接数</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p>配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/<span class="built_in">local</span>/prometheus/prometheus.yml</span><br><span class="line"><span class="comment"># my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s <span class="comment"># Set the scrape interval to every 15 seconds. Default is every 1 minute.</span></span><br><span class="line">  evaluation_interval: 15s <span class="comment"># Evaluate rules every 15 seconds. The default is every 1 minute.</span></span><br><span class="line">  <span class="comment"># scrape_timeout is set to the global default (10s).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">      <span class="comment"># - alertmanager:9093</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load rules once and periodically evaluate them according to the global &#x27;evaluation_interval&#x27;.</span></span><br><span class="line">rule_files:</span><br><span class="line">  <span class="comment"># - &quot;first_rules.yml&quot;</span></span><br><span class="line">  <span class="comment"># - &quot;second_rules.yml&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="comment"># Here it&#x27;s Prometheus itself.</span></span><br><span class="line">scrape_configs:</span><br><span class="line">  <span class="comment"># The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  <span class="comment">#作业 默认配置  用于监控prometheus自身</span></span><br><span class="line">  - job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># metrics_path defaults to &#x27;/metrics&#x27;</span></span><br><span class="line">    <span class="comment"># scheme defaults to &#x27;http&#x27;.</span></span><br><span class="line"></span><br><span class="line">    static_configs:</span><br><span class="line">    <span class="comment">#实例</span></span><br><span class="line">    - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动服务</p>
+</li>
+</ol>
+   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> prometheus &amp;&amp; systemctl start prometheus</span><br><span class="line"></span><br><span class="line">ss -tnl |grep 9090</span><br><span class="line">LISTEN     0      128       [::]:9090                  [::]:*  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-4-重写标签"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/"
+    >4.重写标签</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="重写标签"><a href="#重写标签" class="headerlink" title="重写标签"></a>重写标签</h2><p>是配置文件中的一个字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">relabel_configs:</span><br><span class="line">	....</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
+
+<h2 id="action：重新标签动作"><a href="#action：重新标签动作" class="headerlink" title="action：重新标签动作"></a>action：重新标签动作</h2><ul>
+<li>replace：默认，通过regex匹配source_label的值，使用replacement来引用表达式匹配的分组</li>
+<li>keep：只保留regex匹配的目标 source_labels </li>
+<li>drop：删除regex匹配的目标 source_labels </li>
+<li>labeldrop：删除regex匹配的标签</li>
+<li>labelkeep：只保留regex匹配的标签</li>
+<li>hashmod：设置target_label为modulus连接的哈希值source_labels </li>
+<li>labelmap：匹配regex所有标签名称。然后复制匹配标签的值进行分组，replacement分组引用（${1},${2},…）替代</li>
+</ul>
+<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ul>
+<li><p>给作业中所有实例添加标签</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">  <span class="comment">#静态实例</span></span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment">#添加了IDC标签赋值BJ</span></span><br><span class="line">      IDC: <span class="string">&quot;BJ&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看所有带有IDC:BJ标签实例的某指标的总和</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum(指标名称&#123;IDC:<span class="string">&quot;BJ&quot;</span>&#125;)</span><br><span class="line"><span class="comment">#在prometheus页面中填写公式 可获得总值</span></span><br><span class="line"><span class="comment">#sum() 求和</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="标签重写"><a href="#标签重写" class="headerlink" title="标签重写"></a>标签重写</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这个job命名方便识别机房</span></span><br><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#指定动作 默认replace 标签重写</span></span><br><span class="line">   - action: replace</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)</span><br><span class="line">     <span class="comment">#后向引用</span></span><br><span class="line">     replacement: <span class="variable">$1</span></span><br><span class="line">     <span class="comment">#标签的K被修改idc 原有标签还保留 多了一个 idc=&#x27;BJ-Prometheus&#x27;的标签</span></span><br><span class="line">     target_label: idc</span><br></pre></td></tr></table></figure>
+
+<h2 id="keep-和-drop"><a href="#keep-和-drop" class="headerlink" title="keep 和 drop"></a>keep 和 drop</h2><p>实现采集指标的过滤 使得指标是可以选择性采集的</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#keep 表示只采集有指定标签的指标</span></span><br><span class="line">   <span class="comment">#drop 表示不采集有此标签的的指标</span></span><br><span class="line">   - action: keep</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)     </span><br></pre></td></tr></table></figure>
+
+<h2 id="labeldrop和labelkeep"><a href="#labeldrop和labelkeep" class="headerlink" title="labeldrop和labelkeep"></a>labeldrop和labelkeep</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#labeldrop 删除匹配到的标签 配合标签重写 可以实现真正的重命名标签</span></span><br><span class="line">   <span class="comment">#labelkeep 只保留匹配到的标签 其余删除</span></span><br><span class="line">   - action: labeldrop</span><br><span class="line">     <span class="comment">#正则</span></span><br><span class="line">     regex: job</span><br><span class="line">     </span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-6-基于文件的动态实例发现"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
+    >6.基于文件的动态实例发现</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-7-常用函数"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/"
+    >7.常用函数</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><ul>
+<li>rate()<ul>
+<li>函数计算某个时间序列范围内的每秒平均增长率。适合缓慢变化的计数器（counter）</li>
+</ul>
+</li>
+</ul>
+<p>这是一个非常重要的函数，专门配合counter类型数据，取counter在这个时间段中的平均每秒增量。比如监控网络接受字节数的情况，在9:10到9:20期间累计量增加了1000bytes，加入rate([1m])函数后就会使用1000除以60秒，计算出数据大约为16bytes。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rate( node_network_receive_bytes[1m] ) <span class="comment">#获取``1``分钟内每秒的增量</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>irate()<ul>
+<li>函数计算一段时间范围内某个时刻的每秒增长率。适合快速变化的计数器（counter）</li>
+</ul>
+</li>
+<li>sum()<ul>
+<li>求和</li>
+</ul>
+</li>
+<li>increase()<ul>
+<li>和rate()函数一样也是配合Counter使用。区别就是它是取其中一段时间的增量而不是平均值，</li>
+<li>比如</li>
+<li>increase(node_cpu[1m])    #获取CPU总使用时间1分钟的增量</li>
+</ul>
+</li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-5-node_exporter"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/5-node_exporter/"
+    >5.node_exporter部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/5-node_exporter/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署"><a href="#部署" class="headerlink" title="部署:"></a>部署:</h2><p>用于输出操作系统 指标 如 cpu负载 内存使用量等</p>
+<p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz</span><br><span class="line">tar xf node_exporter-1.0.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/node_exporter-1.0.1.linux-amd64 /usr/<span class="built_in">local</span>/node_exporter</span><br><span class="line"></span><br><span class="line">cat &gt;/usr/lib/systemd/system/node-exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=Prometheus Server</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/node_exporter/node_exporter</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> node-exporter.service &amp;&amp; systemctl start node-exporter.service </span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证</span></span><br><span class="line">ss -tnlp |grep node_exporter</span><br><span class="line">LISTEN  0 128  [::]:9100   [::]:*   users:((<span class="string">&quot;node_exporter&quot;</span>,pid=4209,fd=3))</span><br><span class="line"><span class="comment">#部署两台服务器 用于下章 动态发现 以及后面的实验</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-8-grafana部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/"
+    >8.grafana部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署Grafana"><a href="#部署Grafana" class="headerlink" title="部署Grafana"></a>部署Grafana</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://dl.grafana.com/oss/release/grafana-7.3.1-1.x86_64.rpm</span><br><span class="line">yum install -y grafana-7.3.1-1.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> grafana-server.service &amp;&amp; systemctl start grafana-server.service</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ss -tnl |grep 3000</span><br><span class="line">LISTEN     0      128       [::]:3000                  [::]:* </span><br></pre></td></tr></table></figure>
+
+<p>此时可以使用浏览器访问了  默认账号密码 admin  admin   首次登陆必须修改密码</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+  </article>
+  
+
+  
+  <nav class="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
+  </nav>
+  
+</section>
+</div>
+
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2020
+        <i class="ri-heart-fill heart_icon"></i> Nero
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Nero 的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+</body>
+
+</html>
