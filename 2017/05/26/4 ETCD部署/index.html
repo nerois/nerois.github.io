@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    9.mysqld_exporter部署与监控 |  Nero 的个人博客
+    4ETCD部署 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-9-mysqld_exporter部署与监控"
+  id="post-4 ETCD部署"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,14 +60,14 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  9.mysqld_exporter部署与监控
+  4ETCD部署
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/9-mysqld_exporter%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%9B%91%E6%8E%A7/" class="article-date">
+      <a href="/2017/05/26/4%20ETCD%E9%83%A8%E7%BD%B2/" class="article-date">
   <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
 </a> 
   <div class="article-category">
@@ -84,9 +84,27 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="mysqld-exporter"><a href="#mysqld-exporter" class="headerlink" title="mysqld_exporter"></a>mysqld_exporter</h2><p>用于输出mysql指标</p>
-<p>部署</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.12.1/mysqld_exporter-0.12.1.linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line">tar xf mysqld_exporter-0.12.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/mysqld_exporter-0.12.1.linux-amd64 /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line"><span class="comment">#官方github要求版本如下</span></span><br><span class="line"><span class="comment">#MySQL &gt;= 5.6.</span></span><br><span class="line"><span class="comment">#MariaDB &gt;= 10.1</span></span><br><span class="line"><span class="comment">#创建用户</span></span><br><span class="line">MariaDB [(none)]&gt; CREATE USER <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span> IDENTIFIED BY <span class="string">&#x27;888888&#x27;</span> WITH MAX_USER_CONNECTIONS 3;</span><br><span class="line">MariaDB [(none)]&gt; GRANT PROCESS, REPLICATION SLAVE ADMIN, SELECT ON *.* TO <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="comment">#创建配置文件</span></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line">cat &gt; .my.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[client]</span><br><span class="line">host=127.0.0.1</span><br><span class="line">user=exporter</span><br><span class="line">password=888888</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/mysqld_exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=mysqld_exporter</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">#user=mysql</span></span><br><span class="line"><span class="string">Type=simple</span></span><br><span class="line"><span class="string">Restart=on-failure</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/mysqld_exporter/mysqld_exporter --config.my-cnf=/usr/local/mysqld_exporter/.my.cnf</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> mysqld_exporter &amp;&amp; systemctl start mysqld_exporter</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">ss -tnl|grep 9104</span><br><span class="line">LISTEN     0      20480     [::]:9104                  [::]:*  </span><br><span class="line"><span class="comment">#随后去prometheus 添加上对应的job target </span></span><br><span class="line"><span class="comment">#Grafana 模板  推荐 7362  如果你是Galera 集群 的mariadb 推荐13106 </span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">主要关注几个指标 </span><br><span class="line">连接数   </span><br><span class="line">利用率</span><br><span class="line">InnoDB Buffer Pool Data</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  <h2 id="下载etcd-二进制文件"><a href="#下载etcd-二进制文件" class="headerlink" title="**下载etcd 二进制文件"></a>**下载etcd 二进制文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;coreos&#x2F;etcd&#x2F;releases&#x2F;download&#x2F;v3.3.7&#x2F;etcd-v3.3.7-linux-amd64.tar.gz</span><br><span class="line">tar xf etcd-v3.3.7-linux-amd64.tar.gz</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="分发二进制文件到各个etcd节点"><a href="#分发二进制文件到各个etcd节点" class="headerlink" title="**分发二进制文件到各个etcd节点"></a>**分发二进制文件到各个etcd节点</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scp -rp etcd-v3.3.7-linux-amd64 k-n1:&#x2F;usr&#x2F;local&#x2F;etcd</span><br><span class="line"></span><br><span class="line">echo &#39;export PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd&#x2F;:$PATH&#39; &gt;  &#x2F;etc&#x2F;profile.d&#x2F;etcd.sh &amp;&amp; source &#x2F;etc&#x2F;profile.d&#x2F;etcd.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="制作ETCD-unitfile-模板-所有etcd节点执行"><a href="#制作ETCD-unitfile-模板-所有etcd节点执行" class="headerlink" title="**制作ETCD  unitfile 模板 所有etcd节点执行"></a>**制作ETCD  unitfile 模板 所有etcd节点执行</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;&#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &lt;&lt;EOF</span><br><span class="line">[Unit]</span><br><span class="line">Description&#x3D;Etcd Server</span><br><span class="line">After&#x3D;network.target</span><br><span class="line">After&#x3D;network-online.target</span><br><span class="line">Wants&#x3D;network-online.target</span><br><span class="line">Documentation&#x3D;https:&#x2F;&#x2F;github.com&#x2F;coreos</span><br><span class="line">[Service]</span><br><span class="line">Type&#x3D;notify</span><br><span class="line">WorkingDirectory&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd</span><br><span class="line">ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd&#x2F;etcd \\</span><br><span class="line">    --data-dir&#x3D;&#x2F;data&#x2F;etcd \\</span><br><span class="line">    --name ##NODE_NAME## \\</span><br><span class="line">    --cert-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;server.crt \\</span><br><span class="line">    --key-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;server.key \\</span><br><span class="line">    --trusted-ca-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \\</span><br><span class="line">    --peer-cert-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;peer.crt \\</span><br><span class="line">    --peer-key-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;peer.key \\</span><br><span class="line">    --peer-trusted-ca-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \\</span><br><span class="line">    --peer-client-cert-auth \\</span><br><span class="line">    --client-cert-auth \\</span><br><span class="line">    --listen-peer-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2380 \\</span><br><span class="line">    --initial-advertise-peer-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2380 \\</span><br><span class="line">    --listen-client-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2379,http:&#x2F;&#x2F;127.0.0.1:2379\\</span><br><span class="line">    --advertise-client-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2379 \\</span><br><span class="line">    --initial-cluster-token&#x3D;etcd-cluster-0 \\</span><br><span class="line">    --initial-cluster&#x3D;etcd01&#x3D;https:&#x2F;&#x2F;192.168.1.71:2380,etcd02&#x3D;https:&#x2F;&#x2F;192.168.1.81:2380,etcd03&#x3D;https:&#x2F;&#x2F;192.168.1.82:2380 \\</span><br><span class="line">    --initial-cluster-state&#x3D;new</span><br><span class="line">Restart&#x3D;on-failure</span><br><span class="line">RestartSec&#x3D;5</span><br><span class="line">LimitNOFILE&#x3D;65536</span><br><span class="line">[Install]</span><br><span class="line">WantedBy&#x3D;multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+
+<p>#注：<br>##WorkingDirectory 、 –data-dir ：指定工作目录和数据目录为/opt/lib/etcd ，需在启动服务前创建这个目录；<br>#–name ：指定节点名称，当 –initial-cluster-state 值为 new 时， –name 的参数值必须位于 –initial-cluster 列表中；<br>#–cert-file 、 –key-file ：etcd server 与 client 通信时使用的证书和私钥；<br>#–trusted-ca-file ：签名 client 证书的 CA 证书，用于验证 client 证书；<br>#–peer-cert-file 、 –peer-key-file ：etcd 与 peer 通信使用的证书和私钥；<br>#–peer-trusted-ca-file ：签名 peer 证书的 CA 证书，用于验证 peer 证书</p>
+<h2 id="各个ETCD-替换模板内容"><a href="#各个ETCD-替换模板内容" class="headerlink" title="**各个ETCD 替换模板内容"></a>**各个ETCD 替换模板内容</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#不同节点替换不同名称和ip</span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd01%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.71%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service </span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd02%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.81%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service</span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd03%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.82%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#数据目录 权限</span><br><span class="line"> mkdir -p &#x2F;data&#x2F;etcd </span><br><span class="line"></span><br><span class="line">#启动</span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl enable etcd &amp;&amp; systemctl start etcd</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="验证集群"><a href="#验证集群" class="headerlink" title="**验证集群"></a>**验证集群</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">etcdctl --cert-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;healthcheck-client.crt \</span><br><span class="line">--key-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;healthcheck-client.key \</span><br><span class="line">--ca-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \</span><br><span class="line">--endpoints&#x3D;&quot;https:&#x2F;&#x2F;192.168.1.71:2379,https:&#x2F;&#x2F;192.168.1.81:2379,https:&#x2F;&#x2F;192.168.1.82:2379&quot;  \</span><br><span class="line">cluster-health</span><br><span class="line"></span><br><span class="line">member 68afffba56612fd is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.71:2379</span><br><span class="line">member e42b05792291d17 is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.81:2379</span><br><span class="line">member e10fc861b3b13bc0 is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.82:2379</span><br><span class="line">cluster is healthy</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -106,19 +124,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2017/05/26/3.1%20%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            8.grafana部署
+            3.1生成证书
           
         </div>
       </a>
     
     
-      <a href="/2017/05/26/10%20%E9%9B%86%E7%BE%A4%E9%AA%8C%E8%AF%81/" class="article-nav-link">
+      <a href="/2017/05/26/5%20Master%E8%8A%82%E7%82%B9%20APIserver/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">10集群验证</div>
+        <div class="article-nav-title">5master节点组件apiserver</div>
       </a>
     
   </nav>

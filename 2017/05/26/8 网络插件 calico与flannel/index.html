@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    9.mysqld_exporter部署与监控 |  Nero 的个人博客
+    8网络插件calico与flannel |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-9-mysqld_exporter部署与监控"
+  id="post-8 网络插件 calico与flannel"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  9.mysqld_exporter部署与监控
+  8网络插件calico与flannel
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/9-mysqld_exporter%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%9B%91%E6%8E%A7/" class="article-date">
+      <a href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/" class="article-date">
   <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
   </div>
  
     </div>
@@ -84,9 +84,32 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="mysqld-exporter"><a href="#mysqld-exporter" class="headerlink" title="mysqld_exporter"></a>mysqld_exporter</h2><p>用于输出mysql指标</p>
-<p>部署</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.12.1/mysqld_exporter-0.12.1.linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line">tar xf mysqld_exporter-0.12.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/mysqld_exporter-0.12.1.linux-amd64 /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line"><span class="comment">#官方github要求版本如下</span></span><br><span class="line"><span class="comment">#MySQL &gt;= 5.6.</span></span><br><span class="line"><span class="comment">#MariaDB &gt;= 10.1</span></span><br><span class="line"><span class="comment">#创建用户</span></span><br><span class="line">MariaDB [(none)]&gt; CREATE USER <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span> IDENTIFIED BY <span class="string">&#x27;888888&#x27;</span> WITH MAX_USER_CONNECTIONS 3;</span><br><span class="line">MariaDB [(none)]&gt; GRANT PROCESS, REPLICATION SLAVE ADMIN, SELECT ON *.* TO <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="comment">#创建配置文件</span></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line">cat &gt; .my.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[client]</span><br><span class="line">host=127.0.0.1</span><br><span class="line">user=exporter</span><br><span class="line">password=888888</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/mysqld_exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=mysqld_exporter</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">#user=mysql</span></span><br><span class="line"><span class="string">Type=simple</span></span><br><span class="line"><span class="string">Restart=on-failure</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/mysqld_exporter/mysqld_exporter --config.my-cnf=/usr/local/mysqld_exporter/.my.cnf</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> mysqld_exporter &amp;&amp; systemctl start mysqld_exporter</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">ss -tnl|grep 9104</span><br><span class="line">LISTEN     0      20480     [::]:9104                  [::]:*  </span><br><span class="line"><span class="comment">#随后去prometheus 添加上对应的job target </span></span><br><span class="line"><span class="comment">#Grafana 模板  推荐 7362  如果你是Galera 集群 的mariadb 推荐13106 </span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">主要关注几个指标 </span><br><span class="line">连接数   </span><br><span class="line">利用率</span><br><span class="line">InnoDB Buffer Pool Data</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  <p>###calico 与 flannel 选一即可</p>
+<h2 id="calico"><a href="#calico" class="headerlink" title="**calico"></a>**calico</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/v3.8/manifests/calico.yaml </span><br><span class="line">sed -i -e <span class="string">&quot;s?192.168.0.0/16?10.244.0.0/16?g&quot;</span> calico.yaml</span><br><span class="line"><span class="comment">#最好下载好镜像上传至内部harbor</span></span><br><span class="line"><span class="comment">#然后修改此文件中的镜像指向内部harbor </span></span><br><span class="line">calico/cni:v3.8.9</span><br><span class="line">calico/pod2daemon-flexvol:v3.8.9</span><br><span class="line">calico/node:v3.8.9</span><br><span class="line">calico/kube-controllers:v3.8.9</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="替换镜像"><a href="#替换镜像" class="headerlink" title="**替换镜像"></a>**替换镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&quot;s@calico/cni:v3.8.9@hb.sp.com/calico/cni:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/pod2daemon-flexvol:v3.8.9@hb.sp.com/calico/pod2daemon-flexvol:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/node:v3.8.9@hb.sp.com/calico/node:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/kube-controllers:v3.8.9@hb.sp.com/calico/kube-controllers:v3.8.9@g&quot;</span> calico.yaml </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get nodes</span></span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION</span><br><span class="line">k-m1.sp.com   Ready    master   9h    v1.15.12</span><br><span class="line">k-n1.sp.com   Ready    node     25h   v1.15.12</span><br><span class="line">k-n2.sp.com   Ready    node     24h   v1.15.12</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl get pod -n kube-system</span></span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">calico-kube-controllers-867fb4cbb9-tl9d8   1/1     Running   0          51m</span><br><span class="line">calico-node-7nxjj                          1/1     Running   0          51m</span><br><span class="line">calico-node-td9mh                          1/1     Running   0          51m</span><br><span class="line">calico-node-wmbqv                          1/1     Running   0          51m</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flannel"><a href="#flannel" class="headerlink" title="**flannel"></a>**flannel</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/coreos/flannel 中推荐方法</span><br><span class="line"></span><br><span class="line">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="迁移镜像到本地harbor-（可选-但推荐）"><a href="#迁移镜像到本地harbor-（可选-但推荐）" class="headerlink" title="*迁移镜像到本地harbor （可选 但推荐）"></a>*迁移镜像到本地harbor （可选 但推荐）</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看镜像版本</span></span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line"><span class="comment">#上传镜像到本地harbor</span></span><br><span class="line">docker pull quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">docker image tag quay.io/coreos/flannel:v0.13.0-rc2    hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">docker push hb.sp.com/flannel/flannel:v0.13.0-rc2 </span><br><span class="line"><span class="comment">#修改清单</span></span><br><span class="line">sed -i <span class="string">&quot;s@quay.io/coreos/flannel:v0.13.0-rc2@hb.sp.com/flannel/flannel:v0.13.0-rc2@g&quot;</span> kube-flannel.yml</span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="部署"><a href="#部署" class="headerlink" title="*部署"></a>*部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f kube-flannel.yml</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                    READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kube-flannel-ds-7pfdp   1/1     Running   0          48s   192.168.1.71   k-m1.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-hn6bf   1/1     Running   0          48s   192.168.1.82   k-n2.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-vjr2k   1/1     Running   0          48s   192.168.1.81   k-n1.sp.com   &lt;none&gt;           &lt;none&gt;。</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -98,7 +121,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
 
     </footer>
   </div>
@@ -106,19 +129,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2017/05/26/7.1%20Node%E8%8A%82%E7%82%B9%20kube-proxy/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            8.grafana部署
+            7.1NODE节点kube-proxy
           
         </div>
       </a>
     
     
-      <a href="/2017/05/26/10%20%E9%9B%86%E7%BE%A4%E9%AA%8C%E8%AF%81/" class="article-nav-link">
+      <a href="/2017/05/26/9.1%20dashboard/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">10集群验证</div>
+        <div class="article-nav-title">9.1dashboard</div>
       </a>
     
   </nav>
