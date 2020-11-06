@@ -108,6 +108,62 @@
     
     
     <article
+  id="post-5.1 Master节点 controller-manager"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/5.1%20Master%E8%8A%82%E7%82%B9%20controller-manager/"
+    >5.1master节点组件controller-manager</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/5.1%20Master%E8%8A%82%E7%82%B9%20controller-manager/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="unitfile"><a href="#unitfile" class="headerlink" title="**unitfile"></a>**unitfile</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-controller-manager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes Controller Manager</span><br><span class="line">Documentation=https://github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-controller-manager \</span><br><span class="line">  --allocate-node-cidrs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --authentication-kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --authorization-kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --client-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --cluster-signing-key-file=/etc/kubernetes/pki/ca.key \</span><br><span class="line">  --bind-address=127.0.0.1 \</span><br><span class="line">  --leader-elect=<span class="literal">true</span> \</span><br><span class="line">  --cluster-cidr=10.244.0.0/16 \</span><br><span class="line">  --service-cluster-ip-range=10.96.0.0/12 \</span><br><span class="line">  --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt \</span><br><span class="line">  --service-account-private-key-file=/etc/kubernetes/pki/sa.key \</span><br><span class="line">  --root-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --use-service-account-credentials=<span class="literal">true</span> \</span><br><span class="line">  --controllers=*,bootstrapsigner,tokencleaner \</span><br><span class="line">  --experimental-cluster-signing-duration=86700h \</span><br><span class="line">  --feature-gates=RotateKubeletClientCertificate=<span class="literal">true</span> \</span><br><span class="line">  --alsologtostderr=<span class="literal">true</span> \</span><br><span class="line">  --logtostderr=<span class="literal">false</span> \</span><br><span class="line">  --log-dir=/data/kubelog/controller-manager \</span><br><span class="line">  --v=2</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=10s</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /data/kubelog/controller-manager</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-controller-manager &amp;&amp; systemctl start kube-controller-manager</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-6 配置 bootstrap"
   class="article article-type-post"
   itemscope
