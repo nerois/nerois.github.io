@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    1.指标类型 |  Nero 的个人博客
+    1.ansible入门基础 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-1-指标类型"
+  id="post-1 ansible基础"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  1.指标类型
+  1.ansible入门基础
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/ansible/">ansible</a>
   </div>
  
     </div>
@@ -84,19 +84,17 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
+  <h2 id="ansible入门"><a href="#ansible入门" class="headerlink" title="ansible入门"></a>ansible入门</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><h5 id="配置-etc-ansible-hosts-主机清单"><a href="#配置-etc-ansible-hosts-主机清单" class="headerlink" title="配置/etc/ansible/hosts 主机清单"></a>配置/etc/ansible/hosts 主机清单</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># cat /etc/ansible/hosts</span></span><br><span class="line">[master]192.168.1.71</span><br><span class="line">[node]</span><br><span class="line">192.168.1.8[1:2]</span><br><span class="line"><span class="comment">#主机清单支持 ip 主机名 如果ssh端口非默认22端口 可以在ip或主机名后加上端口 如 192.168.1.71:2222</span></span><br><span class="line"><span class="comment">#如果主机名 或 ip 有连贯数字 可以使用 [] 来指定数字范围 如 192.168.1.8[1:2] 就是 192.168.1.81 和192.168.1.82</span></span><br></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
- 
+<h5 id="确保-etc-ansible-ansible-cfg配置中启用如下配置"><a href="#确保-etc-ansible-ansible-cfg配置中启用如下配置" class="headerlink" title="确保/etc/ansible/ansible.cfg配置中启用如下配置"></a>确保/etc/ansible/ansible.cfg配置中启用如下配置</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">host_key_checking = False</span><br><span class="line"><span class="comment">#ansible采用ssh进行连接 当第一次连接会有交互性提示 此配置忽略交互性提示 </span></span><br></pre></td></tr></table></figure>
+
+<h5 id="所有主机免秘钥认证"><a href="#所有主机免秘钥认证" class="headerlink" title="所有主机免秘钥认证"></a>所有主机免秘钥认证</h5><h2 id="验证测试"><a href="#验证测试" class="headerlink" title="验证测试"></a>验证测试</h2><h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#语法</span></span><br><span class="line">ansible [hosts] -m ping</span><br><span class="line"><span class="comment">#hosts 可以是 主机名或者ip 但更多的时候应该使用组名 如上面我们写的master 和node 都是组名</span></span><br><span class="line"><span class="comment">#hosts 也支持通配符 如 192.168.1.* </span></span><br><span class="line"><span class="comment">#一个组包含一个或者多个主机</span></span><br><span class="line"><span class="comment">#all 表示清单中所有主机</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line">~]<span class="comment"># ansible all -m ping</span></span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#ping模块 通过ssh方式测试是否连通主机 如果连通 返回 pong</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="ansible-的与或非"><a href="#ansible-的与或非" class="headerlink" title="ansible 的与或非"></a>ansible 的与或非</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑或 :</span></span><br><span class="line">ansible master:node -m ping </span><br><span class="line">ansible master:node -m ping </span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#可以看到这里的逻辑或 是指 多个主机 或者多组主机 都执行任务</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑与 :&amp;</span></span><br><span class="line">ansible <span class="string">&quot;master:&amp;node&quot;</span> -m ping</span><br><span class="line">[WARNING]: No hosts matched, nothing to <span class="keyword">do</span></span><br><span class="line"><span class="comment">#注意双引号 否则报错</span></span><br><span class="line"><span class="comment">#这里为什么会没有主机呢 </span></span><br><span class="line"><span class="comment">#因为这里的逻辑与 是取 两个组的交集 我指定的这两个组没有交集 </span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑非 :!</span></span><br><span class="line">ansible <span class="string">&#x27;master:!node&#x27;</span> -m ping</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#注意这里的必须是单引号 否则shell 会把特殊符号替换 导致报错</span></span><br><span class="line"><span class="comment">#这里的逻辑非 是指  在master中存在 但不在node中存在 </span></span><br></pre></td></tr></table></figure> 
       <!-- reward -->
       
     </div>
@@ -106,7 +104,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
 
     </footer>
   </div>
@@ -114,19 +112,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/" class="article-nav-link">
+      <a href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            1.ansible入门基础
+            2.常用模块
           
         </div>
       </a>
     
     
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">10.alertmanager部署</div>
+        <div class="article-nav-title">1.指标类型</div>
       </a>
     
   </nav>
