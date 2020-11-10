@@ -108,6 +108,76 @@
     
     
     <article
+  id="post-亲和性.反亲和性"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/%E4%BA%B2%E5%92%8C%E6%80%A7.%E5%8F%8D%E4%BA%B2%E5%92%8C%E6%80%A7/"
+    >亲和,反亲和</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/%E4%BA%B2%E5%92%8C%E6%80%A7.%E5%8F%8D%E4%BA%B2%E5%92%8C%E6%80%A7/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/">K8S资源清单</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="亲和-反亲和"><a href="#亲和-反亲和" class="headerlink" title="亲和,反亲和"></a>亲和,反亲和</h2><p>pod的被调度时,我们可以定义是否允许 或 不允许调度到同一位置,被称为亲和性 和 反亲和性</p>
+<p>所谓同一位置 通常是指 指定节点的一个标签的键  有相同键的节点即认为是同一位置,</p>
+<p>在我们规划集群时候,通常会精心规划节点标签 来标识位置,如 机房 机柜 甚至 数据中心等</p>
+<p>而后就可以通过亲和 反亲和 实现将pod 部署在想要的位置</p>
+<h2 id="硬亲和-软亲和"><a href="#硬亲和-软亲和" class="headerlink" title="硬亲和 ,软亲和"></a>硬亲和 ,软亲和</h2><ul>
+<li><p>硬亲和</p>
+<p> 所谓硬亲和 是指必须满足 亲和性 或 反亲和性的条件才可调度pod</p>
+</li>
+<li><p>软亲和</p>
+<p>所谓软亲和 是指”尽量”符合 亲和性 或 反亲和性的条件,如并没有符合条件的节点,则可以不按照条件调度</p>
+</li>
+</ul>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><h4 id="亲和性"><a href="#亲和性" class="headerlink" title="亲和性"></a>亲和性</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#硬亲和</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">myapp-with-pod-affinity</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="comment">#亲和性字段</span></span><br><span class="line">      <span class="attr">affinity:</span></span><br><span class="line">        <span class="comment">#指定为亲和性而非反亲和</span></span><br><span class="line">        <span class="attr">podAffinity:</span></span><br><span class="line">          <span class="comment">#指定为硬亲和</span></span><br><span class="line">          <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span></span><br><span class="line">            <span class="comment">#通过标签的K 区域界定 通常是规划好的 比如同一机房有同样标签视为同一个区域</span></span><br><span class="line">            <span class="comment">#如有两个区域 一个zone=one 一个zone=two 通过此字段界定了此集群有2个区域</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">topologyKey:</span> <span class="string">zone</span></span><br><span class="line">            <span class="comment">#以上用过zone划分区域 </span></span><br><span class="line">            <span class="comment">#一下确定需要调度到那个区域</span></span><br><span class="line">            <span class="comment">#通过pod标签确定此pod运行在哪个区域</span></span><br><span class="line">            <span class="comment">#亲和性就是要与此pod运行在同一个区域</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">labelSelector:</span></span><br><span class="line">                <span class="attr">matchExpressions:</span></span><br><span class="line">                  <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">                    <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">                    <span class="attr">values:</span></span><br><span class="line">                      <span class="bullet">-</span> <span class="string">&quot;db&quot;</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">          </span><br></pre></td></tr></table></figure>
+
+<h4 id="反亲和"><a href="#反亲和" class="headerlink" title="反亲和"></a>反亲和</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">myapp-with-pod-anti-affinity</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">affinity:</span></span><br><span class="line">        <span class="comment">#反亲和</span></span><br><span class="line">        <span class="attr">podAntiAffinity:</span></span><br><span class="line">          <span class="comment">#硬亲和</span></span><br><span class="line">          <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span></span><br><span class="line">            <span class="comment"># 这个标签是 K8S自带的标签用于记录主机名</span></span><br><span class="line">            <span class="comment"># 以主机名为区域界定</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">topologyKey:</span> <span class="string">kubernetes.io/hostname</span></span><br><span class="line">              <span class="attr">labelSelector:</span></span><br><span class="line">                <span class="comment">#这里写了当前pod自己的标签</span></span><br><span class="line">                <span class="comment">#而且使用了反亲和的硬亲和就是说 一定不允许此pod副本运行在同一节点</span></span><br><span class="line">                <span class="comment">#如果replicas 超过了亲和性或者反亲和的可调度数量时候 多余的pod 则会pending 因为这里使用了硬亲和</span></span><br><span class="line">                <span class="attr">matchExpressions:</span></span><br><span class="line">                  <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">                    <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">                    <span class="attr">values:</span></span><br><span class="line">                      <span class="bullet">-</span> <span class="string">&quot;myapp&quot;</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="软亲和示例"><a href="#软亲和示例" class="headerlink" title="软亲和示例"></a>软亲和示例</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">myapp-with-pod-anti-affinity</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">affinity:</span></span><br><span class="line">        <span class="attr">podAffinity:</span></span><br><span class="line">          <span class="comment">#软亲和</span></span><br><span class="line">          <span class="attr">preferredDuringSchedulingIgnoredDuringExecution:</span></span><br><span class="line">            <span class="comment">#多条件 条件之间是或关系 按照权重 满足其一即可</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">podAffinityTerm:</span></span><br><span class="line">                <span class="attr">topologyKey:</span> <span class="string">rack</span></span><br><span class="line">                <span class="attr">labelSelector:</span></span><br><span class="line">                  <span class="attr">matchExpressions:</span></span><br><span class="line">                    <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">                      <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">                      <span class="attr">values:</span></span><br><span class="line">                        <span class="bullet">-</span> <span class="string">&quot;db&quot;</span></span><br><span class="line">              <span class="comment">#权重 也可以理解为条件优先级</span></span><br><span class="line">              <span class="attr">weight:</span> <span class="number">80</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">podAffinityTerm:</span></span><br><span class="line">                <span class="attr">topologyKey:</span> <span class="string">zone</span></span><br><span class="line">                <span class="attr">labelSelector:</span></span><br><span class="line">                  <span class="attr">matchExpressions:</span></span><br><span class="line">                    <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">                      <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">                      <span class="attr">values:</span></span><br><span class="line">                        <span class="bullet">-</span> <span class="string">&quot;db&quot;</span></span><br><span class="line">              <span class="attr">weight:</span> <span class="number">20</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-ConfigMap"
   class="article article-type-post"
   itemscope
@@ -701,67 +771,13 @@
 </article>
 
     
-    <article
-  id="post-6-基于文件的动态实例发现"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
-    >6.基于文件的动态实例发现</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
   </nav>
   
 </section>
