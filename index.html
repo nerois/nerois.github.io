@@ -202,10 +202,10 @@
   <h1 id="1-安装kubernetes-插件"><a href="#1-安装kubernetes-插件" class="headerlink" title="1 安装kubernetes 插件"></a>1 安装kubernetes 插件</h1><ul>
 <li>这里不在概述  安装过程  和一些基本插件 如 <a target="_blank" rel="noopener" href="https://plugins.jenkins.io/localization-zh-cn">Localization: Chinese (Simplified)</a> 汉化插件  Pipeline插件 git 等</li>
 </ul>
-<h1 id="2-配置kubernetes-集群"><a href="#2-配置kubernetes-集群" class="headerlink" title="2 配置kubernetes 集群"></a>2 配置kubernetes 集群</h1><p>![image-20201118171607644](2 实现k8s动态生成slave POD/image-20201118171607644.png)</p>
-<p>![image-20201118171702624](2 实现k8s动态生成slave POD/image-20201118171702624.png)</p>
-<p>![image-20201118171822457](2 实现k8s动态生成slave POD/image-20201118171822457.png)</p>
-<p>![image-20201118172247287](2 实现k8s动态生成slave POD/image-20201118172247287.png)</p>
+<h1 id="2-配置kubernetes-集群"><a href="#2-配置kubernetes-集群" class="headerlink" title="2 配置kubernetes 集群"></a>2 配置kubernetes 集群</h1><p><img src="/.com//image-20201118171607644.png" alt="image-20201118171607644"></p>
+<p><img src="/.com//image-20201118171702624.png" alt="image-20201118171702624"></p>
+<p><img src="/.com//image-20201118171822457.png" alt="image-20201118171822457"></p>
+<p><img src="/.com//image-20201118172247287.png" alt="image-20201118172247287"></p>
 <h1 id="3-编写dockerfile-生成jenkins-slave的镜像"><a href="#3-编写dockerfile-生成jenkins-slave的镜像" class="headerlink" title="3 编写dockerfile 生成jenkins slave的镜像"></a>3 编写dockerfile 生成jenkins slave的镜像</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#下载slave包</span></span><br><span class="line">[jenkins_url]/jnlpJars/slave.jar</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#下载容器启动脚本</span></span><br><span class="line">wget https://raw.githubusercontent.com/jenkinsci/docker-inbound-agent/master/jenkins-agent</span><br></pre></td></tr></table></figure>
