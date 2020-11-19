@@ -108,6 +108,268 @@
     
     
     <article
+  id="post-FileBeat收集nginx日志"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/"
+    >FileBeat收集nginx日志</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/" class="article-date">
+  <time datetime="2020-11-20T06:24:23.000Z" itemprop="datePublished">2020-11-20</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/FileBeat7/">FileBeat7</a> / <a class="article-category-link" href="/categories/FileBeat7/ELK7/">ELK7</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="NGINX改为json格式日志"><a href="#NGINX改为json格式日志" class="headerlink" title="NGINX改为json格式日志"></a>NGINX改为json格式日志</h1><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">log_format</span> json <span class="string">&#x27;&#123;&quot;<span class="variable">@timestamp</span>&quot;:&quot;<span class="variable">$time_iso8601</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;<span class="variable">@version</span>&quot;:&quot;1&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;server_addr&quot;:&quot;<span class="variable">$server_addr</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;remote_addr&quot;:&quot;<span class="variable">$remote_addr</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;host&quot;:&quot;<span class="variable">$host</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;uri&quot;:&quot;<span class="variable">$uri</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;body_bytes_sent&quot;:<span class="variable">$body_bytes_sent</span>,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;bytes_sent&quot;:<span class="variable">$body_bytes_sent</span>,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;upstream_response_time&quot;:<span class="variable">$upstream_response_time</span>,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;request&quot;:&quot;<span class="variable">$request</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;request_length&quot;:<span class="variable">$request_length</span>,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;request_time&quot;:<span class="variable">$request_time</span>,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;status&quot;:&quot;<span class="variable">$status</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;http_referer&quot;:&quot;<span class="variable">$http_referer</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;http_x_forwarded_for&quot;:&quot;<span class="variable">$http_x_forwarded_for</span>&quot;,&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&quot;http_user_agent&quot;:&quot;<span class="variable">$http_user_agent</span>&quot;&#x27;</span></span><br><span class="line">            <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line"><span class="comment">#引用json格式日志</span></span><br><span class="line"><span class="attribute">access_log</span> /var/log/nginx/access.log json;</span><br><span class="line"><span class="comment">#配置错误日志</span></span><br><span class="line"><span class="attribute">error_log</span> /var/log/nginx/error.log;</span><br></pre></td></tr></table></figure>
+
+<p>FileBeat配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat.inputs:</span> </span><br><span class="line"><span class="bullet">-</span> <span class="attr">type:</span> <span class="string">log</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">/var/log/nginx/access.log</span></span><br><span class="line">  <span class="attr">json.keys_under_root:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">json.overwrite_keys:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">output.elasticsearch:</span></span><br><span class="line">  <span class="attr">hosts:</span> [<span class="string">&quot;192.168.1.61:9200&quot;</span>, <span class="string">&quot;192.168.1.62:9200&quot;</span>, <span class="string">&quot;192.168.1.63:9200&quot;</span>]</span><br><span class="line">  <span class="attr">index:</span> <span class="string">&quot;nginx-access-<span class="template-variable">%&#123;[agent.version]&#125;</span>-<span class="template-variable">%&#123;+yyyy.MM.dd&#125;</span>&quot;</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">setup.ilm.enabled:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">setup.template.name:</span> <span class="string">&quot;nginx&quot;</span></span><br><span class="line"><span class="attr">setup.template.pattern:</span> <span class="string">&quot;nginx-*&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="kibana简单使用视图统计"><a href="#kibana简单使用视图统计" class="headerlink" title="kibana简单使用视图统计"></a>kibana简单使用视图统计</h1><p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120015655939.png" alt="image-20201120015655939"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120015745522.png" alt="image-20201120015745522"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120020155816.png" alt="image-20201120020155816"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120020408130.png" alt="image-20201120020408130"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120020503524.png" alt="image-20201120020503524"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120020521241.png" alt="image-20201120020521241"></p>
+<p><img src="/2020/11/20/FileBeat%E6%94%B6%E9%9B%86nginx%E6%97%A5%E5%BF%97/image-20201120021559268.png" alt="image-20201120021559268"></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FileBeat7/" rel="tag">FileBeat7</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-FileBeat"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/19/FileBeat/"
+    >FileBeat部署以及配置</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/19/FileBeat/" class="article-date">
+  <time datetime="2020-11-19T06:24:23.000Z" itemprop="datePublished">2020-11-19</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/FileBeat7/">FileBeat7</a> / <a class="article-category-link" href="/categories/FileBeat7/ELK7/">ELK7</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><ul>
+<li>是一个轻量级的数据采集器</li>
+<li>通过监视你指定的文件路径收集并转发到 es, logstash,redis和kafka等</li>
+</ul>
+<h1 id="主要组件"><a href="#主要组件" class="headerlink" title="主要组件"></a>主要组件</h1><ul>
+<li>input(输入)     负责管理收割机在哪个路径找到文件</li>
+<li>harvester(收割机)     负责从单文件中逐行读取内容 并将内容发送到输出</li>
+</ul>
+<h1 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.1-x86_64.rpm</span><br><span class="line">yum install -y filebeat-7.4.1-x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置详解"><a href="#配置详解" class="headerlink" title="配置详解"></a>配置详解</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#=========================== Filebeat inputs =============================</span></span><br><span class="line"><span class="comment">#输入组件</span></span><br><span class="line">filebeat.inputs: </span><br><span class="line"><span class="comment">#定义输入类型 也就是从哪里得到数据 支持 log redis kafka 等</span></span><br><span class="line">- <span class="built_in">type</span>: <span class="built_in">log</span></span><br><span class="line">  <span class="comment"># 是否启用此inputs 默认true</span></span><br><span class="line">  enabled: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 从哪里读取日志 支持通配符</span></span><br><span class="line">  paths:</span><br><span class="line">    - /var/<span class="built_in">log</span>/*.<span class="built_in">log</span></span><br><span class="line">  <span class="comment">#默认是false，将会日志存储在messages字段 如果日志是json格式请改为true</span></span><br><span class="line">  json.keys_under_root: <span class="literal">true</span></span><br><span class="line">  <span class="comment">#覆盖默认的key 使用自定义json格式的key</span></span><br><span class="line">  json.overwrite_keys: <span class="literal">true</span></span><br><span class="line">  <span class="comment">#使用正则匹配日志行 被匹配到的行降被过滤不再上传</span></span><br><span class="line">  exclude_lines: [<span class="string">&#x27;^DBG&#x27;</span>]</span><br><span class="line">  <span class="comment">#使用正则匹配日志行 只保留被匹配到的行</span></span><br><span class="line">  include_lines: [<span class="string">&#x27;^ERR&#x27;</span>, <span class="string">&#x27;^WARN&#x27;</span>, <span class="string">&#x27;sshd&#x27;</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">#正则匹配排除文件</span></span><br><span class="line">  exclude_files: [<span class="string">&#x27;.gz$&#x27;</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment">### Multiline options</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Multiline can be used for log messages spanning multiple lines. This is common</span></span><br><span class="line">  <span class="comment"># for Java Stack Traces or C-Line Continuation</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># The regexp Pattern that has to be matched. The example pattern matches all lines starting with [</span></span><br><span class="line">  <span class="comment">#multiline.pattern: ^\[</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Defines if the pattern set under pattern should be negated or not. Default is false.</span></span><br><span class="line">  <span class="comment">#multiline.negate: false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Match can be set to &quot;after&quot; or &quot;before&quot;. It is used to define if lines should be append to a pattern</span></span><br><span class="line">  <span class="comment"># that was (not) matched before or after or as long as a pattern is not matched based on negate.</span></span><br><span class="line">  <span class="comment"># Note: After is the equivalent to previous and before is the equivalent to to next in Logstash</span></span><br><span class="line">  <span class="comment">#multiline.match: after</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#============================= Filebeat modules ===============================</span></span><br><span class="line"></span><br><span class="line">filebeat.config.modules:</span><br><span class="line">  <span class="comment"># Glob pattern for configuration loading</span></span><br><span class="line">  path: <span class="variable">$&#123;path.config&#125;</span>/modules.d/*.yml</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Set to true to enable config reloading</span></span><br><span class="line">  reload.enabled: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Period on which files under path should be checked for changes</span></span><br><span class="line">  <span class="comment">#reload.period: 10s</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#================================ General =====================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The name of the shipper that publishes the network data. It can be used to group</span></span><br><span class="line"><span class="comment"># all the transactions sent by a single shipper in the web interface.</span></span><br><span class="line"><span class="comment">#name:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The tags of the shipper are included in their own field with each</span></span><br><span class="line"><span class="comment"># transaction published.</span></span><br><span class="line"><span class="comment">#tags: [&quot;service-X&quot;, &quot;web-tier&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Optional fields that you can specify to add additional information to the</span></span><br><span class="line"><span class="comment"># output.</span></span><br><span class="line"><span class="comment">#fields:</span></span><br><span class="line"><span class="comment">#  env: staging</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#============================== Dashboards =====================================</span></span><br><span class="line"><span class="comment"># These settings control loading the sample dashboards to the Kibana index. Loading</span></span><br><span class="line"><span class="comment"># the dashboards is disabled by default and can be enabled either by setting the</span></span><br><span class="line"><span class="comment"># options here or by using the `setup` command.</span></span><br><span class="line"><span class="comment">#setup.dashboards.enabled: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The URL from where to download the dashboards archive. By default this URL</span></span><br><span class="line"><span class="comment"># has a value which is computed based on the Beat name and version. For released</span></span><br><span class="line"><span class="comment"># versions, this URL points to the dashboard archive on the artifacts.elastic.co</span></span><br><span class="line"><span class="comment"># website.</span></span><br><span class="line"><span class="comment">#setup.dashboards.url:</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#============================== Kibana =====================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.</span></span><br><span class="line"><span class="comment"># This requires a Kibana endpoint configuration.</span></span><br><span class="line">setup.kibana:</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Kibana Host</span></span><br><span class="line">  <span class="comment"># Scheme and port can be left out and will be set to the default (http and 5601)</span></span><br><span class="line">  <span class="comment"># In case you specify and additional path, the scheme is required: http://localhost:5601/path</span></span><br><span class="line">  <span class="comment"># IPv6 addresses should always be defined as: https://[2001:db8::1]:5601</span></span><br><span class="line">  <span class="comment">#host: &quot;localhost:5601&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Kibana Space ID</span></span><br><span class="line">  <span class="comment"># ID of the Kibana Space into which the dashboards should be loaded. By default,</span></span><br><span class="line">  <span class="comment"># the Default Space will be used.</span></span><br><span class="line">  <span class="comment">#space.id:</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#============================= Elastic Cloud ==================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># These settings simplify using Filebeat with the Elastic Cloud (https://cloud.elastic.co/).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The cloud.id setting overwrites the `output.elasticsearch.hosts` and</span></span><br><span class="line"><span class="comment"># `setup.kibana.host` options.</span></span><br><span class="line"><span class="comment"># You can find the `cloud.id` in the Elastic Cloud web UI.</span></span><br><span class="line"><span class="comment">#cloud.id:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The cloud.auth setting overwrites the `output.elasticsearch.username` and</span></span><br><span class="line"><span class="comment"># `output.elasticsearch.password` settings. The format is `&lt;user&gt;:&lt;pass&gt;`.</span></span><br><span class="line"><span class="comment">#cloud.auth:</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#================================ Outputs =====================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Configure what output to use when sending the data collected by the beat.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#-------------------------- Elasticsearch output ------------------------------</span></span><br><span class="line">output.elasticsearch:</span><br><span class="line">  <span class="comment"># es列表</span></span><br><span class="line">  hosts: [<span class="string">&quot;192.168.1.61:9200&quot;</span>, <span class="string">&quot;192.168.1.62:9200&quot;</span>, <span class="string">&quot;192.168.1.63:9200&quot;</span>]</span><br><span class="line">  <span class="comment">#定义索引名称 </span></span><br><span class="line">  index: <span class="string">&quot;system-%&#123;[agent.version]&#125;-%&#123;+yyyy.MM.dd&#125;&quot;</span></span><br><span class="line">  <span class="comment">#协议</span></span><br><span class="line">  <span class="comment">#protocol: &quot;https&quot;</span></span><br><span class="line">  <span class="comment">#用户密码</span></span><br><span class="line">  <span class="comment">#username: &quot;elastic&quot;</span></span><br><span class="line">  <span class="comment">#password: &quot;changeme&quot;</span></span><br><span class="line"><span class="comment">#==================== Elasticsearch template setting ==========================</span></span><br><span class="line"><span class="comment">#索引生命周期ilm功能 默认开启 开启后索引名称将不能自定义</span></span><br><span class="line">setup.ilm.enabled: <span class="literal">false</span> </span><br><span class="line"><span class="comment">#定义模板名称</span></span><br><span class="line">setup.template.name: <span class="string">&quot;system&quot;</span></span><br><span class="line"><span class="comment">#使用统配匹配索引名称 如果匹配将使用此模板</span></span><br><span class="line">setup.template.pattern: <span class="string">&quot;system*&quot;</span></span><br><span class="line"><span class="comment">#模板相关设置   这里不推荐在这里修改shard数量以及副本数量 后面会说另一种方法</span></span><br><span class="line">setup.template.settings:</span><br><span class="line">  <span class="comment">#shard数量</span></span><br><span class="line">  index.number_of_shards: 3</span><br><span class="line">  <span class="comment">#副本数量</span></span><br><span class="line">  index.number_of_replicas: 1</span><br><span class="line">  <span class="comment">#index.codec: best_compression</span></span><br><span class="line">  <span class="comment">#_source.enabled: false</span></span><br><span class="line"><span class="comment">#----------------------------- Logstash output --------------------------------</span></span><br><span class="line"><span class="comment">#output.logstash:</span></span><br><span class="line">  <span class="comment"># The Logstash hosts</span></span><br><span class="line">  <span class="comment">#hosts: [&quot;localhost:5044&quot;]</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Optional SSL. By default is off.</span></span><br><span class="line">  <span class="comment"># List of root certificates for HTTPS server verifications</span></span><br><span class="line">  <span class="comment">#ssl.certificate_authorities: [&quot;/etc/pki/root/ca.pem&quot;]</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Certificate for SSL client authentication</span></span><br><span class="line">  <span class="comment">#ssl.certificate: &quot;/etc/pki/client/cert.pem&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Client Certificate Key</span></span><br><span class="line">  <span class="comment">#ssl.key: &quot;/etc/pki/client/cert.key&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#================================ Processors =====================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Configure processors to enhance or manipulate events generated by the beat.</span></span><br><span class="line"></span><br><span class="line">processors:</span><br><span class="line">  - add_host_metadata: ~</span><br><span class="line">  - add_cloud_metadata: ~</span><br><span class="line"></span><br><span class="line"><span class="comment">#================================ Logging =====================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Sets log level. The default log level is info.</span></span><br><span class="line"><span class="comment"># Available log levels are: error, warning, info, debug</span></span><br><span class="line"><span class="comment">#logging.level: debug</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># At debug level, you can selectively enable logging only for some components.</span></span><br><span class="line"><span class="comment"># To enable all selectors use [&quot;*&quot;]. Examples of other selectors are &quot;beat&quot;,</span></span><br><span class="line"><span class="comment"># &quot;publish&quot;, &quot;service&quot;.</span></span><br><span class="line"><span class="comment">#logging.selectors: [&quot;*&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#============================== X-Pack Monitoring ===============================</span></span><br><span class="line"><span class="comment"># filebeat can export internal metrics to a central Elasticsearch monitoring</span></span><br><span class="line"><span class="comment"># cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The</span></span><br><span class="line"><span class="comment"># reporting is disabled by default.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set to true to enable the monitoring reporter.</span></span><br><span class="line"><span class="comment">#monitoring.enabled: false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Sets the UUID of the Elasticsearch cluster under which monitoring data for this</span></span><br><span class="line"><span class="comment"># Filebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch</span></span><br><span class="line"><span class="comment"># is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.</span></span><br><span class="line"><span class="comment">#monitoring.cluster_uuid:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Uncomment to send the metrics to Elasticsearch. Most settings from the</span></span><br><span class="line"><span class="comment"># Elasticsearch output are accepted here as well.</span></span><br><span class="line"><span class="comment"># Note that the settings should point to your Elasticsearch *monitoring* cluster.</span></span><br><span class="line"><span class="comment"># Any setting that is not set is automatically inherited from the Elasticsearch</span></span><br><span class="line"><span class="comment"># output configuration, so if you have the Elasticsearch output configured such</span></span><br><span class="line"><span class="comment"># that it is pointing to your Elasticsearch monitoring cluster, you can simply</span></span><br><span class="line"><span class="comment"># uncomment the following line.</span></span><br><span class="line"><span class="comment">#monitoring.elasticsearch:</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="收集系统日志并修改分片数量"><a href="#收集系统日志并修改分片数量" class="headerlink" title="收集系统日志并修改分片数量"></a>收集系统日志并修改分片数量</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">filebeat.inputs: </span><br><span class="line">- <span class="built_in">type</span>: <span class="built_in">log</span></span><br><span class="line">  paths:</span><br><span class="line">  - /var/<span class="built_in">log</span>/messages</span><br><span class="line">  </span><br><span class="line">output.elasticsearch:</span><br><span class="line">  hosts: [<span class="string">&quot;192.168.1.61:9200&quot;</span>, <span class="string">&quot;192.168.1.62:9200&quot;</span>, <span class="string">&quot;192.168.1.63:9200&quot;</span>]</span><br><span class="line">  index: <span class="string">&quot;system-%&#123;[agent.version]&#125;-%&#123;+yyyy.MM.dd&#125;&quot;</span></span><br><span class="line">  </span><br><span class="line">setup.ilm.enabled: <span class="literal">false</span></span><br><span class="line">setup.template.name: <span class="string">&quot;system&quot;</span></span><br><span class="line">setup.template.pattern: <span class="string">&quot;system-*&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 命令行启动 测试</span></span><br><span class="line">filebeat -e -c /etc/filebeat/filebeat.yml</span><br><span class="line"><span class="comment">#生成日志 </span></span><br><span class="line"><span class="built_in">echo</span> 123 &gt;&gt; /var/<span class="built_in">log</span>/messages</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看监控页面"><a href="#查看监控页面" class="headerlink" title="查看监控页面"></a>查看监控页面</h2><p><img src="/2020/11/19/FileBeat/image-20201120004007030.png" alt="image-20201120004007030"></p>
+<p>以上可以看到只有一个主分片 和一个副本分片</p>
+<h2 id="修改分片以及副本数量"><a href="#修改分片以及副本数量" class="headerlink" title="修改分片以及副本数量"></a>修改分片以及副本数量</h2><p><img src="/2020/11/19/FileBeat/image-20201120004221130.png" alt="image-20201120004221130"></p>
+<p><img src="/2020/11/19/FileBeat/image-20201120004331923.png" alt="image-20201120004331923"></p>
+<p><img src="/2020/11/19/FileBeat/image-20201120004625149.png" alt="image-20201120004625149"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;number_of_shards&quot;: &quot;3&quot;,</span><br><span class="line">&quot;number_of_replicas&quot;: &quot;1&quot;,</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/11/19/FileBeat/image-20201120004858732.png" alt="image-20201120004858732"></p>
+<p><img src="/2020/11/19/FileBeat/image-20201120005031802.png" alt="image-20201120005031802"></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FileBeat7/" rel="tag">FileBeat7</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-1ES7部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/"
+    >1ES7部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2020-11-19T02:24:23.000Z" itemprop="datePublished">2020-11-19</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/ELK7/">ELK7</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="规划"><a href="#规划" class="headerlink" title="规划"></a>规划</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#es节点 版本7.4.1</span></span><br><span class="line">ip           hostname       es_nodename</span><br><span class="line">192.168.1.61 es1.sp.com     es1</span><br><span class="line">192.168.1.62 es2.sp.com     es2</span><br><span class="line">192.168.1.63 es3.sp.com     es3</span><br></pre></td></tr></table></figure>
+
+<h1 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#所有es节点</span></span><br><span class="line">wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.4.1-x86_64.rpm</span><br><span class="line">yum install -y elasticsearch-7.4.1-x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#配置文件/etc/elasticsearch/elasticsearch.yml  </span></span><br><span class="line">cluster.name: ES <span class="comment">#定义集群名称 所有节点必须一致</span></span><br><span class="line">node.name: es1  <span class="comment">#定义节点名称 需要保证集群内的唯一性 与主机名称一致方便管理</span></span><br><span class="line">path.data: /data/es_data <span class="comment">#数据存储路径</span></span><br><span class="line">path.logs: /data/es_data/<span class="built_in">log</span> <span class="comment">#日志存储路径</span></span><br><span class="line">bootstrap.memory_lock: <span class="literal">true</span> <span class="comment">#只是用内存 从不使用swap 生成中建议开启 否则性能可能会变差</span></span><br><span class="line">network.host: 0.0.0.0 <span class="comment">#监听地址</span></span><br><span class="line">http.port: 9200 <span class="comment">#外部访问端口</span></span><br><span class="line">discovery.seed_hosts: [<span class="string">&quot;es1&quot;</span>, <span class="string">&quot;es2&quot;</span>, <span class="string">&quot;es3&quot;</span>] <span class="comment">#定义集群发现 也就是 集群成员 主要这里是主机名并且可以正确解析,不是nodename 也可以是ip</span></span><br><span class="line">cluster.initial_master_nodes: [<span class="string">&quot;es1&quot;</span>, <span class="string">&quot;es2&quot;</span>, <span class="string">&quot;es3&quot;</span>] <span class="comment">#选举 也就是定义 谁可以作为master 是主机名或ip</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#修改好配置文件分发到各个节点 修改 node.name: 为各节点自己的名称</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#额外补充几个配置 不常用 但需要知道</span></span><br><span class="line">node.master: <span class="literal">true</span> <span class="comment">#是否可以参与选举为master 默认true </span></span><br><span class="line">node.data: <span class="literal">true</span> <span class="comment">#是否成为data节点 也就是此节点是否存储数据 默认为true</span></span><br><span class="line">				<span class="comment">#能够存储数据的节点称为data节点</span></span><br><span class="line">				<span class="comment">#问题  如果 node.master: false  node.data: false  那要这个节点有什么作用呢?</span></span><br><span class="line">				<span class="comment">#答: 集群不只有 master  data 两种角色 还有一种角色是 coordinating来负责接受请求 </span></span><br><span class="line">				<span class="comment">#实际上就是转发路由到master节点来处理   而且coordinating角色不能取消 </span></span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line">				</span><br><span class="line"><span class="comment">#所有节点创建并授权 数据目录 和日志目录</span></span><br><span class="line">mkdir /data/es_data/<span class="built_in">log</span> -p</span><br><span class="line">chown -R elasticsearch.elasticsearch /data/es_data</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#配置内存相关 /etc/elasticsearch/elasticsearch.yml</span></span><br><span class="line">-Xms1g 改为 -Xms4g  <span class="comment">#配置最小内存  </span></span><br><span class="line">-Xmx1g 改为 -Xmx4g  <span class="comment">#配置最大内存   不能超过32g   根据情况自己定义 通常是全部内存的一半或者三分之2</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="启动和验证"><a href="#启动和验证" class="headerlink" title="启动和验证"></a>启动和验证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#所有节点验证端口监听情况 </span></span><br><span class="line">╰─➤  ss -tnl |grep -E <span class="string">&#x27;9200|9300&#x27;</span></span><br><span class="line">LISTEN     0      128       [::]:9200                  [::]:* </span><br><span class="line">LISTEN     0      128       [::]:9300                  [::]:* </span><br><span class="line"><span class="comment">#使用curl验证节点是否在同一集群</span></span><br><span class="line">╰─➤  curl es1:9200 </span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span> : <span class="string">&quot;es1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;cluster_name&quot;</span> : <span class="string">&quot;ES&quot;</span>,</span><br><span class="line">  <span class="string">&quot;cluster_uuid&quot;</span> : <span class="string">&quot;cPswZ2euR8uP849QbVoVEQ&quot;</span>, <span class="comment">#查看所有节点的集群id是否一致</span></span><br><span class="line">  <span class="string">&quot;version&quot;</span> : &#123;</span><br><span class="line">    <span class="string">&quot;number&quot;</span> : <span class="string">&quot;7.4.1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;build_flavor&quot;</span> : <span class="string">&quot;default&quot;</span>,</span><br><span class="line">    <span class="string">&quot;build_type&quot;</span> : <span class="string">&quot;rpm&quot;</span>,</span><br><span class="line">    <span class="string">&quot;build_hash&quot;</span> : <span class="string">&quot;fc0eeb6e2c25915d63d871d344e3d0b45ea0ea1e&quot;</span>,</span><br><span class="line">    <span class="string">&quot;build_date&quot;</span> : <span class="string">&quot;2019-10-22T17:16:35.176724Z&quot;</span>,</span><br><span class="line">    <span class="string">&quot;build_snapshot&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">    <span class="string">&quot;lucene_version&quot;</span> : <span class="string">&quot;8.2.0&quot;</span>,</span><br><span class="line">    <span class="string">&quot;minimum_wire_compatibility_version&quot;</span> : <span class="string">&quot;6.8.0&quot;</span>,</span><br><span class="line">    <span class="string">&quot;minimum_index_compatibility_version&quot;</span> : <span class="string">&quot;6.0.0-beta1&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">&quot;tagline&quot;</span> : <span class="string">&quot;You Know, for Search&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#curl命令查看所有节点健康度</span></span><br><span class="line">╰─➤  curl <span class="string">&#x27;es1:9200/_cluster/health?pretty&#x27;</span>       </span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;cluster_name&quot;</span> : <span class="string">&quot;ES&quot;</span>, <span class="comment">#集群名称</span></span><br><span class="line">  <span class="string">&quot;status&quot;</span> : <span class="string">&quot;green&quot;</span>,  <span class="comment">#green 代表健康 </span></span><br><span class="line">  <span class="string">&quot;timed_out&quot;</span> : <span class="literal">false</span>, <span class="comment">#是否超时</span></span><br><span class="line">  <span class="string">&quot;number_of_nodes&quot;</span> : 3, <span class="comment">#节点数量</span></span><br><span class="line">  <span class="string">&quot;number_of_data_nodes&quot;</span> : 3,</span><br><span class="line">  <span class="string">&quot;active_primary_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;active_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;relocating_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;initializing_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;unassigned_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;delayed_unassigned_shards&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;number_of_pending_tasks&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;number_of_in_flight_fetch&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;task_max_waiting_in_queue_millis&quot;</span> : 0,</span><br><span class="line">  <span class="string">&quot;active_shards_percent_as_number&quot;</span> : 100.0</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#kibana console 命令查看集群健康情况</span></span><br><span class="line">GET /_cluster_health</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="cerebor-监控ES"><a href="#cerebor-监控ES" class="headerlink" title="cerebor  监控ES"></a>cerebor  监控ES</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#是一款ES集群的监控软件</span></span><br><span class="line"><span class="comment">#下载 任意节点安装</span></span><br><span class="line">wget https://github.com/lmenezes/cerebro/releases/download/v0.8.5/cerebro-0.8.5-1.noarch.rpm</span><br><span class="line">yum install -y cerebro-0.8.5-1.noarch.rpm</span><br><span class="line">yum install -y java-1.8.0-openjdk</span><br><span class="line"></span><br><span class="line"><span class="comment">#修改配置 /etc/cerebro/application.conf </span></span><br><span class="line">data.path = <span class="string">&quot;/data/cerebro/cerebro.db&quot;</span> <span class="comment">#数据路径 </span></span><br><span class="line"><span class="comment">#创建数据路径并授权</span></span><br><span class="line">mkdir -p /data/cerebro</span><br><span class="line">chown -R cerebro.cerebro /data/cerebro</span><br><span class="line"></span><br><span class="line"><span class="comment">#启动服务</span></span><br><span class="line">systemctl start cerebro.service &amp;&amp; systemctl <span class="built_in">enable</span> cerebro</span><br><span class="line"></span><br><span class="line"><span class="comment">#验证端口 </span></span><br><span class="line">╰─➤  ss -tnl |grep 9000</span><br><span class="line">LISTEN     0      100       [::]:9000                  [::]:*</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="cerebor-初识"><a href="#cerebor-初识" class="headerlink" title="cerebor 初识"></a>cerebor 初识</h1><p>浏览器访问<a target="_blank" rel="noopener" href="http://es1.sp.com:9000/">http://es1.sp.com:9000/</a></p>
+<p><img src="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/image-20201119170314763.png" alt="image-20201119170314763"></p>
+<p><img src="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/image-20201119171008449.png" alt="image-20201119171008449"></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-kibana安装"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/19/kibana%E5%AE%89%E8%A3%85/"
+    >kibana安装</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/19/kibana%E5%AE%89%E8%A3%85/" class="article-date">
+  <time datetime="2020-11-19T02:24:23.000Z" itemprop="datePublished">2020-11-19</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/ELK7/">ELK7</a> / <a class="article-category-link" href="/categories/ELK7/kibana7/">kibana7</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="kibana安装"><a href="#kibana安装" class="headerlink" title="kibana安装"></a>kibana安装</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://artifacts.elastic.co/downloads/kibana/kibana-7.4.1-x86_64.rpm</span><br><span class="line">yum install -y kibana-7.4.1-x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601 <span class="comment">#端口</span></span><br><span class="line">server.host: <span class="string">&quot;0.0.0.0&quot;</span>  <span class="comment">#监听地址</span></span><br><span class="line">server.name: <span class="string">&quot;nidelaofuqin&quot;</span> <span class="comment">#自定义名称</span></span><br><span class="line">elasticsearch.hosts: [<span class="string">&quot;http://localhost:9200&quot;</span>] <span class="comment">#es列表</span></span><br><span class="line">kibana.index: <span class="string">&quot;.kibana&quot;</span> <span class="comment">#kibana自动生成的索引名称  .开头视为隐藏</span></span><br><span class="line">kibana.defaultAppId: <span class="string">&quot;home&quot;</span> <span class="comment">#默认应用程序</span></span><br><span class="line">i18n.locale: <span class="string">&quot;zh-CN&quot;</span> <span class="comment">#设置中文</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> kibana.service &amp;&amp;systemctl start kibana.service </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kibana7/" rel="tag">kibana7</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-1 k8s 部署jenkins"
   class="article article-type-post"
   itemscope
@@ -500,246 +762,6 @@
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-1-指标类型"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
-    >1.指标类型</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-10-alertmanager部署"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
-    >10.alertmanager部署</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-2-作业和实例"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
-    >2.作业和实例</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
-<li><p>实例</p>
-<p>   可以抓取的目标称为实例（Instances）</p>
-</li>
-<li><p>作业</p>
-<p>具有相同目标的实例集合称为作业（Job）</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-11-告警规则与告警"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/"
-    >11.告警规则与告警</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="告警规则"><a href="#告警规则" class="headerlink" title="告警规则"></a>告警规则</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##prometheus.yml </span></span><br><span class="line"><span class="comment">#配置加载的文件  这个文件只要主配置中存在 就会定期去加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - <span class="string">&quot;rules/*.yml&quot;</span></span><br><span class="line"><span class="comment">##rules/node.yml 编写告警规则</span></span><br><span class="line">groups:</span><br><span class="line"><span class="comment"># 报警规则组名称</span></span><br><span class="line">- name: example   </span><br><span class="line">  rules:</span><br><span class="line">  <span class="comment">#规则名称</span></span><br><span class="line">  - alert: InstanceDown</span><br><span class="line">    <span class="comment">#指标阀值表达式</span></span><br><span class="line">    expr: up == 0</span><br><span class="line">    <span class="comment">#持续时间 ， 表示连续触发阀值达5分钟才触发报警</span></span><br><span class="line">    <span class="keyword">for</span>: 5m </span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment"># 自定义标签</span></span><br><span class="line">      severity: page</span><br><span class="line">    <span class="comment">#消息体</span></span><br><span class="line">    annotations:</span><br><span class="line">      <span class="comment"># 自定义摘要&#123;&#123; $labels.instance &#125;&#125; 是引用指标标签instance的值</span></span><br><span class="line">      summary: <span class="string">&quot;Instance &#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; down&quot;</span></span><br><span class="line">      <span class="comment"># 自定义具体描述 &#123;&#123; $labels.job &#125;&#125; 表示引用指标标签job的值</span></span><br><span class="line">      description: <span class="string">&quot;&#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; of job &#123;&#123; <span class="variable">$labels</span>.job &#125;&#125; has been down for more than 5 minutes.&quot;</span> </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="告警状态"><a href="#告警状态" class="headerlink" title="告警状态"></a>告警状态</h2><p>在prometheus 的web页面  alerts选项中可以常看状态</p>
-<p>⦁    Inactive：这里什么都没有发生。<br>⦁    Pending：已触发阈值，但未满足告警持续时间（即rule中的for字段）<br>⦁    Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，经过处理，发送给接受者。</p>
-<h2 id="用过标签分类告警以及分组告警"><a href="#用过标签分类告警以及分组告警" class="headerlink" title="用过标签分类告警以及分组告警"></a>用过标签分类告警以及分组告警</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">route:</span><br><span class="line">  <span class="comment">#通过标签进行分组 标签K/V结构 ,当K的值相等的时候将划分为一组一并发出</span></span><br><span class="line">  <span class="comment">#alertname是默认标签,表示告警名称</span></span><br><span class="line">  group_by: [cluster, alertname]</span><br><span class="line">  <span class="comment"># 告警等待时间 如果等待过程又收到告警并且属同一组将一并发出</span></span><br><span class="line">  group_wait: 10s</span><br><span class="line">  <span class="comment"># 告警间隔 如告警后又出现告警将判断间隔时间延迟发出</span></span><br><span class="line">  group_interval: 10s</span><br><span class="line">  <span class="comment"># 重复告警周期 同一个告警最少间隔时间 </span></span><br><span class="line">  repeat_interval: 20m</span><br><span class="line"><span class="comment"># 标签不匹配的告警都将保留在根节点，并发送到“default-receiver”</span></span><br><span class="line">  receiver: <span class="string">&#x27;default-receiver&#x27;</span> </span><br><span class="line">  routes: <span class="comment">#路由匹配标签来决定将告警发送到那个接收器上 接收器执行发送告警</span></span><br><span class="line"><span class="comment"># 标签service=mysql或者service=cassandra的告警分配到数据库接收端</span></span><br><span class="line">  - receiver: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">    group_wait: 10s</span><br><span class="line">    <span class="comment">#正则匹配标签</span></span><br><span class="line">    match_re:</span><br><span class="line">      service: mysql|cassandra</span><br><span class="line"><span class="comment"># 标签team=frontend的告警都与此子路由匹配</span></span><br><span class="line">  - receiver: <span class="string">&#x27;frontend-pager&#x27;</span></span><br><span class="line">    group_by: [product, environment]</span><br><span class="line">    <span class="comment">#精确匹配标签</span></span><br><span class="line">    match:</span><br><span class="line">      team: frontend </span><br><span class="line"><span class="comment">#定义接收器名称以及发送告警方式</span></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: <span class="string">&#x27;http://127.0.0.1:5001/&#x27;</span></span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">    - to: <span class="string">&#x27;******@163.com&#x27;</span> </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
 
     </footer>
   </div>
