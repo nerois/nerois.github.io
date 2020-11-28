@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    kibana安装 |  Nero 的个人博客
+    filebeat-module |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-kibana安装"
+  id="post-filebeat-module"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  kibana安装
+  filebeat-module
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/19/kibana%E5%AE%89%E8%A3%85/" class="article-date">
+      <a href="/2020/11/19/filebeat-module/" class="article-date">
   <time datetime="2020-11-19T02:24:23.000Z" itemprop="datePublished">2020-11-19</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/ELK7/">ELK7</a> / <a class="article-category-link" href="/categories/ELK7/kibana7/">kibana7</a>
+    <a class="article-category-link" href="/categories/ELK7/">ELK7</a>
   </div>
  
     </div>
@@ -84,9 +84,15 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="kibana安装"><a href="#kibana安装" class="headerlink" title="kibana安装"></a>kibana安装</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://artifacts.elastic.co/downloads/kibana/kibana-7.4.1-x86_64.rpm</span><br><span class="line">yum install -y kibana-7.4.1-x86_64.rpm</span><br></pre></td></tr></table></figure>
+  <h1 id="filebeat-module"><a href="#filebeat-module" class="headerlink" title="filebeat module"></a>filebeat module</h1><p>这个功能 类似 logstash的pattern  主要是把非结构化的日志 转换成结构化的日志</p>
+<p>官方文档: <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html">https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html</a></p>
+<h1 id="nginx-示例"><a href="#nginx-示例" class="headerlink" title="nginx 示例"></a>nginx 示例</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#filebeat 配置文件 </span></span><br><span class="line">filebeat.config.modules:</span><br><span class="line">  <span class="comment">#指定module文件</span></span><br><span class="line">  path: <span class="variable">$&#123;path.config&#125;</span>/modules.d/*.yml</span><br><span class="line">  reload.enabled: <span class="literal">false</span></span><br><span class="line">setup.kibana:</span><br><span class="line">  <span class="comment">#指定kibana地址和端口</span></span><br><span class="line">  host: <span class="string">&quot;192.168.1.62:5601&quot;</span></span><br><span class="line">output.elasticsearch:</span><br><span class="line">  hosts: [<span class="string">&quot;192.168.1.61:9200&quot;</span>, <span class="string">&quot;192.168.1.62:9200&quot;</span>, <span class="string">&quot;192.168.1.63:9200&quot;</span>]</span><br></pre></td></tr></table></figure>
 
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601 <span class="comment">#端口</span></span><br><span class="line">server.host: <span class="string">&quot;0.0.0.0&quot;</span>  <span class="comment">#监听地址</span></span><br><span class="line">server.name: <span class="string">&quot;nidelaofuqin&quot;</span> <span class="comment">#自定义名称</span></span><br><span class="line">elasticsearch.hosts: [<span class="string">&quot;http://localhost:9200&quot;</span>] <span class="comment">#es列表</span></span><br><span class="line">kibana.index: <span class="string">&quot;.kibana&quot;</span> <span class="comment">#kibana自动生成的索引名称  .开头视为隐藏</span></span><br><span class="line">elasticsearch.shardTimeout: 30000 <span class="comment">#去es获取数据的超时时间单位毫秒 生产者规模比较大是时候 建议60000-90000</span></span><br><span class="line">kibana.defaultAppId: <span class="string">&quot;home&quot;</span> <span class="comment">#默认应用程序</span></span><br><span class="line">i18n.locale: <span class="string">&quot;zh-CN&quot;</span> <span class="comment">#设置中文</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> kibana.service &amp;&amp;systemctl start kibana.service </span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看module 状态列表</span></span><br><span class="line">filebeat modules list</span><br><span class="line"><span class="comment"># 开启module 实际上就是在 module目录中的配置文件重命名</span></span><br><span class="line">filebeat modules <span class="built_in">enable</span> nginx</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置模块配置文件/etc/filebeat/modules.d/nginx.yml</span></span><br><span class="line">- module: nginx</span><br><span class="line">  <span class="comment"># Access logs</span></span><br><span class="line">  access:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line">    var.paths: [<span class="string">&quot;/usr/local/nginx/logs/access.log&quot;</span>]</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Error logs</span></span><br><span class="line">  error:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line">    var.paths: [<span class="string">&quot;/usr/local/nginx/logs/error.log&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#初始化 会导入kibana一些图形 和 仪表盘</span></span><br><span class="line">filebeat setup -e</span><br><span class="line"><span class="comment">#启动服务</span></span><br><span class="line">systemctl start filebeat  </span><br><span class="line"><span class="comment">#此时es应该有 filebeat 开头的索引 </span></span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -98,7 +104,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kibana7/" rel="tag">kibana7</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FileBeat7/" rel="tag">FileBeat7</a></li></ul>
 
     </footer>
   </div>
@@ -106,19 +112,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2020/11/19/kibana%E5%AE%89%E8%A3%85/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            1ES7部署
+            kibana安装
           
         </div>
       </a>
     
     
-      <a href="/2020/11/19/filebeat-module/" class="article-nav-link">
+      <a href="/2020/11/19/kafka-zookeeper/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">filebeat-module</div>
+        <div class="article-nav-title">kafka-zookeeper</div>
       </a>
     
   </nav>

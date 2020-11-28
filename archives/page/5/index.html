@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    kibana安装 |  Nero 的个人博客
+    归档 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -48,133 +48,56 @@
       
     <main class="content on">
       <section class="outer">
-  <article
-  id="post-kibana安装"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
+  
+  <article class="articles">
     
-    <header class="article-header">
+    
+    <h1 class="page-type-title">归档</h1>
+    
+    
+  
+  
+  
+  
+  
+  
+  <div class="archives-wrap">
+    <div class="archive-year-wrap">
+      <a href="/archives/2017" class="archive-year">2017</a>
+    </div>
+    <div class="archives">
+      
+      <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2017/05/26/9.1%20dashboard/" class="archive-article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">05/26</time>
+</a>
        
-<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  kibana安装
-</h1>
+<h2 itemprop="name">
+  <a class="archive-article-title" href="/2017/05/26/9.1%20dashboard/"
+    >9.1dashboard</a> 
+</h2>
  
 
     </header>
-     
-    <div class="article-meta">
-      <a href="/2020/11/19/kibana%E5%AE%89%E8%A3%85/" class="article-date">
-  <time datetime="2020-11-19T02:24:23.000Z" itemprop="datePublished">2020-11-19</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ELK7/">ELK7</a> / <a class="article-category-link" href="/categories/ELK7/kibana7/">kibana7</a>
+    
+    
   </div>
- 
-    </div>
+</article>
       
-    <div class="tocbot"></div>
-
-
-
+      
+    </div>
+  </div>
+  
+  
 
   
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="kibana安装"><a href="#kibana安装" class="headerlink" title="kibana安装"></a>kibana安装</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://artifacts.elastic.co/downloads/kibana/kibana-7.4.1-x86_64.rpm</span><br><span class="line">yum install -y kibana-7.4.1-x86_64.rpm</span><br></pre></td></tr></table></figure>
-
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601 <span class="comment">#端口</span></span><br><span class="line">server.host: <span class="string">&quot;0.0.0.0&quot;</span>  <span class="comment">#监听地址</span></span><br><span class="line">server.name: <span class="string">&quot;nidelaofuqin&quot;</span> <span class="comment">#自定义名称</span></span><br><span class="line">elasticsearch.hosts: [<span class="string">&quot;http://localhost:9200&quot;</span>] <span class="comment">#es列表</span></span><br><span class="line">kibana.index: <span class="string">&quot;.kibana&quot;</span> <span class="comment">#kibana自动生成的索引名称  .开头视为隐藏</span></span><br><span class="line">elasticsearch.shardTimeout: 30000 <span class="comment">#去es获取数据的超时时间单位毫秒 生产者规模比较大是时候 建议60000-90000</span></span><br><span class="line">kibana.defaultAppId: <span class="string">&quot;home&quot;</span> <span class="comment">#默认应用程序</span></span><br><span class="line">i18n.locale: <span class="string">&quot;zh-CN&quot;</span> <span class="comment">#设置中文</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> kibana.service &amp;&amp;systemctl start kibana.service </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
+  <nav class="page-nav">
     
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kibana7/" rel="tag">kibana7</a></li></ul>
-
-    </footer>
-  </div>
-
-   
-  <nav class="article-nav">
-    
-      <a href="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            1ES7部署
-          
-        </div>
-      </a>
-    
-    
-      <a href="/2020/11/19/filebeat-module/" class="article-nav-link">
-        <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">filebeat-module</div>
-      </a>
-    
+    <a class="extend prev" rel="prev" href="/archives/page/4/">上一页</a><a class="page-number" href="/archives/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/3/">3</a><a class="page-number" href="/archives/page/4/">4</a><span class="page-number current">5</span>
   </nav>
-
-   
-<!-- valine评论 -->
-<div id="vcomments-box">
-  <div id="vcomments"></div>
-</div>
-<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#vcomments",
-    app_id: "",
-    app_key: "",
-    path: window.location.pathname,
-    avatar: "monsterid",
-    placeholder: "给我的文章加点评论吧~",
-    recordIP: true,
-  });
-  const infoEle = document.querySelector("#vcomments .info");
-  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
-    infoEle.childNodes.forEach(function (item) {
-      item.parentNode.removeChild(item);
-    });
-  }
-</script>
-<style>
-  #vcomments-box {
-    padding: 5px 30px;
-  }
-
-  @media screen and (max-width: 800px) {
-    #vcomments-box {
-      padding: 5px 0px;
-    }
-  }
-
-  #vcomments-box #vcomments {
-    background-color: #fff;
-  }
-
-  .v .vlist .vcard .vh {
-    padding-right: 20px;
-  }
-
-  .v .vlist .vcard {
-    padding-left: 10px;
-  }
-</style>
-
- 
-     
-</article>
-
+  
 </section>
       <footer class="footer">
   <div class="outer">
@@ -297,23 +220,6 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
-
-
-<script src="/js/tocbot.min.js"></script>
-
-<script>
-  tocbot.init({
-    tocSelector: '.tocbot',
-    contentSelector: '.article-entry',
-    headingSelector: 'h1, h2, h3, h4, h5, h6',
-    hasInnerContainers: true,
-    scrollSmooth: true,
-    scrollContainer: 'main',
-    positionFixedSelector: '.tocbot',
-    positionFixedClass: 'is-position-fixed',
-    fixedSidebarOffset: 'auto'
-  });
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">

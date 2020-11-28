@@ -108,6 +108,252 @@
     
     
     <article
+  id="post-6-基于文件的动态实例发现"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
+    >6.基于文件的动态实例发现</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-7-常用函数"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/"
+    >7.常用函数</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><ul>
+<li>rate()<ul>
+<li>函数计算某个时间序列范围内的每秒平均增长率。适合缓慢变化的计数器（counter）</li>
+</ul>
+</li>
+</ul>
+<p>这是一个非常重要的函数，专门配合counter类型数据，取counter在这个时间段中的平均每秒增量。比如监控网络接受字节数的情况，在9:10到9:20期间累计量增加了1000bytes，加入rate([1m])函数后就会使用1000除以60秒，计算出数据大约为16bytes。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rate( node_network_receive_bytes[1m] ) <span class="comment">#获取``1``分钟内每秒的增量</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>irate()<ul>
+<li>函数计算一段时间范围内某个时刻的每秒增长率。适合快速变化的计数器（counter）</li>
+</ul>
+</li>
+<li>sum()<ul>
+<li>求和</li>
+</ul>
+</li>
+<li>increase()<ul>
+<li>和rate()函数一样也是配合Counter使用。区别就是它是取其中一段时间的增量而不是平均值，</li>
+<li>比如</li>
+<li>increase(node_cpu[1m])    #获取CPU总使用时间1分钟的增量</li>
+</ul>
+</li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-5-node_exporter"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/5-node_exporter/"
+    >5.node_exporter部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/5-node_exporter/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署"><a href="#部署" class="headerlink" title="部署:"></a>部署:</h2><p>用于输出操作系统 指标 如 cpu负载 内存使用量等</p>
+<p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz</span><br><span class="line">tar xf node_exporter-1.0.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/node_exporter-1.0.1.linux-amd64 /usr/<span class="built_in">local</span>/node_exporter</span><br><span class="line"></span><br><span class="line">cat &gt;/usr/lib/systemd/system/node-exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=Prometheus Server</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/node_exporter/node_exporter</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> node-exporter.service &amp;&amp; systemctl start node-exporter.service </span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证</span></span><br><span class="line">ss -tnlp |grep node_exporter</span><br><span class="line">LISTEN  0 128  [::]:9100   [::]:*   users:((<span class="string">&quot;node_exporter&quot;</span>,pid=4209,fd=3))</span><br><span class="line"><span class="comment">#部署两台服务器 用于下章 动态发现 以及后面的实验</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-8-grafana部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/"
+    >8.grafana部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/8-grafana%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署Grafana"><a href="#部署Grafana" class="headerlink" title="部署Grafana"></a>部署Grafana</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://dl.grafana.com/oss/release/grafana-7.3.1-1.x86_64.rpm</span><br><span class="line">yum install -y grafana-7.3.1-1.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> grafana-server.service &amp;&amp; systemctl start grafana-server.service</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ss -tnl |grep 3000</span><br><span class="line">LISTEN     0      128       [::]:3000                  [::]:* </span><br></pre></td></tr></table></figure>
+
+<p>此时可以使用浏览器访问了  默认账号密码 admin  admin   首次登陆必须修改密码</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-9-mysqld_exporter部署与监控"
   class="article article-type-post"
   itemscope
@@ -479,291 +725,13 @@
 </article>
 
     
-    <article
-  id="post-3.1 生成证书"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/3.1%20%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6/"
-    >3.1生成证书</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/3.1%20%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="证书生成"><a href="#证书生成" class="headerlink" title="**证书生成"></a>**证书生成</h2><p>必须得在/etc/kubernetes/pki/这个目录下建所有证书</p>
-<h2 id="生成kubernetes-ca"><a href="#生成kubernetes-ca" class="headerlink" title="**生成kubernetes-ca"></a>**生成kubernetes-ca</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=kubernetes-ca&quot;</span> -extensions v3_ca -out ca.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<h2 id="生成etcd"><a href="#生成etcd" class="headerlink" title="**生成etcd"></a>**生成etcd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key etcd/ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=etcd-ca&quot;</span> -extensions v3_ca -out etcd/ca.crt -days 10000</span><br><span class="line">**front-proxy-ca</span><br><span class="line">openssl genrsa -out front-proxy-ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key front-proxy-ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=kubernetes-ca&quot;</span> -extensions v3_ca -out front-proxy-ca.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># tree</span></span><br><span class="line">.</span><br><span class="line">├── ca.crt</span><br><span class="line">├── ca.key</span><br><span class="line">├── etcd</span><br><span class="line">│   ├── ca.crt</span><br><span class="line">│   └── ca.key</span><br><span class="line">├── front-proxy-ca.crt</span><br><span class="line">├── front-proxy-ca.key</span><br><span class="line">└── openssl.cnf</span><br></pre></td></tr></table></figure>
-
-<h2 id="apiserver-etcd-client"><a href="#apiserver-etcd-client" class="headerlink" title="**apiserver-etcd-client"></a>**apiserver-etcd-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out apiserver-etcd-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver-etcd-client.key -subj <span class="string">&quot;/CN=apiserver-etcd-client/O=system:masters&quot;</span> -out apiserver-etcd-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> apiserver-etcd-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out apiserver-etcd-client.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<h2 id="kube-etcd"><a href="#kube-etcd" class="headerlink" title="** kube-etcd"></a>** kube-etcd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/server.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/server.key -subj <span class="string">&quot;/CN=etcd-server&quot;</span> -out etcd/server.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<h2 id="kube-etcd-peer"><a href="#kube-etcd-peer" class="headerlink" title="**kube-etcd-peer"></a>**kube-etcd-peer</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/peer.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/peer.key -subj <span class="string">&quot;/CN=etcd-peer&quot;</span> -out etcd/peer.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<h2 id="kube-etcd-healthcheck-client"><a href="#kube-etcd-healthcheck-client" class="headerlink" title="**kube-etcd-healthcheck-client"></a>**kube-etcd-healthcheck-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/healthcheck-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/healthcheck-client.key -subj <span class="string">&quot;/CN=etcd-client&quot;</span> -out etcd/healthcheck-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days 10000</span><br></pre></td></tr></table></figure>
-
-<h2 id="kube-apiserver"><a href="#kube-apiserver" class="headerlink" title="**kube-apiserver"></a>**kube-apiserver</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out apiserver.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver.key -subj <span class="string">&quot;/CN=kube-apiserver&quot;</span> -config openssl.cnf -out apiserver.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_apiserver -extfile openssl.cnf -out apiserver.crt</span><br></pre></td></tr></table></figure>
-
-<h2 id="apiserver-kubelet-client"><a href="#apiserver-kubelet-client" class="headerlink" title="**apiserver-kubelet-client"></a>**apiserver-kubelet-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  apiserver-kubelet-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver-kubelet-client.key -subj <span class="string">&quot;/CN=apiserver-kubelet-client/O=system:masters&quot;</span> -out apiserver-kubelet-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> apiserver-kubelet-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out apiserver-kubelet-client.crt</span><br></pre></td></tr></table></figure>
-
-<h2 id="front-proxy-client"><a href="#front-proxy-client" class="headerlink" title="**front-proxy-client"></a>**front-proxy-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  front-proxy-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key front-proxy-client.key -subj <span class="string">&quot;/CN=front-proxy-client&quot;</span> -out front-proxy-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> front-proxy-client.csr -CA front-proxy-ca.crt -CAkey front-proxy-ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out front-proxy-client.crt</span><br></pre></td></tr></table></figure>
-
-<h2 id="kube-scheduler"><a href="#kube-scheduler" class="headerlink" title="**kube-scheduler"></a>**kube-scheduler</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  kube-scheduler.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key kube-scheduler.key -subj <span class="string">&quot;/CN=system:kube-scheduler&quot;</span> -out kube-scheduler.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out kube-scheduler.crt</span><br></pre></td></tr></table></figure>
-
-<h2 id="sa-pub-sa-key"><a href="#sa-pub-sa-key" class="headerlink" title="**sa.pub sa.key"></a>**sa.pub sa.key</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  sa.key 2048 &amp;&amp; \</span><br><span class="line">openssl ecparam -name secp521r1 -genkey -noout -out sa.key &amp;&amp; \</span><br><span class="line">openssl ec -<span class="keyword">in</span> sa.key -outform PEM -pubout -out sa.pub &amp;&amp; \</span><br><span class="line">openssl req -new -sha256 -key sa.key -subj <span class="string">&quot;/CN=system:kube-controller-manager&quot;</span> -out sa.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out sa.crt</span><br></pre></td></tr></table></figure>
-
-<h2 id="admin"><a href="#admin" class="headerlink" title="**admin"></a>**admin</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  admin.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key admin.key -subj <span class="string">&quot;/CN=kubernetes-admin/O=system:masters&quot;</span> -out admin.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out admin.crt</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-4 ETCD部署"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/4%20ETCD%E9%83%A8%E7%BD%B2/"
-    >4ETCD部署</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/4%20ETCD%E9%83%A8%E7%BD%B2/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="下载etcd-二进制文件"><a href="#下载etcd-二进制文件" class="headerlink" title="**下载etcd 二进制文件"></a>**下载etcd 二进制文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;coreos&#x2F;etcd&#x2F;releases&#x2F;download&#x2F;v3.3.7&#x2F;etcd-v3.3.7-linux-amd64.tar.gz</span><br><span class="line">tar xf etcd-v3.3.7-linux-amd64.tar.gz</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="分发二进制文件到各个etcd节点"><a href="#分发二进制文件到各个etcd节点" class="headerlink" title="**分发二进制文件到各个etcd节点"></a>**分发二进制文件到各个etcd节点</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scp -rp etcd-v3.3.7-linux-amd64 k-n1:&#x2F;usr&#x2F;local&#x2F;etcd</span><br><span class="line"></span><br><span class="line">echo &#39;export PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd&#x2F;:$PATH&#39; &gt;  &#x2F;etc&#x2F;profile.d&#x2F;etcd.sh &amp;&amp; source &#x2F;etc&#x2F;profile.d&#x2F;etcd.sh</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="制作ETCD-unitfile-模板-所有etcd节点执行"><a href="#制作ETCD-unitfile-模板-所有etcd节点执行" class="headerlink" title="**制作ETCD  unitfile 模板 所有etcd节点执行"></a>**制作ETCD  unitfile 模板 所有etcd节点执行</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;&#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &lt;&lt;EOF</span><br><span class="line">[Unit]</span><br><span class="line">Description&#x3D;Etcd Server</span><br><span class="line">After&#x3D;network.target</span><br><span class="line">After&#x3D;network-online.target</span><br><span class="line">Wants&#x3D;network-online.target</span><br><span class="line">Documentation&#x3D;https:&#x2F;&#x2F;github.com&#x2F;coreos</span><br><span class="line">[Service]</span><br><span class="line">Type&#x3D;notify</span><br><span class="line">WorkingDirectory&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd</span><br><span class="line">ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;etcd&#x2F;etcd \\</span><br><span class="line">    --data-dir&#x3D;&#x2F;data&#x2F;etcd \\</span><br><span class="line">    --name ##NODE_NAME## \\</span><br><span class="line">    --cert-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;server.crt \\</span><br><span class="line">    --key-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;server.key \\</span><br><span class="line">    --trusted-ca-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \\</span><br><span class="line">    --peer-cert-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;peer.crt \\</span><br><span class="line">    --peer-key-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;peer.key \\</span><br><span class="line">    --peer-trusted-ca-file&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \\</span><br><span class="line">    --peer-client-cert-auth \\</span><br><span class="line">    --client-cert-auth \\</span><br><span class="line">    --listen-peer-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2380 \\</span><br><span class="line">    --initial-advertise-peer-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2380 \\</span><br><span class="line">    --listen-client-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2379,http:&#x2F;&#x2F;127.0.0.1:2379\\</span><br><span class="line">    --advertise-client-urls&#x3D;https:&#x2F;&#x2F;##NODE_IP##:2379 \\</span><br><span class="line">    --initial-cluster-token&#x3D;etcd-cluster-0 \\</span><br><span class="line">    --initial-cluster&#x3D;etcd01&#x3D;https:&#x2F;&#x2F;192.168.1.71:2380,etcd02&#x3D;https:&#x2F;&#x2F;192.168.1.81:2380,etcd03&#x3D;https:&#x2F;&#x2F;192.168.1.82:2380 \\</span><br><span class="line">    --initial-cluster-state&#x3D;new</span><br><span class="line">Restart&#x3D;on-failure</span><br><span class="line">RestartSec&#x3D;5</span><br><span class="line">LimitNOFILE&#x3D;65536</span><br><span class="line">[Install]</span><br><span class="line">WantedBy&#x3D;multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-<p>#注：<br>##WorkingDirectory 、 –data-dir ：指定工作目录和数据目录为/opt/lib/etcd ，需在启动服务前创建这个目录；<br>#–name ：指定节点名称，当 –initial-cluster-state 值为 new 时， –name 的参数值必须位于 –initial-cluster 列表中；<br>#–cert-file 、 –key-file ：etcd server 与 client 通信时使用的证书和私钥；<br>#–trusted-ca-file ：签名 client 证书的 CA 证书，用于验证 client 证书；<br>#–peer-cert-file 、 –peer-key-file ：etcd 与 peer 通信使用的证书和私钥；<br>#–peer-trusted-ca-file ：签名 peer 证书的 CA 证书，用于验证 peer 证书</p>
-<h2 id="各个ETCD-替换模板内容"><a href="#各个ETCD-替换模板内容" class="headerlink" title="**各个ETCD 替换模板内容"></a>**各个ETCD 替换模板内容</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#不同节点替换不同名称和ip</span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd01%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.71%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service </span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd02%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.81%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service</span><br><span class="line">sed -i &#39;s%##NODE_NAME##%etcd03%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service &amp;&amp; sed -i &#39;s%##NODE_IP##%192.168.1.82%g&#39; &#x2F;usr&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;etcd.service</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#数据目录 权限</span><br><span class="line"> mkdir -p &#x2F;data&#x2F;etcd </span><br><span class="line"></span><br><span class="line">#启动</span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl enable etcd &amp;&amp; systemctl start etcd</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="验证集群"><a href="#验证集群" class="headerlink" title="**验证集群"></a>**验证集群</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">etcdctl --cert-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;healthcheck-client.crt \</span><br><span class="line">--key-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;healthcheck-client.key \</span><br><span class="line">--ca-file &#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;etcd&#x2F;ca.crt \</span><br><span class="line">--endpoints&#x3D;&quot;https:&#x2F;&#x2F;192.168.1.71:2379,https:&#x2F;&#x2F;192.168.1.81:2379,https:&#x2F;&#x2F;192.168.1.82:2379&quot;  \</span><br><span class="line">cluster-health</span><br><span class="line"></span><br><span class="line">member 68afffba56612fd is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.71:2379</span><br><span class="line">member e42b05792291d17 is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.81:2379</span><br><span class="line">member e10fc861b3b13bc0 is healthy: got healthy result from https:&#x2F;&#x2F;192.168.1.82:2379</span><br><span class="line">cluster is healthy</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-5 Master节点 APIserver"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/5%20Master%E8%8A%82%E7%82%B9%20APIserver/"
-    >5master节点组件apiserver</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/5%20Master%E8%8A%82%E7%82%B9%20APIserver/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="准备"><a href="#准备" class="headerlink" title="**准备"></a>**准备</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#kubectl 链接api</span></span><br><span class="line">mkdir -p ~/.kube/;</span><br><span class="line">   cp /etc/kubernetes/admin.kubeconfig ~/.kube/config</span><br><span class="line"><span class="comment">#kubectl子命令补全</span></span><br><span class="line">   yum install -y bash-completion</span><br><span class="line">   <span class="built_in">source</span> &lt;(kubectl completion bash)</span><br><span class="line">   <span class="built_in">echo</span> <span class="string">&#x27;source &lt;(kubectl completion bash)&#x27;</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="comment">#如果你是zsh 将bash替换为zsh即可</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="UnitFILE"><a href="#UnitFILE" class="headerlink" title="**UnitFILE"></a>**UnitFILE</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-apiserver.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes API Server</span><br><span class="line">Documentation=https:/github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-apiserver \</span><br><span class="line">  --authorization-mode=Node,RBAC \</span><br><span class="line">  --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeClaimResize,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority,PodPreset \</span><br><span class="line">  --advertise-address=&#123;&#123; NODE_IP &#125;&#125; \</span><br><span class="line">  --bind-address=&#123;&#123; NODE_IP &#125;&#125;  \</span><br><span class="line">  --insecure-port=0 \</span><br><span class="line">  --secure-port=6443 \</span><br><span class="line">  --allow-privileged=<span class="literal">true</span> \</span><br><span class="line">  --apiserver-count=1 \</span><br><span class="line">  --audit-log-maxage=30 \</span><br><span class="line">  --audit-log-maxbackup=3 \</span><br><span class="line">  --audit-log-maxsize=100 \</span><br><span class="line">  --audit-log-path=/data/kubelog/apiserver/audit.log \</span><br><span class="line">  --enable-swagger-ui=<span class="literal">true</span> \</span><br><span class="line">  --storage-backend=etcd3 \</span><br><span class="line">  --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt \</span><br><span class="line">  --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt \</span><br><span class="line">  --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key \</span><br><span class="line">  --etcd-servers=https://192.168.1.71:2379,https://192.168.1.81:2379,https://192.168.1.82:2379 \</span><br><span class="line">  --event-ttl=1h \</span><br><span class="line">  --enable-bootstrap-token-auth \</span><br><span class="line">  --client-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --kubelet-https \</span><br><span class="line">  --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt \</span><br><span class="line">  --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key \</span><br><span class="line">  --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \</span><br><span class="line">  --runtime-config=api/all,settings.k8s.io/v1alpha1=<span class="literal">true</span> \</span><br><span class="line">  --service-cluster-ip-range=10.96.0.0/12 \</span><br><span class="line">  --service-node-port-range=30000-32767 \</span><br><span class="line">  --service-account-key-file=/etc/kubernetes/pki/sa.pub \</span><br><span class="line">  --tls-cert-file=/etc/kubernetes/pki/apiserver.crt \</span><br><span class="line">  --tls-private-key-file=/etc/kubernetes/pki/apiserver.key \</span><br><span class="line">  --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt \</span><br><span class="line">  --requestheader-username-headers=X-Remote-User \</span><br><span class="line">  --requestheader-group-headers=X-Remote-Group \</span><br><span class="line">  --requestheader-allowed-names=front-proxy-client \</span><br><span class="line">  --requestheader-extra-headers-prefix=X-Remote-Extra- \</span><br><span class="line">  --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt \</span><br><span class="line">  --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key \</span><br><span class="line">  --feature-gates=PodShareProcessNamespace=<span class="literal">true</span> \</span><br><span class="line">  --v=2</span><br><span class="line"></span><br><span class="line">Restart=on-failure</span><br><span class="line">RestartSec=10s</span><br><span class="line">LimitNOFILE=65535</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-<p>##–apiserver-count=1 是apiserver进程在集群中运行的数量 是一个整数 记得根据情况修改</p>
-<h2 id="各节点替换内容"><a href="#各节点替换内容" class="headerlink" title="**各节点替换内容"></a>**各节点替换内容</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##替换当前节点的ip</span></span><br><span class="line">sed -i <span class="string">&#x27;s/&#123;&#123; NODE_IP &#125;&#125;/192.168.1.71/g&#x27;</span> /usr/lib/systemd/system/kube-apiserver.service </span><br><span class="line"></span><br><span class="line"><span class="comment">## </span></span><br></pre></td></tr></table></figure>
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/kubernetes/manifests /var/lib/kubelet /var/<span class="built_in">log</span>/kubernetes /data/kubelog/apiserver/</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-apiserver &amp;&amp; systemctl start kube-apiserver</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-5.1 Master节点 controller-manager"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/5.1%20Master%E8%8A%82%E7%82%B9%20controller-manager/"
-    >5.1master节点组件controller-manager</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/5.1%20Master%E8%8A%82%E7%82%B9%20controller-manager/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="unitfile"><a href="#unitfile" class="headerlink" title="**unitfile"></a>**unitfile</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-controller-manager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes Controller Manager</span><br><span class="line">Documentation=https://github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-controller-manager \</span><br><span class="line">  --allocate-node-cidrs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --authentication-kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --authorization-kubeconfig=/etc/kubernetes/controller-manager.kubeconfig \</span><br><span class="line">  --client-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --cluster-signing-key-file=/etc/kubernetes/pki/ca.key \</span><br><span class="line">  --bind-address=127.0.0.1 \</span><br><span class="line">  --leader-elect=<span class="literal">true</span> \</span><br><span class="line">  --cluster-cidr=10.244.0.0/16 \</span><br><span class="line">  --service-cluster-ip-range=10.96.0.0/12 \</span><br><span class="line">  --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt \</span><br><span class="line">  --service-account-private-key-file=/etc/kubernetes/pki/sa.key \</span><br><span class="line">  --root-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --use-service-account-credentials=<span class="literal">true</span> \</span><br><span class="line">  --controllers=*,bootstrapsigner,tokencleaner \</span><br><span class="line">  --experimental-cluster-signing-duration=86700h \</span><br><span class="line">  --feature-gates=RotateKubeletClientCertificate=<span class="literal">true</span> \</span><br><span class="line">  --alsologtostderr=<span class="literal">true</span> \</span><br><span class="line">  --logtostderr=<span class="literal">false</span> \</span><br><span class="line">  --log-dir=/data/kubelog/controller-manager \</span><br><span class="line">  --v=2</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=10s</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /data/kubelog/controller-manager</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-controller-manager &amp;&amp; systemctl start kube-controller-manager</span><br></pre></td></tr></table></figure> 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
+    <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
   </nav>
   
 </section>
