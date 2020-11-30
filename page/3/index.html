@@ -108,6 +108,84 @@
     
     
     <article
+  id="post-4-重写标签"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/"
+    >4.重写标签</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="重写标签"><a href="#重写标签" class="headerlink" title="重写标签"></a>重写标签</h2><p>是配置文件中的一个字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">relabel_configs:</span><br><span class="line">	....</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
+
+<h2 id="action：重新标签动作"><a href="#action：重新标签动作" class="headerlink" title="action：重新标签动作"></a>action：重新标签动作</h2><ul>
+<li>replace：默认，通过regex匹配source_label的值，使用replacement来引用表达式匹配的分组</li>
+<li>keep：只保留regex匹配的目标 source_labels </li>
+<li>drop：删除regex匹配的目标 source_labels </li>
+<li>labeldrop：删除regex匹配的标签</li>
+<li>labelkeep：只保留regex匹配的标签</li>
+<li>hashmod：设置target_label为modulus连接的哈希值source_labels </li>
+<li>labelmap：匹配regex所有标签名称。然后复制匹配标签的值进行分组，replacement分组引用（${1},${2},…）替代</li>
+</ul>
+<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ul>
+<li><p>给作业中所有实例添加标签</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">  <span class="comment">#静态实例</span></span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment">#添加了IDC标签赋值BJ</span></span><br><span class="line">      IDC: <span class="string">&quot;BJ&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看所有带有IDC:BJ标签实例的某指标的总和</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum(指标名称&#123;IDC:<span class="string">&quot;BJ&quot;</span>&#125;)</span><br><span class="line"><span class="comment">#在prometheus页面中填写公式 可获得总值</span></span><br><span class="line"><span class="comment">#sum() 求和</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="标签重写"><a href="#标签重写" class="headerlink" title="标签重写"></a>标签重写</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这个job命名方便识别机房</span></span><br><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#指定动作 默认replace 标签重写</span></span><br><span class="line">   - action: replace</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)</span><br><span class="line">     <span class="comment">#后向引用</span></span><br><span class="line">     replacement: <span class="variable">$1</span></span><br><span class="line">     <span class="comment">#标签的K被修改idc 原有标签还保留 多了一个 idc=&#x27;BJ-Prometheus&#x27;的标签</span></span><br><span class="line">     target_label: idc</span><br></pre></td></tr></table></figure>
+
+<h2 id="keep-和-drop"><a href="#keep-和-drop" class="headerlink" title="keep 和 drop"></a>keep 和 drop</h2><p>实现采集指标的过滤 使得指标是可以选择性采集的</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#keep 表示只采集有指定标签的指标</span></span><br><span class="line">   <span class="comment">#drop 表示不采集有此标签的的指标</span></span><br><span class="line">   - action: keep</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)     </span><br></pre></td></tr></table></figure>
+
+<h2 id="labeldrop和labelkeep"><a href="#labeldrop和labelkeep" class="headerlink" title="labeldrop和labelkeep"></a>labeldrop和labelkeep</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#labeldrop 删除匹配到的标签 配合标签重写 可以实现真正的重命名标签</span></span><br><span class="line">   <span class="comment">#labelkeep 只保留匹配到的标签 其余删除</span></span><br><span class="line">   - action: labeldrop</span><br><span class="line">     <span class="comment">#正则</span></span><br><span class="line">     regex: job</span><br><span class="line">     </span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-6-基于文件的动态实例发现"
   class="article article-type-post"
   itemscope
@@ -634,75 +712,6 @@
 <h2 id="证书创建"><a href="#证书创建" class="headerlink" title="**证书创建"></a>**证书创建</h2><p>所有的操作都在master01的节点上进行<br>在master01上创建证书，然后分发到各个节点<br>#所有节点创建相关目录</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/kubernetes/pki/etcd &amp;&amp; \</span><br><span class="line"><span class="built_in">cd</span> /etc/kubernetes/pki/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cat &gt; /etc/kubernetes/pki/openssl.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[ req ]</span><br><span class="line">default_bits = 2048</span><br><span class="line">default_md = sha256</span><br><span class="line">distinguished_name = req_distinguished_name</span><br><span class="line"></span><br><span class="line">[req_distinguished_name]</span><br><span class="line"></span><br><span class="line">[ v3_ca ]</span><br><span class="line">basicConstraints = critical, CA:TRUE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign</span><br><span class="line"></span><br><span class="line">[ v3_req_server ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_client ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = clientAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_apiserver ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line">subjectAltName = @alt_names_cluster</span><br><span class="line"></span><br><span class="line">[ v3_req_etcd ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth, clientAuth</span><br><span class="line">subjectAltName = @alt_names_etcd</span><br><span class="line"></span><br><span class="line">[ alt_names_cluster ]</span><br><span class="line">DNS.1 = kubernetes</span><br><span class="line">DNS.2 = kubernetes.default</span><br><span class="line">DNS.3 = kubernetes.default.svc</span><br><span class="line">DNS.4 = kubernetes.default.svc.cluster.local</span><br><span class="line">DNS.5 = localhost</span><br><span class="line">IP.1 = 10.96.0.1  <span class="comment">##kubernetes.default.svc.cluster.local</span></span><br><span class="line">IP.2 = 127.0.0.1  <span class="comment">##localhost</span></span><br><span class="line">IP.3 = 192.168.1.77    <span class="comment">##vip</span></span><br><span class="line">IP.4 = 192.168.1.71  <span class="comment">##master01</span></span><br><span class="line">IP.5 = 192.168.1.81  <span class="comment">##node1</span></span><br><span class="line">IP.6 = 192.168.1.82</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[ alt_names_etcd ]</span><br><span class="line">DNS.1 = localhost</span><br><span class="line">IP.1 = 127.0.0.1</span><br><span class="line">IP.2 = 192.168.1.71   <span class="comment">##etcd节点</span></span><br><span class="line">IP.3 = 192.168.1.81</span><br><span class="line">IP.4 = 192.168.1.82</span><br><span class="line">EOF</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-3.2 生成kubeconfig"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/3.2%20%E7%94%9F%E6%88%90kubeconfig/"
-    >3.2生成kubeconfig</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/3.2%20%E7%94%9F%E6%88%90kubeconfig/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="利用证书生成组件的kubeconfig"><a href="#利用证书生成组件的kubeconfig" class="headerlink" title="**利用证书生成组件的kubeconfig"></a>**利用证书生成组件的kubeconfig</h2><p>所有的操作都在master01的节点上进行</p>
-<h2 id="kube-controller-manager"><a href="#kube-controller-manager" class="headerlink" title="**kube-controller-manager"></a>**kube-controller-manager</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/kubernetes</span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;system:kube-controller-manager&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;sa&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;controller-manager.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#KUBE_APISERVER 指向vip或者apiserver 如果打算做高可用 就指向vip</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="kube-scheduler"><a href="#kube-scheduler" class="headerlink" title="**kube-scheduler"></a>**kube-scheduler</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/kubernetes</span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;system:kube-scheduler&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;kube-scheduler&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;scheduler.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="admin-kubectl"><a href="#admin-kubectl" class="headerlink" title="**admin(kubectl)"></a>**admin(kubectl)</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;kubernetes-admin&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;admin&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;admin.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#客户端认证</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#添加上下文</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#验证 </span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="分发kubeconfig及证书其他-master-节点"><a href="#分发kubeconfig及证书其他-master-节点" class="headerlink" title="**分发kubeconfig及证书其他 master 节点"></a>**分发kubeconfig及证书其他 master 节点</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r /etc/kubernetes k-m2:/etc/</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="分发etcd证书到所有etcd节点"><a href="#分发etcd证书到所有etcd节点" class="headerlink" title="**分发etcd证书到所有etcd节点"></a>**分发etcd证书到所有etcd节点</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -rp /etc/kubernetes/pki/etcd  k-n1:/etc/kubernetes/pki</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->

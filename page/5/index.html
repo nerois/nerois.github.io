@@ -108,6 +108,85 @@
     
     
     <article
+  id="post-8 网络插件 calico与flannel"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/"
+    >8网络插件calico与flannel</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>###calico 与 flannel 选一即可</p>
+<h2 id="calico"><a href="#calico" class="headerlink" title="**calico"></a>**calico</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/v3.8/manifests/calico.yaml </span><br><span class="line">sed -i -e <span class="string">&quot;s?192.168.0.0/16?10.244.0.0/16?g&quot;</span> calico.yaml</span><br><span class="line"><span class="comment">#最好下载好镜像上传至内部harbor</span></span><br><span class="line"><span class="comment">#然后修改此文件中的镜像指向内部harbor </span></span><br><span class="line">calico/cni:v3.8.9</span><br><span class="line">calico/pod2daemon-flexvol:v3.8.9</span><br><span class="line">calico/node:v3.8.9</span><br><span class="line">calico/kube-controllers:v3.8.9</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="替换镜像"><a href="#替换镜像" class="headerlink" title="**替换镜像"></a>**替换镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&quot;s@calico/cni:v3.8.9@hb.sp.com/calico/cni:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/pod2daemon-flexvol:v3.8.9@hb.sp.com/calico/pod2daemon-flexvol:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/node:v3.8.9@hb.sp.com/calico/node:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/kube-controllers:v3.8.9@hb.sp.com/calico/kube-controllers:v3.8.9@g&quot;</span> calico.yaml </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get nodes</span></span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION</span><br><span class="line">k-m1.sp.com   Ready    master   9h    v1.15.12</span><br><span class="line">k-n1.sp.com   Ready    node     25h   v1.15.12</span><br><span class="line">k-n2.sp.com   Ready    node     24h   v1.15.12</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl get pod -n kube-system</span></span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">calico-kube-controllers-867fb4cbb9-tl9d8   1/1     Running   0          51m</span><br><span class="line">calico-node-7nxjj                          1/1     Running   0          51m</span><br><span class="line">calico-node-td9mh                          1/1     Running   0          51m</span><br><span class="line">calico-node-wmbqv                          1/1     Running   0          51m</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="flannel"><a href="#flannel" class="headerlink" title="**flannel"></a>**flannel</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/coreos/flannel 中推荐方法</span><br><span class="line"></span><br><span class="line">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="迁移镜像到本地harbor-（可选-但推荐）"><a href="#迁移镜像到本地harbor-（可选-但推荐）" class="headerlink" title="*迁移镜像到本地harbor （可选 但推荐）"></a>*迁移镜像到本地harbor （可选 但推荐）</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看镜像版本</span></span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line"><span class="comment">#上传镜像到本地harbor</span></span><br><span class="line">docker pull quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">docker image tag quay.io/coreos/flannel:v0.13.0-rc2    hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">docker push hb.sp.com/flannel/flannel:v0.13.0-rc2 </span><br><span class="line"><span class="comment">#修改清单</span></span><br><span class="line">sed -i <span class="string">&quot;s@quay.io/coreos/flannel:v0.13.0-rc2@hb.sp.com/flannel/flannel:v0.13.0-rc2@g&quot;</span> kube-flannel.yml</span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="部署"><a href="#部署" class="headerlink" title="*部署"></a>*部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f kube-flannel.yml</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                    READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kube-flannel-ds-7pfdp   1/1     Running   0          48s   192.168.1.71   k-m1.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-hn6bf   1/1     Running   0          48s   192.168.1.82   k-n2.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-vjr2k   1/1     Running   0          48s   192.168.1.81   k-n1.sp.com   &lt;none&gt;           &lt;none&gt;。</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-9.1 dashboard"
   class="article article-type-post"
   itemscope
