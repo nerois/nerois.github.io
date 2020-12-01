@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    K8S |  Nero 的个人博客
+    污点和容忍度 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -48,84 +48,144 @@
       
     <main class="content on">
       <section class="outer">
-  
-  <article class="articles">
+  <article
+  id="post-污点和容忍度"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
     
-    
-    <h1 class="page-type-title">K8S</h1>
-    
-    
-  
-  
-  
-  
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2019" class="archive-year">2019</a>
-    </div>
-    <div class="archives">
-      
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/08/08/%E6%B1%A1%E7%82%B9%E5%92%8C%E5%AE%B9%E5%BF%8D%E5%BA%A6/" class="archive-article-date">
-  <time datetime="2019-08-08T04:13:11.000Z" itemprop="datePublished">08/08</time>
-</a>
+    <header class="article-header">
        
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/08/08/%E6%B1%A1%E7%82%B9%E5%92%8C%E5%AE%B9%E5%BF%8D%E5%BA%A6/"
-    >污点和容忍度</a> 
-</h2>
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  污点和容忍度
+</h1>
  
 
     </header>
-    
-      
+     
+    <div class="article-meta">
+      <a href="/2019/08/08/%E6%B1%A1%E7%82%B9%E5%92%8C%E5%AE%B9%E5%BF%8D%E5%BA%A6/" class="article-date">
+  <time datetime="2019-08-08T04:13:11.000Z" itemprop="datePublished">2019-08-08</time>
+</a> 
   <div class="article-category">
     <a class="article-category-link" href="/categories/K8S/">K8S</a> / <a class="article-category-link" href="/categories/K8S/%E6%B1%A1%E7%82%B9%E5%92%8C%E5%AE%B9%E5%BF%8D/">污点和容忍</a>
   </div>
-
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/06/08/ingress-traefik/" class="archive-article-date">
-  <time datetime="2019-06-08T03:14:13.000Z" itemprop="datePublished">06/08</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/06/08/ingress-traefik/"
-    >ingress-traefik</a> 
-</h2>
  
-
-    </header>
-    
+    </div>
       
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S/">K8S</a> / <a class="article-category-link" href="/categories/K8S/ingress/">ingress</a>
-  </div>
+    <div class="tocbot"></div>
 
-    
-    
-  </div>
-</article>
-      
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="污点"><a href="#污点" class="headerlink" title="污点"></a>污点</h1><h2 id="污点类型"><a href="#污点类型" class="headerlink" title="污点类型:"></a>污点类型:</h2><ul>
+<li>NoSchedule ：一定不能被调度。</li>
+<li>PreferNoSchedule：尽量不要调度。</li>
+<li>NoExecute：不仅不会调度，还会驱逐Node上已有的Pod。</li>
+</ul>
+<h2 id="污点操作"><a href="#污点操作" class="headerlink" title="污点操作"></a>污点操作</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加污点</span></span><br><span class="line">kubectl taint nodes node1 key=value:NoSchedule </span><br><span class="line"><span class="comment">#删除污点 不用指定value 且在后面加上-即可</span></span><br><span class="line">kubectl taint nodes node1 key=:NoSchedule-</span><br><span class="line"><span class="comment">#查看污点</span></span><br><span class="line">kubectl describe nodes &#123;Node名称&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="容忍"><a href="#容忍" class="headerlink" title="容忍"></a>容忍</h1><h2 id="方式1"><a href="#方式1" class="headerlink" title="方式1"></a>方式1</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 容忍的 key、value 和对应 effect 也必须和污点 taints 保持一致</span></span><br><span class="line"><span class="string">......</span></span><br><span class="line"><span class="attr">tolerations:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;key&quot;</span></span><br><span class="line">  <span class="attr">operator:</span> <span class="string">&quot;Equal&quot;</span></span><br><span class="line">  <span class="attr">value:</span> <span class="string">&quot;value&quot;</span></span><br><span class="line">  <span class="attr">effect:</span> <span class="string">&quot;NoSchedule&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="方式2"><a href="#方式2" class="headerlink" title="方式2"></a>方式2</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 容忍  key 和要污点 taints 的 key 一致，且设置的 effect 也相同，不需要设置 value</span></span><br><span class="line"><span class="comment">## 当 operator: &quot;Exists&quot;时  effect: 行可以省略 表示只要KEY匹配 就容忍</span></span><br><span class="line"><span class="comment">## 甚至如果你 key 和 effect 都不写 那么就是容忍任何污点</span></span><br><span class="line"><span class="string">......</span></span><br><span class="line"><span class="attr">tolerations:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;key&quot;</span></span><br><span class="line">  <span class="attr">operator:</span> <span class="string">&quot;Exists&quot;</span></span><br><span class="line">  <span class="attr">effect:</span> <span class="string">&quot;NoSchedule&quot;</span></span><br><span class="line">  </span><br><span class="line"><span class="comment">#容忍任何污点写法</span></span><br><span class="line"><span class="string">......</span></span><br><span class="line"><span class="attr">tolerations:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">operator:</span> <span class="string">&quot;Exists&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="容忍时间"><a href="#容忍时间" class="headerlink" title="容忍时间"></a>容忍时间</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 当次pod 被驱逐时候 将延迟的的时间 单位秒</span></span><br><span class="line"><span class="string">......</span></span><br><span class="line"><span class="attr">tolerations:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;key&quot;</span></span><br><span class="line">  <span class="attr">operator:</span> <span class="string">&quot;Exists&quot;</span></span><br><span class="line">  <span class="attr">effect:</span> <span class="string">&quot;NoSchedule&quot;</span></span><br><span class="line">  <span class="attr">tolerationSeconds:</span> <span class="number">3600</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Deployment示例"><a href="#Deployment示例" class="headerlink" title="Deployment示例"></a>Deployment示例</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/vl</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span> </span><br><span class="line">  <span class="attr">name:</span> <span class="string">example</span> </span><br><span class="line"><span class="attr">spec:</span> </span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">5</span> </span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span> </span><br><span class="line">      <span class="string">......</span></span><br><span class="line">      <span class="attr">tolerations:</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;key&quot;</span></span><br><span class="line">        <span class="attr">operator:</span> <span class="string">&quot;Equal&quot;</span></span><br><span class="line">        <span class="attr">value:</span> <span class="string">&quot;value&quot;</span></span><br><span class="line">        <span class="attr">effect:</span> <span class="string">&quot;NoSchedule&quot;</span></span><br><span class="line">        <span class="attr">tolerationSeconds:</span> <span class="number">3600</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
       
     </div>
-  </div>
-  
-  
+    
 
-  
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S/" rel="tag">K8S</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            2 实现k8s动态生成slave POD.md
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/06/08/ingress-traefik/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">ingress-traefik</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
 </section>
       <footer class="footer">
   <div class="outer">
@@ -248,6 +308,23 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
