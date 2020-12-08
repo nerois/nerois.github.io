@@ -108,6 +108,75 @@
     
     
     <article
+  id="post-2实现k8s动态生成slavePOD"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/"
+    >2 实现k8s动态生成slave POD.md</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/" class="article-date">
+  <time datetime="2020-11-18T02:24:23.000Z" itemprop="datePublished">2020-11-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Jenkins/">Jenkins</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="1-安装kubernetes-插件"><a href="#1-安装kubernetes-插件" class="headerlink" title="1 安装kubernetes 插件"></a>1 安装kubernetes 插件</h1><ul>
+<li>这里不在概述  安装过程  和一些基本插件 如 <a target="_blank" rel="noopener" href="https://plugins.jenkins.io/localization-zh-cn">Localization: Chinese (Simplified)</a> 汉化插件  Pipeline插件 git 等</li>
+</ul>
+<h1 id="2-配置kubernetes-集群"><a href="#2-配置kubernetes-集群" class="headerlink" title="2 配置kubernetes 集群"></a>2 配置kubernetes 集群</h1><p><img src="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/image-20201118171607644.png" alt="image-20201118171607644"></p>
+<p><img src="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/image-20201118171702624.png" alt="image-20201118171702624"></p>
+<p><img src="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/image-20201118171822457.png" alt="image-20201118171822457"></p>
+<p><img src="/2020/11/18/2%E5%AE%9E%E7%8E%B0k8s%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90slavePOD/image-20201118172247287.png" alt="image-20201118172247287"></p>
+<h1 id="3-编写dockerfile-生成jenkins-slave的镜像"><a href="#3-编写dockerfile-生成jenkins-slave的镜像" class="headerlink" title="3 编写dockerfile 生成jenkins slave的镜像"></a>3 编写dockerfile 生成jenkins slave的镜像</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#下载slave包</span></span><br><span class="line">[jenkins_url]/jnlpJars/slave.jar</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#下载容器启动脚本</span></span><br><span class="line">wget https://raw.githubusercontent.com/jenkinsci/docker-inbound-agent/master/jenkins-agent</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#dockerfile 安装适合自己构建的环境  jdk可以换 本人测试jdk11 可以运行slave的包</span></span><br><span class="line">FROM centos:7</span><br><span class="line">LABEL maintainer lizhenliang</span><br><span class="line">RUN yum install -y java-1.8.0-openjdk maven curl git libtool-ltdl-devel &amp;&amp; \</span><br><span class="line">yum clean all &amp;&amp; \</span><br><span class="line">rm -rf /var/cache/yum/* &amp;&amp; \</span><br><span class="line">mkdir -p /usr/share/jenkins</span><br><span class="line">COPY slave.jar /usr/share/jenkins/agent.jar</span><br><span class="line">COPY jenkins-agent /usr/bin/jenkins-agent</span><br><span class="line">COPY settings.xml /etc/maven/settings.xml</span><br><span class="line">RUN chmod +x /usr/bin/jenkins-agent</span><br><span class="line">ENTRYPOINT [<span class="string">&quot;jenkins-agent&quot;</span>]</span><br><span class="line"><span class="comment">#构建好镜像上传harbor</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="4-编写pipeline脚本实现动态生成slave"><a href="#4-编写pipeline脚本实现动态生成slave" class="headerlink" title="4 编写pipeline脚本实现动态生成slave"></a>4 编写pipeline脚本实现动态生成slave</h1><h2 id="脚本语法"><a href="#脚本语法" class="headerlink" title="脚本语法:"></a>脚本语法:</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">//声明slave pod模板</span><br><span class="line">podTemplate(label: <span class="string">&#x27;jenkins-slave&#x27;</span>, cloud: <span class="string">&#x27;kubernetes&#x27;</span>, containers: [</span><br><span class="line">   containerTemplate(</span><br><span class="line">   		//name 必须是jnlp 否则 会自动增加一个容器名字为jnlp 并且使用官方默认slave镜像</span><br><span class="line">         name: <span class="string">&#x27;jnlp&#x27;</span>,</span><br><span class="line">         image: <span class="string">&#x27;hb.sp.com/public/jenkins-slave-jdk11:v4&#x27;</span>,</span><br><span class="line">         ttyEnabled: <span class="literal">true</span></span><br><span class="line">     )],</span><br><span class="line">     //volumes: [] </span><br><span class="line">       volumes: [</span><br><span class="line">            hostPathVolume(mountPath: <span class="string">&#x27;/var/run/docker.sock&#x27;</span>, hostPath: <span class="string">&#x27;/var/run/docker.sock&#x27;</span>),</span><br><span class="line">            hostPathVolume(mountPath: <span class="string">&#x27;/usr/bin/docker&#x27;</span>, hostPath: <span class="string">&#x27;/usr/bin/docker&#x27;</span>),</span><br><span class="line">	        persistentVolumeClaim(claimName: <span class="string">&#x27;jenkins-slave-pvc&#x27;</span>, mountPath: <span class="string">&#x27;/root/.m2&#x27;</span>, readOnly: <span class="literal">false</span>)</span><br><span class="line">        ]</span><br><span class="line">   ) </span><br><span class="line">&#123;</span><br><span class="line">    //pipeline流水线脚本</span><br><span class="line">    node (<span class="string">&#x27;jenkins-slave&#x27;</span>) &#123;</span><br><span class="line">        stage(<span class="string">&#x27;拉取代码&#x27;</span>) &#123;</span><br><span class="line">           git branch: <span class="string">&#x27;$&#123;Branch&#125;&#x27;</span>, credentialsId: <span class="string">&#x27;d487fa05-b60c-4ba2-b529-20bb1dcce9bd&#x27;</span>, url: <span class="string">&#x27;ssh://git@URL.com/lt/lot.git&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;代码编译&#x27;</span>) &#123;</span><br><span class="line">            sh<span class="string">&#x27;mvn clean install -Dmaven.test.skip=true&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;构建并推送到harbor&#x27;</span>) &#123;</span><br><span class="line">            //获取简短commit</span><br><span class="line">            env.imageTag = sh (script: <span class="string">&#x27;git rev-parse --short HEAD $&#123;GIT_COMMIT&#125;&#x27;</span>, returnStdout: <span class="literal">true</span>).trim()</span><br><span class="line">            //生成dockerfile</span><br><span class="line">            sh <span class="string">&#x27;echo &quot;FROM hb.sp.com/public/jdk:11.0.8\nCOPY apiend/target/*.jar  apiend.jar\nCMD java -jar apiend.jar\n&quot; &gt;dockerfile&#x27;</span></span><br><span class="line">            //build docker image</span><br><span class="line">            sh <span class="string">&quot;docker build . -t <span class="variable">$&#123;harbor_url&#125;</span>/<span class="variable">$&#123;harbor_project&#125;</span>/apiend:<span class="variable">$&#123;imageTag&#125;</span>&quot;</span></span><br><span class="line">            //登录harbor并推送</span><br><span class="line">            withCredentials([usernamePassword(credentialsId: <span class="string">&#x27;8ca55b3d-611f-4df3-a46f-4e61cb85246c&#x27;</span>, passwordVariable: <span class="string">&#x27;p&#x27;</span>, usernameVariable: <span class="string">&#x27;u&#x27;</span>)]) &#123;</span><br><span class="line">                sh<span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">                docker login -u <span class="variable">$&#123;u&#125;</span> -p &#x27;<span class="variable">$&#123;p&#125;</span>&#x27; <span class="variable">$&#123;harbor_url&#125;</span></span></span><br><span class="line"><span class="string">                docker push <span class="variable">$&#123;harbor_url&#125;</span>/<span class="variable">$&#123;harbor_project&#125;</span>/apiend:<span class="variable">$&#123;imageTag&#125;</span></span></span><br><span class="line"><span class="string">                &quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;发布到K8S&#x27;</span>) &#123;</span><br><span class="line">            sh<span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">			kubectl set image deploy lot-apiend lot-apiend=<span class="variable">$&#123;harbor_url&#125;</span>/<span class="variable">$&#123;harbor_project&#125;</span>/apiend:<span class="variable">$&#123;imageTag&#125;</span> -n lot ---record</span></span><br><span class="line"><span class="string">			&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="声明语法"><a href="#声明语法" class="headerlink" title="声明语法:"></a>声明语法:</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">	//指定运行代理主机</span><br><span class="line">	agent &#123;</span><br><span class="line">	//jenkins定义的kubernetes集群名称</span><br><span class="line">    kubernetes &#123;</span><br><span class="line"> 	  //</span><br><span class="line">      yaml <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">apiVersion: v1</span></span><br><span class="line"><span class="string">kind: Pod</span></span><br><span class="line"><span class="string">metadata:</span></span><br><span class="line"><span class="string">  name: jnlp</span></span><br><span class="line"><span class="string">  labels:</span></span><br><span class="line"><span class="string">    app: jnlp</span></span><br><span class="line"><span class="string">spec:</span></span><br><span class="line"><span class="string">  containers:</span></span><br><span class="line"><span class="string">    - name: jnlp</span></span><br><span class="line"><span class="string">      image: hb.sp.com/public/jenkins-slave-jdk11:v4</span></span><br><span class="line"><span class="string">      imagePullPolicy: IfNotPresent</span></span><br><span class="line"><span class="string">      tty: true</span></span><br><span class="line"><span class="string">      volumeMounts:</span></span><br><span class="line"><span class="string">        - mountPath: /var/run/docker.sock</span></span><br><span class="line"><span class="string">          name: v1</span></span><br><span class="line"><span class="string">        - mountPath: /usr/bin/docker</span></span><br><span class="line"><span class="string">          name: v2</span></span><br><span class="line"><span class="string">        - mountPath: /root/.m2</span></span><br><span class="line"><span class="string">          name: v3</span></span><br><span class="line"><span class="string">  restartPolicy: Always</span></span><br><span class="line"><span class="string">  volumes:</span></span><br><span class="line"><span class="string">    - name: v1</span></span><br><span class="line"><span class="string">      hostPath:</span></span><br><span class="line"><span class="string">        path: /var/run/docker.sock</span></span><br><span class="line"><span class="string">    - name: v2</span></span><br><span class="line"><span class="string">      hostPath:</span></span><br><span class="line"><span class="string">        path: /usr/bin/docker</span></span><br><span class="line"><span class="string">    - name: v3</span></span><br><span class="line"><span class="string">      persistentVolumeClaim:</span></span><br><span class="line"><span class="string">        claimName: jenkins-slave-pvc</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">	//任务集合</span><br><span class="line">	stages &#123;</span><br><span class="line">		//步骤1</span><br><span class="line">		stage(<span class="string">&#x27;拉取代码&#x27;</span>) &#123;</span><br><span class="line">			//步骤具体任务</span><br><span class="line">			steps &#123;</span><br><span class="line">			 //这里写生成的pipeline语法 或者 shell语法</span><br><span class="line">			    sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">			    git --version </span></span><br><span class="line"><span class="string">			    &quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		//步骤2</span><br><span class="line">		stage(<span class="string">&#x27;编译代码&#x27;</span>)&#123;</span><br><span class="line">			steps &#123;</span><br><span class="line">				sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">				mvn --version</span></span><br><span class="line"><span class="string">				&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		stage(<span class="string">&#x27;docker&#x27;</span>)&#123;</span><br><span class="line">			steps &#123;</span><br><span class="line">				sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">				docker info</span></span><br><span class="line"><span class="string">				&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		stage(<span class="string">&#x27;kube&#x27;</span>)&#123;</span><br><span class="line">			steps &#123;</span><br><span class="line">				sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">				kubectl get ns</span></span><br><span class="line"><span class="string">				&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	post &#123;</span><br><span class="line">		//任务失败执行</span><br><span class="line">		failure &#123;</span><br><span class="line">			sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">			echo false</span></span><br><span class="line"><span class="string">			&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">		//任务成功后执行</span><br><span class="line">		success &#123;</span><br><span class="line">			sh <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">			echo true</span></span><br><span class="line"><span class="string">			&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jenkins/" rel="tag">Jenkins</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-污点和容忍度"
   class="article article-type-post"
   itemscope
@@ -723,68 +792,6 @@
   <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-2-作业和实例"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
-    >2.作业和实例</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
-<li><p>实例</p>
-<p>   可以抓取的目标称为实例（Instances）</p>
-</li>
-<li><p>作业</p>
-<p>具有相同目标的实例集合称为作业（Job）</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
