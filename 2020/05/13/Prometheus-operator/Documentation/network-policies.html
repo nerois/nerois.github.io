@@ -1,0 +1,156 @@
+<br>
+<div class="alert alert-info" role="alert">
+    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> Starting with v0.12.0, Prometheus Operator requires use of Kubernetes v1.7.x and up.
+</div>
+
+<h1 id="Network-policies"><a href="#Network-policies" class="headerlink" title="Network policies"></a>Network policies</h1><p><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">Network policies</a> allow you easily restrict the ingress traffic between pods using <a href="https://kubernetes.io/docs/user-guide/labels/">k8s labels</a>.<br>To keep your cluster safer, it’s strongly recommended to enable network policies into prometheus namespace.</p>
+<h1 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h1><p>This example will close all inbound communication on the namespace monitoring, and allow only necessary traffic.<br><strong>This example has only been tested with the calico provider.</strong></p>
+<p>First, follow the instructions to <a href="http://docs.projectcalico.org/v1.5/getting-started/kubernetes/installation/">add Calico to an existing Kubernetes cluster</a>.</p>
+<p>Next, use the following configuration to deny all the ingress (inbound) traffic.</p>
+<pre><code class="yaml"> apiVersion: networking.k8s.io/v1
+ kind: NetworkPolicy
+ metadata:
+   name: default-deny-all
+   namespace: monitoring
+ spec:
+   podSelector:
+     matchLabels:</code></pre>
+<p>Save the config file as default-deny-all.yaml and apply the configuration to the cluster using</p>
+<pre><code>kubectl apply -f &lt;path to config file&gt;/default-deny-all.yaml</code></pre>
+<p>Apply the following network policies to allow the necessary traffic to access ports in the pod:</p>
+<pre><code>$ kubectl apply -n monitoring -f example/networkpolicies/
+
+networkpolicy &quot;alertmanager-web&quot; configured
+networkpolicy &quot;alertmanager-mesh&quot; configured
+networkpolicy &quot;grafana&quot; configured
+networkpolicy &quot;node-exporter&quot; configured
+networkpolicy &quot;prometheus&quot; configured</code></pre>
+<h2 id="Explaining-the-network-policies"><a href="#Explaining-the-network-policies" class="headerlink" title="Explaining the network policies"></a>Explaining the network policies</h2><h4 id="Alertmanager"><a href="#Alertmanager" class="headerlink" title="Alertmanager"></a>Alertmanager</h4><ul>
+<li>Allow inbound tcp dst port 9093 from any source to alertmanager</li>
+<li>Allow inbound tcp &amp; udp dst port 9094 from only alertmanager to alertmanager</li>
+</ul>
+<pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: alertmanager-web
+spec:
+  ingress:
+  - from:
+    ports:
+    - port: 9093
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      alertmanager: main
+      app: alertmanager
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: alertmanager-mesh
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - alertmanager
+        - key: alertmanager
+          operator: In
+          values:
+          - main
+    ports:
+    - port: 9094
+      protocol: TCP
+    - port: 9094
+      protocol: UDP
+  podSelector:
+    matchLabels:
+      alertmanager: main
+      app: alertmanager
+</code></pre>
+<h4 id="Grafana"><a href="#Grafana" class="headerlink" title="Grafana"></a>Grafana</h4><ul>
+<li>Allow inbound tcp dst port 3000 from any source to grafana</li>
+</ul>
+<pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana
+spec:
+  ingress:
+  - ports:
+    - port: 3000
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: grafana</code></pre>
+<h4 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h4><ul>
+<li>Allow inbound tcp dst port 9090 from any source to prometheus</li>
+</ul>
+<pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus
+spec:
+  ingress:
+  - ports:
+    - port: 9090
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: prometheus
+      prometheus: k8s</code></pre>
+<h4 id="Node-exporter"><a href="#Node-exporter" class="headerlink" title="Node-exporter"></a>Node-exporter</h4><ul>
+<li>Allow inbound tcp dst port 9100 from only prometheus to node-exporter</li>
+</ul>
+<pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: node-exporter
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - prometheus
+        - key: prometheus
+          operator: In
+          values:
+          - k8s
+    ports:
+    - port: 9100
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: node-exporter</code></pre>
+<h4 id="Kube-state-metrics"><a href="#Kube-state-metrics" class="headerlink" title="Kube-state-metrics"></a>Kube-state-metrics</h4><ul>
+<li>Allow inbound tcp dst port 8080 from only prometheus to kube-state-metrics</li>
+</ul>
+<pre><code class="yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kube-state-metrics
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - prometheus
+        - key: prometheus
+          operator: In
+          values:
+          - k8s
+    ports:
+    - port: 8080
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: kube-state-metrics</code></pre>

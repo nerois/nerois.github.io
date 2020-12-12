@@ -1,0 +1,19 @@
+<h1 id="kube-prometheus"><a href="#kube-prometheus" class="headerlink" title="kube-prometheus"></a>kube-prometheus</h1><h2 id="WARNING-kube-prometheus-moved-to-coreos-kube-prometheus"><a href="#WARNING-kube-prometheus-moved-to-coreos-kube-prometheus" class="headerlink" title="WARNING: kube-prometheus moved to coreos/kube-prometheus!"></a>WARNING: kube-prometheus moved to <a href="https://github.com/coreos/kube-prometheus">coreos/kube-prometheus</a>!</h2><p><strong>Why did you move it?</strong></p>
+<p>Even though kube-prometheus is an entirely different project, it was part of the Prometheus Operator repository for the last two years.<br>Moving kube-prometheus into its own repository is going to allow us to move more independently from the Prometheus Operator.<br>As an example, we are now going to publish versioned kube-prometheus releases, something that was not possible before.</p>
+<p>Take a look at this issue for more information:<br><a href="https://github.com/coreos/prometheus-operator/issues/2553">https://github.com/coreos/prometheus-operator/issues/2553</a></p>
+<p><strong>What do I need to do?</strong></p>
+<p>Simply go to <a href="https://github.com/coreos/kube-prometheus">coreos/kube-prometheus</a> and make use of it the same way you did before.</p>
+<p>Users depending on kube-prometheus with jsonnet-bundler, should change this their <code>jsonnetfile.json</code> and <code>jsonnetfile.lock.json</code> to point to the correct repository.</p>
+<pre><code class="diff">             &quot;name&quot;: &quot;kube-prometheus&quot;,
+             &quot;source&quot;: {
+                 &quot;git&quot;: {
+-                    &quot;remote&quot;: &quot;https://github.com/coreos/prometheus-operator&quot;,
+-                    &quot;subdir&quot;: &quot;contrib/kube-prometheus/jsonnet/kube-prometheus&quot;
++                    &quot;remote&quot;: &quot;https://github.com/coreos/kube-prometheus&quot;,
++                    &quot;subdir&quot;: &quot;jsonnet/kube-prometheus&quot;
+                 }
+             },
+             &quot;version&quot;: &quot;master&quot;</code></pre>
+<p><em>Note: We needed to merge the two repositories and commit hashes are not the same anymore, when referencing coreos/kube-prometheus.</em></p>
+<p><strong>You still have questions why it moved?</strong></p>
+<p>Feel free to either create an issue or ask in #prometheus-operator on <a href="http://slack.k8s.io/">Kubernetes Slack</a>.</p>

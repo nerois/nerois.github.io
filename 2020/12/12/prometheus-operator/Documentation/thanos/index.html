@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="摇旗呐喊的热情,携光阴渐远去,人世间悲喜烂剧,昼夜轮播不停,纷飞的滥情男女,情仇爱恨别离,一代人终将老去，但总有人正年轻" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+     Nero 的个人博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-prometheus-operator/Documentation/thanos"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+     
+    <div class="article-meta">
+      <a href="/2020/12/12/prometheus-operator/Documentation/thanos/" class="article-date">
+  <time datetime="2020-12-12T13:30:47.215Z" itemprop="datePublished">2020-12-12</time>
+</a>  
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Thanos-and-the-Prometheus-Operator"><a href="#Thanos-and-the-Prometheus-Operator" class="headerlink" title="Thanos and the Prometheus Operator"></a>Thanos and the Prometheus Operator</h1><p><em>Note: This guide is valid for Prometheus Operator v0.28+ and Thanos v0.2+ and above.</em></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/thanos-io/thanos/">Thanos</a> is a set of components that can be composed into a highly available,<br>multi Prometheus metric system with potentially unlimited storage capacity, if your Object Storage allows for it.</p>
+<p>Before continuing with Prometheus Operator Thanos integration, it is recommended to read more about Thanos in the <a target="_blank" rel="noopener" href="https://thanos.io/getting-started.md/">documentation</a>.</p>
+<h2 id="What-Prometheus-Operator-helps-with"><a href="#What-Prometheus-Operator-helps-with" class="headerlink" title="What Prometheus Operator helps with?"></a>What Prometheus Operator helps with?</h2><p>Prometheus Operator operates <code>Prometheus</code> and optionally <code>ThanosRuler</code> components.<br>Other Thanos components, such as the querier and store gateway, must be configured<br>separately.  The Thanos system integrates with Prometheus by adding a Thanos<br>sidecar to each Prometheus instance.  The Thanos sidecar can be configured directly in the <code>Prometheus</code> CRD. This Sidecar can hook into the Thanos querying system as well as <strong>optionally</strong> back up your data in object storage.</p>
+<p>Each component other than the sidecar and <code>ThanosRuler</code> is deployed independently of the Prometheus Operator and its Thanos configuration. The<br><a target="_blank" rel="noopener" href="https://github.com/thanos-io/kube-thanos/">kube-thanos</a> project has some starting points for other Thanos components deployments.</p>
+<p>In short, for the Thanos integration using the Prometheus Operator to work correctly you will need to have these extra components installed and configured.</p>
+<h2 id="Prometheus-Custom-Resource-with-Thanos-Sidecar"><a href="#Prometheus-Custom-Resource-with-Thanos-Sidecar" class="headerlink" title="Prometheus Custom Resource with Thanos Sidecar"></a>Prometheus Custom Resource with Thanos Sidecar</h2><p>The <code>Prometheus</code> CRD has support for adding a Thanos sidecar to the Prometheus<br>Pod. To enable the sidecar, reference the following examples.</p>
+<p>This is the simplest configuration change that needs to be made to your<br>Prometheus Custom Resource, after creating the secret.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">spec:</span><br><span class="line">  ...</span><br><span class="line">  thanos:</span><br><span class="line">    baseImage: quay.io&#x2F;thanos&#x2F;thanos</span><br><span class="line">    version: v0.8.1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>Note: If you’re using Istio you may need to also set <code>ListenLocal</code> on the Thanos spec due to Istio’s forwarding of traffic to localhost.</p>
+<h2 id="Configuring-Thanos-Object-Storage"><a href="#Configuring-Thanos-Object-Storage" class="headerlink" title="Configuring Thanos Object Storage"></a>Configuring Thanos Object Storage</h2><p>If you want sidecar to be able to upload blocks to object storage you need to tell Prometheus Operator about it.</p>
+<p>In this mode, sidecar assumes an existing Kubernetes Secret containing the Thanos configuration.<br>Inside this secret you configure how to run Thanos with your object storage.</p>
+<p>For more information and examples about the configuration itself, take a look at the Thanos documentation:<br><a target="_blank" rel="noopener" href="https://github.com/thanos-io/thanos/blob/master/docs/storage.md">https://github.com/thanos-io/thanos/blob/master/docs/storage.md</a></p>
+<p>Once you have written your configuration save it to a file.<br>Here’s an example:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">type:</span> <span class="string">s3</span></span><br><span class="line"><span class="attr">config:</span></span><br><span class="line">  <span class="attr">bucket:</span> <span class="string">thanos</span></span><br><span class="line">  <span class="attr">endpoint:</span> <span class="string">ams3.digitaloceanspaces.com</span></span><br><span class="line">  <span class="attr">access_key:</span> <span class="string">XXX</span></span><br><span class="line">  <span class="attr">secret_key:</span> <span class="string">XXX</span></span><br></pre></td></tr></table></figure>
+
+<p>Let’s assume you saved this file to <code>/tmp/thanos-config.yaml</code>. You can use the following command to create a secret called <code>thanos-objstore-config</code> inside your cluster in the <code>monitoring</code> namespace.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n monitoring create secret generic thanos-objstore-config --from-file&#x3D;thanos.yaml&#x3D;&#x2F;tmp&#x2F;thanos-config.yaml</span><br></pre></td></tr></table></figure>
+
+<p>And then you can specify this secret inside Thanos part of the Prometheus CRD we mentioned <a href="#prometheus-custom-resource-with-thanos-sidecar">earlier</a>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">spec:</span><br><span class="line">  ...</span><br><span class="line">  thanos:</span><br><span class="line">    baseImage: quay.io&#x2F;thanos&#x2F;thanos</span><br><span class="line">    version: v0.8.1</span><br><span class="line">    objectStorageConfig:</span><br><span class="line">      key: thanos.yaml</span><br><span class="line">      name: thanos-objstore-config</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>This will attach Thanos sidecar that will backup all <em>new blocks</em> that Prometheus produces every 2 hours to the object storage.</p>
+<p>NOTE: This option will also disable local Prometheus compaction. This means that Thanos compactor is the main singleton component<br>responsible for compactions on a global, object storage level.</p>
+<h2 id="Thanos-Ruler"><a href="#Thanos-Ruler" class="headerlink" title="Thanos Ruler"></a>Thanos Ruler</h2><p>The <a target="_blank" rel="noopener" href="https://github.com/thanos-io/thanos/blob/master/docs/components/rule.md">Thanos Ruler</a> component allows recording and alerting rules to be processed across<br>multiple Promtheus instances.  A <code>ThanosRuler</code> instance requires at least one <code>queryEndpoint</code> which points to the location of Thanos Queriers or Prometheus instances.  The <code>queryEndpoints</code> are used to configure the <code>--query</code> arguments(s) of the Thanos runtime.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">apiVersion: monitoring.coreos.com&#x2F;v1</span><br><span class="line">kind: ThanosRuler</span><br><span class="line">metadata:</span><br><span class="line">  name: thanos-ruler-demo</span><br><span class="line">  labels:</span><br><span class="line">    example: thanos-ruler</span><br><span class="line">  namespace: monitoring</span><br><span class="line">spec:</span><br><span class="line">  image: quay.io&#x2F;thanos&#x2F;thanos</span><br><span class="line">  ruleSelector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      role: my-thanos-rules</span><br><span class="line">  queryEndpoints:</span><br><span class="line">    - dnssrv+_http._tcp.my-thanos-querier.monitoring.svc.cluster.local</span><br></pre></td></tr></table></figure>
+
+<p>The recording and alerting rules used by a <code>ThanosRuler</code> component, are configured using the same <code>PrometheusRule</code> objects which are used by Prometheus.  In the given example, the rules contained in any <code>PrometheusRule</code> object which match the label <code>role=my-thanos-rules</code> will be added to the Thanos Ruler POD.</p>
+<h2 id="Other-Thanos-Components"><a href="#Other-Thanos-Components" class="headerlink" title="Other Thanos Components"></a>Other Thanos Components</h2><p>Deploying the sidecar was the first step towards getting Thanos up and running, but there are more components to be deployed, that complete Thanos:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thanos.io/components/query.md/">Querier</a></li>
+</ul>
+<p>Additionally, when object storage backup is desired:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thanos.io/components/store.md/">Store</a></li>
+<li><a target="_blank" rel="noopener" href="https://thanos.io/components/compact.md/">Compactor</a></li>
+</ul>
+<p>Again, take a look at the Thanos documentation for more details on these components: <a target="_blank" rel="noopener" href="https://thanos.io/quick-tutorial.md">https://thanos.io/quick-tutorial.md</a></p>
+<p>kube-thanos project has already supported several thanos components.<br>For more details, please checkout <a target="_blank" rel="noopener" href="https://github.com/thanos-io/kube-thanos/">kube-thanos</a>.</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2020/12/12/prometheus-operator/Documentation/troubleshooting/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            (no title)
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/12/12/prometheus-operator/Documentation/rbac/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title"></div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2020
+        <i class="ri-heart-fill heart_icon"></i> Nero
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.png" alt="Nero 的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+</body>
+
+</html>

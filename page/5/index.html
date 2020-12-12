@@ -108,7 +108,7 @@
     
     
     <article
-  id="post-7 Node节点 kubelet"
+  id="post-2 ansible常用模块"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -119,35 +119,45 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/7%20Node%E8%8A%82%E7%82%B9%20kubelet/"
-    >7NODE节点 kubelet</a> 
+  <a class="article-title" href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/"
+    >2.常用模块</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/7%20Node%E8%8A%82%E7%82%B9%20kubelet/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+    <a class="article-category-link" href="/categories/ansible/">ansible</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <p>#master 也需要安装 只是打不同标签</p>
-<h2 id="二进制文件"><a href="#二进制文件" class="headerlink" title="**二进制文件"></a>**二进制文件</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wget https://dl.k8s.io/v1.15.2/kubernetes-node-linux-amd64.tar.gz</span><br><span class="line">mkdir -p /opt/kube/bin/</span><br><span class="line">tar xvf kubernetes-node-linux-amd64.tar.gz</span><br><span class="line">mv kubernetes/node/bin/kube&#123;<span class="built_in">let</span>,-proxy&#125;  /opt/kube/bin/</span><br><span class="line"><span class="comment">#分发</span></span><br><span class="line">scp -rp /opt/kube/bin/kube&#123;<span class="built_in">let</span>,-proxy&#125; k-n2:/opt/kube/bin/</span><br><span class="line">scp -rp /opt/kube/bin/kube&#123;<span class="built_in">let</span>,-proxy&#125; k-n1:/opt/kube/bin/</span><br></pre></td></tr></table></figure>
+  <h2 id="Ansible常用模块"><a href="#Ansible常用模块" class="headerlink" title="Ansible常用模块"></a>Ansible常用模块</h2><h3 id="Command模块"><a href="#Command模块" class="headerlink" title="Command模块"></a>Command模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#此模块是默认模块  所以不需要-m指定模块名称</span></span><br><span class="line"><span class="comment">#用于执行远程linux简单命令   </span></span><br><span class="line"><span class="comment">#不支持变量引用 管道  &lt; &gt; | $ ; &amp; 等操作 原因是他并不是使用shell环境执行的命令</span></span><br><span class="line"><span class="comment">#如果想要支持 请看下个模块</span></span><br><span class="line"></span><br><span class="line">~]  ansible all -a <span class="string">&#x27;hostname&#x27;</span>     </span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn1.sp.com</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn2.sp.com</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tm1.sp.com</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
+<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#与默认模块相似 都是远程执行命令 但支持shell的特性 如变量引用 管道等</span></span><br><span class="line"><span class="comment">#但也不推荐太复杂的操作 很可能也会失败 </span></span><br><span class="line"><span class="comment">#推荐写好脚本 推送到远程批量执行 详情见下个模块</span></span><br><span class="line">~]  ansible all -m shell -a <span class="string">&#x27;systemctl stop firewalld &amp;&amp; systemctl disable firewalld&#x27;</span></span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line"></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;ifconfig eth0 |grep &quot;inet &quot;&#x27;</span></span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.81  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.82  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        </span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;echo $HOSTNAME&#x27;</span>                                            1 ↵</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn1.sp.com</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn2.sp.com</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tm1.sp.com</span><br><span class="line"><span class="comment">#chdir</span></span><br><span class="line"><span class="comment">#用于执行命令前切换目录</span></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;chdir=/etc/ cat fstab&#x27;</span>                                     1 ↵</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
+<p>script模块2</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#是一个执行脚本的模块 流程是 先把脚本推送到远程 然后在在远程主机执行此脚本</span></span><br><span class="line">示例:</span><br><span class="line">~] vim selinux.sh</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">sed -i <span class="string">&quot;s/^SELINUX=.*/SELINUX=disabled/g&quot;</span> /etc/selinux/config &amp;&amp; setenforce 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">~] ansible all -m script -a <span class="string">&quot;/root/selinux.sh&quot;</span> </span><br><span class="line">192.168.1.82 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.82 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.82 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;22</span><br><span class="line">192.168.1.81 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.81 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.81 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;</span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.71 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.71 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#creates  如果远程文件存在 将不执行  常用于创建文件前判断文件是否存在</span></span><br><span class="line">~] ansible all -m script -a <span class="string">&quot;creates=/etc/fstab etho ok&quot;</span></span><br><span class="line">192.168.1.82 | SKIPPED</span><br><span class="line">192.168.1.81 | SKIPPED</span><br><span class="line">192.168.1.71 | SKIPPED</span><br><span class="line"></span><br><span class="line"><span class="comment">#removes  远程文件存在 才执行 常用于删除文件前判断文件是否存在</span></span><br><span class="line"><span class="comment">#当时没转杯脚本 shell模块也支持 </span></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;removes=/etc/fstab echo ok&#x27;</span></span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br></pre></td></tr></table></figure>
 
-<h2 id="kubelet-conf"><a href="#kubelet-conf" class="headerlink" title="** kubelet-conf"></a>** kubelet-conf</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/etc/kubernetes/kubelet-conf.yml&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">address: 0.0.0.0</span><br><span class="line">apiVersion: kubelet.config.k8s.io/v1beta1</span><br><span class="line">authentication:</span><br><span class="line">  anonymous:</span><br><span class="line">    enabled: <span class="literal">false</span></span><br><span class="line">  webhook:</span><br><span class="line">    cacheTTL: 2m0s</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line">  x509:</span><br><span class="line">    clientCAFile: /etc/kubernetes/pki/ca.crt</span><br><span class="line">authorization:</span><br><span class="line">  mode: Webhook</span><br><span class="line">  webhook:</span><br><span class="line">    cacheAuthorizedTTL: 5m0s</span><br><span class="line">    cacheUnauthorizedTTL: 30s</span><br><span class="line">cgroupDriver: systemd</span><br><span class="line">cgroupsPerQOS: <span class="literal">true</span></span><br><span class="line">clusterDNS:</span><br><span class="line">- 10.96.0.10</span><br><span class="line">clusterDomain: cluster.local</span><br><span class="line">configMapAndSecretChangeDetectionStrategy: Watch</span><br><span class="line">containerLogMaxFiles: 5</span><br><span class="line">containerLogMaxSize: 10Mi</span><br><span class="line">contentType: application/vnd.kubernetes.protobuf</span><br><span class="line">cpuCFSQuota: <span class="literal">true</span></span><br><span class="line">cpuCFSQuotaPeriod: 100ms</span><br><span class="line">cpuManagerPolicy: none</span><br><span class="line">cpuManagerReconcilePeriod: 10s</span><br><span class="line">enableControllerAttachDetach: <span class="literal">true</span></span><br><span class="line">enableDebuggingHandlers: <span class="literal">true</span></span><br><span class="line">enforceNodeAllocatable:</span><br><span class="line">- pods</span><br><span class="line">eventBurst: 10</span><br><span class="line">eventRecordQPS: 5</span><br><span class="line">evictionHard:</span><br><span class="line">  imagefs.available: 15%</span><br><span class="line">  memory.available: 100Mi</span><br><span class="line">  nodefs.available: 10%</span><br><span class="line">  nodefs.inodesFree: 5%</span><br><span class="line">evictionPressureTransitionPeriod: 5m0s</span><br><span class="line">failSwapOn: <span class="literal">true</span></span><br><span class="line">fileCheckFrequency: 20s</span><br><span class="line">hairpinMode: promiscuous-bridge</span><br><span class="line">healthzBindAddress: 127.0.0.1</span><br><span class="line">healthzPort: 10248</span><br><span class="line">httpCheckFrequency: 20s</span><br><span class="line">imageGCHighThresholdPercent: 85</span><br><span class="line">imageGCLowThresholdPercent: 80</span><br><span class="line">imageMinimumGCAge: 2m0s</span><br><span class="line">iptablesDropBit: 15</span><br><span class="line">iptablesMasqueradeBit: 14</span><br><span class="line">kind: KubeletConfiguration</span><br><span class="line">kubeAPIBurst: 10</span><br><span class="line">kubeAPIQPS: 5</span><br><span class="line">makeIPTablesUtilChains: <span class="literal">true</span></span><br><span class="line">maxOpenFiles: 1000000</span><br><span class="line">maxPods: 110</span><br><span class="line">nodeLeaseDurationSeconds: 40</span><br><span class="line">nodeStatusReportFrequency: 1m0s</span><br><span class="line">nodeStatusUpdateFrequency: 10s</span><br><span class="line">oomScoreAdj: -999</span><br><span class="line">podPidsLimit: -1</span><br><span class="line">port: 10250</span><br><span class="line">registryBurst: 10</span><br><span class="line">registryPullQPS: 5</span><br><span class="line">resolvConf: /etc/resolv.conf</span><br><span class="line">rotateCertificates: <span class="literal">true</span></span><br><span class="line">runtimeRequestTimeout: 2m0s</span><br><span class="line">serializeImagePulls: <span class="literal">true</span></span><br><span class="line">staticPodPath: /etc/kubernetes/manifests</span><br><span class="line">streamingConnectionIdleTimeout: 4h0m0s</span><br><span class="line">syncFrequency: 1m0s</span><br><span class="line">volumeStatsAggPeriod: 1m0s</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">**kubelet UnitFile</span><br><span class="line">cat &gt;/lib/systemd/system/kubelet.service&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes Kubelet</span><br><span class="line">Documentation=https://github.com/kubernetes/kubernetes</span><br><span class="line">After=docker.service</span><br><span class="line">Requires=docker.service</span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kubelet \</span><br><span class="line">  --bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \</span><br><span class="line">  --config=/etc/kubernetes/kubelet-conf.yml \</span><br><span class="line">  --pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.1 \</span><br><span class="line">  --network-plugin=cni \</span><br><span class="line">  --cni-conf-dir=/etc/cni/net.d \</span><br><span class="line">  --cni-bin-dir=/opt/cni/bin \</span><br><span class="line">  --cert-dir=/etc/kubernetes/pki \</span><br><span class="line">  --cgroup-driver=cgroupfs \</span><br><span class="line">  --alsologtostderr=<span class="literal">true</span> \</span><br><span class="line">  --logtostderr=<span class="literal">false</span> \</span><br><span class="line">  --log-dir=/data/kubelog/kubelet \</span><br><span class="line">  --v=2</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=10s</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-<p>##–pod-infra-container-imag 的pause 镜像 建议自己下载好 上传到内部harbor  这里填写内部harbor的地址</p>
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /data/kubelog/kubelet /etc/kubernetes/manifests  /etc/cni/net.d</span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kubelet &amp;&amp; systemctl start kubelet</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="copy模块"><a href="#copy模块" class="headerlink" title="copy模块"></a>copy模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#本地文件复制到远程主机</span></span><br><span class="line"><span class="comment">#backup=yes 如果目标存在是否做备份  可选  </span></span><br><span class="line"><span class="comment">#mode=600 指定目标文件的权限   可选  </span></span><br><span class="line"><span class="comment">#owner=root 指定文件所有者 要求目标主机必须存在此用户  可选1</span></span><br><span class="line"><span class="comment">#src 源文件 dest 目标文件</span></span><br><span class="line">~] ansible master -m copy -a <span class="string">&#x27;src=f1 dest=/root/ backup=yes mode=600 owner=root&#x27;</span></span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;gid&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;group&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;0600&quot;</span>, </span><br><span class="line">    <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;path&quot;</span>: <span class="string">&quot;/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;secontext&quot;</span>: <span class="string">&quot;unconfined_u:object_r:admin_home_t:s0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;size&quot;</span>: 4, </span><br><span class="line">    <span class="string">&quot;state&quot;</span>: <span class="string">&quot;file&quot;</span>, </span><br><span class="line">    <span class="string">&quot;uid&quot;</span>: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#指定内容自动生成目标文件</span></span><br><span class="line">~] ansible master -m copy  -a <span class="string">&#x27;content=&quot;123\n321\n&quot; dest=/root/f2 backup=yes mode=600 owner=root &#x27;</span> </span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;c0beba7825cc1b6fb2b2ac00b60a2f6a41e7d510&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/f2&quot;</span>, </span><br><span class="line">    <span class="string">&quot;gid&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;group&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;md5sum&quot;</span>: <span class="string">&quot;8505d51e034e71d37cef01f5e2849472&quot;</span>, </span><br><span class="line">    <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;0600&quot;</span>, </span><br><span class="line">    <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;secontext&quot;</span>: <span class="string">&quot;system_u:object_r:admin_home_t:s0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;size&quot;</span>: 7, </span><br><span class="line">    <span class="string">&quot;src&quot;</span>: <span class="string">&quot;/root/.ansible/tmp/ansible-tmp-1604925832.19-6444-235748674593184/source&quot;</span>, </span><br><span class="line">    <span class="string">&quot;state&quot;</span>: <span class="string">&quot;file&quot;</span>, </span><br><span class="line">    <span class="string">&quot;uid&quot;</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes</span><br><span class="line">NAME          STATUS     ROLES    AGE    VERSION</span><br><span class="line">k-n1.sp.com   NotReady   &lt;none&gt;   3s   	 v1.15.12</span><br><span class="line">k-n2.sp.com   NotReady   &lt;none&gt;   3s     v1.15.12</span><br><span class="line">**打标签声明role</span><br><span class="line"><span class="comment">##给master 打污点 和 role 标签</span></span><br><span class="line">kubectl taint nodes k-m1.sp.com node-role.kubernetes.io/master=<span class="string">&quot;&quot;</span>:NoSchedule</span><br><span class="line">kubectl label node k-m1.sp.com node-role.kubernetes.io/master=<span class="string">&quot;&quot;</span></span><br><span class="line"><span class="comment">##给node 打 role 标签</span></span><br><span class="line">kubectl label node k-n1.sp.com node-role.kubernetes.io/node=<span class="string">&quot;&quot;</span></span><br><span class="line">kubectl label node k-n2.sp.com node-role.kubernetes.io/node=<span class="string">&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="fetch模块"><a href="#fetch模块" class="headerlink" title="fetch模块"></a>fetch模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从远程拉取文件到本地</span></span><br><span class="line"><span class="comment">#注意src只能是文件不能是目录</span></span><br><span class="line">~] ansible master -m fetch -a <span class="string">&quot;src=/root/f1 dest=.&quot;</span></span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/192.168.1.71/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;md5sum&quot;</span>: <span class="string">&quot;ba1f2511fc30423bdbb183fe33f3dd0f&quot;</span>, </span><br><span class="line">    <span class="string">&quot;remote_checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;remote_md5sum&quot;</span>: null</span><br><span class="line">&#125;</span><br><span class="line">~] ll</span><br><span class="line">total 28K</span><br><span class="line">drwxr-xr-x. 3 root root   18 Nov  9 20:55 192.168.1.71</span><br><span class="line">~] <span class="built_in">cd</span> 192.168.1.71 &amp;&amp; free</span><br><span class="line">.</span><br><span class="line">└── root</span><br><span class="line">    └── f1</span><br><span class="line"><span class="comment">#可以看到 它吧目标主机的目录结构都保留下来了</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="file模块"><a href="#file模块" class="headerlink" title="file模块"></a>file模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># path 目标文件</span></span><br><span class="line"><span class="comment"># owner 指定文件所有者</span></span><br><span class="line"><span class="comment"># mode 指定权限 如 755</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置文件属性</span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/a.sh owner=root mode=755&quot;</span></span><br><span class="line"><span class="comment">#创建空文件</span></span><br><span class="line">ansible master -m file <span class="string">&quot;name=/root/b.sh owner=root mode=755&quot;</span></span><br><span class="line"><span class="comment">#创建软连接</span></span><br><span class="line">ansible master -m file <span class="string">&quot;src=/root/b.sh dest=/root/c.sh state=link&quot;</span></span><br><span class="line"><span class="comment">#创建硬链接</span></span><br><span class="line">ansible master -m file <span class="string">&quot;src=/root/b.sh dest=/root/d.sh state=head&quot;</span></span><br><span class="line"><span class="comment">#创建目录</span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/dir owner=root mode=755 state=directory&quot;</span></span><br><span class="line"><span class="comment">#删除目录 或 文件 </span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/dir state=absent&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="hostname模块"><a href="#hostname模块" class="headerlink" title="hostname模块"></a>hostname模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用于修改主机名</span></span><br><span class="line"><span class="comment">#注意修改主机名通常只是一个主机修改 多个主机同一个主机名 显然是不合理的</span></span><br><span class="line">ansible 192.168.1.11 -m hostname -a <span class="string">&#x27;name=123.abc.com&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>Cron计划任务模块</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#支持的时间点 minute hour day month weekday</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#创建计划任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;minute=k*/5 job=&#x27;/usr/sbin/ntpdate ntp.aliyun.com &amp;&gt;/dev/null&#x27; name=Synctime&quot;</span></span><br><span class="line"><span class="comment">#删除计划任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;state=absent name=Synctime&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>yum模块</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=httpd state=latest&#x27;</span> </span><br><span class="line"><span class="comment">#卸载包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=httpd state=absent&#x27;</span> </span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -159,7 +169,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
 
     </footer>
   </div>
@@ -171,7 +181,7 @@
 
     
     <article
-  id="post-9 coredns"
+  id="post-1 ansible基础"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -182,36 +192,36 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/9%20coredns/"
-    >9coredns</a> 
+  <a class="article-title" href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/"
+    >1.ansible入门基础</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/9%20coredns/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+    <a class="article-category-link" href="/categories/ansible/">ansible</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="部署coredns"><a href="#部署coredns" class="headerlink" title="**部署coredns"></a>**部署coredns</h2><h3 id="1-下载清单"><a href="#1-下载清单" class="headerlink" title="1 下载清单"></a>1 下载清单</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir coredns &amp;&amp; <span class="built_in">cd</span> coredns</span><br><span class="line">wget https://raw.githubusercontent.com/coredns/deployment/master/kubernetes/coredns.yaml.sed</span><br><span class="line">wget https://raw.githubusercontent.com/coredns/deployment/master/kubernetes/deploy.sh</span><br></pre></td></tr></table></figure>
+  <h2 id="ansible入门"><a href="#ansible入门" class="headerlink" title="ansible入门"></a>ansible入门</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><h5 id="配置-etc-ansible-hosts-主机清单"><a href="#配置-etc-ansible-hosts-主机清单" class="headerlink" title="配置/etc/ansible/hosts 主机清单"></a>配置/etc/ansible/hosts 主机清单</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># cat /etc/ansible/hosts</span></span><br><span class="line">[master]192.168.1.71</span><br><span class="line">[node]</span><br><span class="line">192.168.1.8[1:2]</span><br><span class="line"><span class="comment">#主机清单支持 ip 主机名 如果ssh端口非默认22端口 可以在ip或主机名后加上端口 如 192.168.1.71:2222</span></span><br><span class="line"><span class="comment">#如果主机名 或 ip 有连贯数字 可以使用 [] 来指定数字范围 如 192.168.1.8[1:2] 就是 192.168.1.81 和192.168.1.82</span></span><br></pre></td></tr></table></figure>
 
+<h5 id="确保-etc-ansible-ansible-cfg配置中启用如下配置"><a href="#确保-etc-ansible-ansible-cfg配置中启用如下配置" class="headerlink" title="确保/etc/ansible/ansible.cfg配置中启用如下配置"></a>确保/etc/ansible/ansible.cfg配置中启用如下配置</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">host_key_checking = False</span><br><span class="line"><span class="comment">#ansible采用ssh进行连接 当第一次连接会有交互性提示 此配置忽略交互性提示 </span></span><br></pre></td></tr></table></figure>
 
+<h5 id="所有主机免秘钥认证"><a href="#所有主机免秘钥认证" class="headerlink" title="所有主机免秘钥认证"></a>所有主机免秘钥认证</h5><h2 id="验证测试"><a href="#验证测试" class="headerlink" title="验证测试"></a>验证测试</h2><h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#语法</span></span><br><span class="line">ansible [hosts] -m ping</span><br><span class="line"><span class="comment">#hosts 可以是 主机名或者ip 但更多的时候应该使用组名 如上面我们写的master 和node 都是组名</span></span><br><span class="line"><span class="comment">#hosts 也支持通配符 如 192.168.1.* </span></span><br><span class="line"><span class="comment">#一个组包含一个或者多个主机</span></span><br><span class="line"><span class="comment">#all 表示清单中所有主机</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line">~]<span class="comment"># ansible all -m ping</span></span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#ping模块 通过ssh方式测试是否连通主机 如果连通 返回 pong</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="2-将镜像下载到本地-推送到内网harbor，可选-但推荐"><a href="#2-将镜像下载到本地-推送到内网harbor，可选-但推荐" class="headerlink" title="2 将镜像下载到本地 推送到内网harbor，可选 但推荐"></a>2 将镜像下载到本地 推送到内网harbor，可选 但推荐</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#你下载的coredns.yaml.sed 中并不一定是此版本 按照coredns.yaml.sed文件中的版本操作</span></span><br><span class="line"> docker pull coredns/coredns:1.7.0</span><br><span class="line">    docker tag coredns/coredns:1.7.0 hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">    docker push hb.sp.com/coredns/coredns:1.7.0</span><br></pre></td></tr></table></figure>
+<h2 id="ansible-的与或非"><a href="#ansible-的与或非" class="headerlink" title="ansible 的与或非"></a>ansible 的与或非</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑或 :</span></span><br><span class="line">ansible master:node -m ping </span><br><span class="line">ansible master:node -m ping </span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#可以看到这里的逻辑或 是指 多个主机 或者多组主机 都执行任务</span></span><br></pre></td></tr></table></figure>
 
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑与 :&amp;</span></span><br><span class="line">ansible <span class="string">&quot;master:&amp;node&quot;</span> -m ping</span><br><span class="line">[WARNING]: No hosts matched, nothing to <span class="keyword">do</span></span><br><span class="line"><span class="comment">#注意双引号 否则报错</span></span><br><span class="line"><span class="comment">#这里为什么会没有主机呢 </span></span><br><span class="line"><span class="comment">#因为这里的逻辑与 是取 两个组的交集 我指定的这两个组没有交集 </span></span><br></pre></td></tr></table></figure>
 
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">将image地址改为本地库 事先去harbor创建好项目：</span><br><span class="line">  原：coredns/coredns:1.7.0</span><br><span class="line">  新: hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">  </span><br><span class="line">  sed -i <span class="string">&quot;s@coredns/coredns:1.7.0@hb.sp.com/coredns/coredns:1.7.0@g&quot;</span> coredns.yaml.sed</span><br><span class="line">  <span class="comment">##验证</span></span><br><span class="line">  cat coredns.yaml.sed |grep image</span><br><span class="line">    image: hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">    imagePullPolicy: IfNotPresent</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-部署"><a href="#3-部署" class="headerlink" title="3  部署"></a>3  部署</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里的IP 需要与apiserver 启动参数--service-cluster-ip-range=10.96.0.0/12 中的一样</span></span><br><span class="line"><span class="comment">#10.96.0.10 是coredns 的svc地址</span></span><br><span class="line">bash deploy.sh -i 10.96.0.10 -r <span class="string">&quot;10.96.0.0/12&quot;</span> -s -t coredns.yaml.sed |kubectl apply -f -</span><br></pre></td></tr></table></figure> 
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑非 :!</span></span><br><span class="line">ansible <span class="string">&#x27;master:!node&#x27;</span> -m ping</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#注意这里的必须是单引号 否则shell 会把特殊符号替换 导致报错</span></span><br><span class="line"><span class="comment">#这里的逻辑非 是指  在master中存在 但不在node中存在 </span></span><br></pre></td></tr></table></figure> 
       <!-- reward -->
       
     </div>
@@ -221,7 +231,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
 
     </footer>
   </div>
@@ -233,7 +243,7 @@
 
     
     <article
-  id="post-7.1 Node节点 kube-proxy"
+  id="post-1-指标类型"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -244,59 +254,37 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/7.1%20Node%E8%8A%82%E7%82%B9%20kube-proxy/"
-    >7.1NODE节点kube-proxy</a> 
+  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
+    >1.指标类型</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/7.1%20Node%E8%8A%82%E7%82%B9%20kube-proxy/" class="article-date">
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
   <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <p>#安装到所有节点</p>
-<h2 id="创建一个-kube-proxy-的-service-account"><a href="#创建一个-kube-proxy-的-service-account" class="headerlink" title="**创建一个 kube-proxy 的 service account"></a>**创建一个 kube-proxy 的 service account</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system create serviceaccount kube-proxy</span><br></pre></td></tr></table></figure>
+  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
+<li><p>时间序列格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
 
-
-
-<h2 id="将-kube-proxy-的-serviceaccount-绑定到-clusterrole-system-node-proxier以允许-RBAC"><a href="#将-kube-proxy-的-serviceaccount-绑定到-clusterrole-system-node-proxier以允许-RBAC" class="headerlink" title="**将 kube-proxy 的 serviceaccount 绑定到 clusterrole system:node-proxier以允许 RBAC"></a>**将 kube-proxy 的 serviceaccount 绑定到 clusterrole system:node-proxier以允许 RBAC</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl create clusterrolebinding kubeadm:kube-proxy \</span><br><span class="line">        --clusterrole system:node-proxier \</span><br><span class="line">        --serviceaccount kube-system:kube-proxy</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="创建kube-proxy的kubeconfig"><a href="#创建kube-proxy的kubeconfig" class="headerlink" title="**创建kube-proxy的kubeconfig"></a>**创建kube-proxy的kubeconfig</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#变量</span></span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;kube-proxy.kubeconfig&quot;</span></span><br><span class="line"></span><br><span class="line">SECRET=$(kubectl -n kube-system get sa/kube-proxy --output=jsonpath=<span class="string">&#x27;&#123;.secrets[0].name&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">JWT_TOKEN=$(kubectl -n kube-system get secret/<span class="variable">$SECRET</span> --output=jsonpath=<span class="string">&#x27;&#123;.data.token&#125;&#x27;</span> | base64 -d)</span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#KUBE_APISERVER 可以是vip</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --token=<span class="variable">$&#123;JWT_TOKEN&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#验证文件</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="kube-proxy-conf"><a href="#kube-proxy-conf" class="headerlink" title="**kube-proxy.conf"></a>**kube-proxy.conf</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/etc/kubernetes/kube-proxy.conf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">apiVersion: kubeproxy.config.k8s.io/v1alpha1</span><br><span class="line">bindAddress: &#123;&#123;LISTEN_IP&#125;&#125;</span><br><span class="line">clientConnection:</span><br><span class="line">    acceptContentTypes: <span class="string">&quot;&quot;</span></span><br><span class="line">    burst: 10</span><br><span class="line">    contentType: application/vnd.kubernetes.protobuf</span><br><span class="line">    kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig</span><br><span class="line">    qps: 5</span><br><span class="line">clusterCIDR: <span class="string">&quot;10.244.0.0/16&quot;</span></span><br><span class="line">configSyncPeriod: 15m0s</span><br><span class="line">conntrack:</span><br><span class="line">    max: null</span><br><span class="line">    maxPerCore: 32768</span><br><span class="line">    min: 131072</span><br><span class="line">    tcpCloseWaitTimeout: 1h0m0s</span><br><span class="line">    tcpEstablishedTimeout: 24h0m0s</span><br><span class="line">enableProfiling: <span class="literal">false</span></span><br><span class="line">healthzBindAddress: &#123;&#123;LISTEN_IP&#125;&#125;:10256</span><br><span class="line">hostnameOverride: <span class="string">&quot;&quot;</span></span><br><span class="line">iptables:</span><br><span class="line">    masqueradeAll: <span class="literal">true</span></span><br><span class="line">    masqueradeBit: 14</span><br><span class="line">    minSyncPeriod: 0s</span><br><span class="line">    syncPeriod: 30s</span><br><span class="line">ipvs:</span><br><span class="line">    excludeCIDRs: null</span><br><span class="line">    minSyncPeriod: 0s</span><br><span class="line">    scheduler: <span class="string">&quot;&quot;</span></span><br><span class="line">    syncPeriod: 30s</span><br><span class="line">kind: KubeProxyConfiguration</span><br><span class="line">metricsBindAddress: 127.0.0.1:10249</span><br><span class="line">mode: <span class="string">&quot;ipvs&quot;</span></span><br><span class="line">nodePortAddresses: null</span><br><span class="line">oomScoreAdj: -999</span><br><span class="line">portRange: <span class="string">&quot;&quot;</span></span><br><span class="line">resourceContainer: /kube-proxy</span><br><span class="line">udpIdleTimeout: 250ms</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="UnitFile"><a href="#UnitFile" class="headerlink" title="**UnitFile"></a>**UnitFile</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-proxy.service&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes Kube Proxy</span><br><span class="line">Documentation=https://github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-proxy \</span><br><span class="line">  --config=/etc/kubernetes/kube-proxy.conf \</span><br><span class="line">  --v=2</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=10s</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="分发"><a href="#分发" class="headerlink" title="**分发"></a>**分发</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scp /etc/kubernetes/kube-proxy.conf k-n1:/etc/kubernetes/kube-proxy.conf</span><br><span class="line">scp /etc/kubernetes/kube-proxy.kubeconfig k-n1:/etc/kubernetes/kube-proxy.kubeconfig</span><br><span class="line">scp /usr/lib/systemd/system/kube-proxy.service k-n1:/usr/lib/systemd/system/kube-proxy.service</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="所有节点替换配置为自己的ip"><a href="#所有节点替换配置为自己的ip" class="headerlink" title="**所有节点替换配置为自己的ip"></a>**所有节点替换配置为自己的ip</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/&#123;&#123;LISTEN_IP&#125;&#125;/192.168.1.71/g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br><span class="line">sed -i <span class="string">&#x27;s#&#123;&#123;LISTEN_IP&#125;&#125;#192.168.1.81#g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br><span class="line">sed -i <span class="string">&#x27;s#&#123;&#123;LISTEN_IP&#125;&#125;#192.168.1.82#g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-proxy &amp;&amp; systemctl start kube-proxy </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ipvsadm -ln                                                                                                                        127 ↵</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  10.96.0.1:443 rr</span><br><span class="line">  -&gt; 192.168.1.71:6443            Masq    1      0          0     </span><br></pre></td></tr></table></figure>
-
-
+</li>
+</ul>
+<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
+<li>Counter：递增的计数器 </li>
+<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
+<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
+<li>Summary：与Histogram类似</li>
+</ol>
  
       <!-- reward -->
       
@@ -307,7 +295,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
 
     </footer>
   </div>
@@ -319,7 +307,7 @@
 
     
     <article
-  id="post-8 网络插件 calico与flannel"
+  id="post-10-alertmanager部署"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -330,51 +318,28 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/"
-    >8网络插件calico与flannel</a> 
+  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
+    >10.alertmanager部署</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/" class="article-date">
+      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
   <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <p>###calico 与 flannel 选一即可</p>
-<h2 id="calico"><a href="#calico" class="headerlink" title="**calico"></a>**calico</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/v3.8/manifests/calico.yaml </span><br><span class="line">sed -i -e <span class="string">&quot;s?192.168.0.0/16?10.244.0.0/16?g&quot;</span> calico.yaml</span><br><span class="line"><span class="comment">#最好下载好镜像上传至内部harbor</span></span><br><span class="line"><span class="comment">#然后修改此文件中的镜像指向内部harbor </span></span><br><span class="line">calico/cni:v3.8.9</span><br><span class="line">calico/pod2daemon-flexvol:v3.8.9</span><br><span class="line">calico/node:v3.8.9</span><br><span class="line">calico/kube-controllers:v3.8.9</span><br></pre></td></tr></table></figure>
+  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-
-
-<h2 id="替换镜像"><a href="#替换镜像" class="headerlink" title="**替换镜像"></a>**替换镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&quot;s@calico/cni:v3.8.9@hb.sp.com/calico/cni:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/pod2daemon-flexvol:v3.8.9@hb.sp.com/calico/pod2daemon-flexvol:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/node:v3.8.9@hb.sp.com/calico/node:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/kube-controllers:v3.8.9@hb.sp.com/calico/kube-controllers:v3.8.9@g&quot;</span> calico.yaml </span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get nodes</span></span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION</span><br><span class="line">k-m1.sp.com   Ready    master   9h    v1.15.12</span><br><span class="line">k-n1.sp.com   Ready    node     25h   v1.15.12</span><br><span class="line">k-n2.sp.com   Ready    node     24h   v1.15.12</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl get pod -n kube-system</span></span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">calico-kube-controllers-867fb4cbb9-tl9d8   1/1     Running   0          51m</span><br><span class="line">calico-node-7nxjj                          1/1     Running   0          51m</span><br><span class="line">calico-node-td9mh                          1/1     Running   0          51m</span><br><span class="line">calico-node-wmbqv                          1/1     Running   0          51m</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="flannel"><a href="#flannel" class="headerlink" title="**flannel"></a>**flannel</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/coreos/flannel 中推荐方法</span><br><span class="line"></span><br><span class="line">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="迁移镜像到本地harbor-（可选-但推荐）"><a href="#迁移镜像到本地harbor-（可选-但推荐）" class="headerlink" title="*迁移镜像到本地harbor （可选 但推荐）"></a>*迁移镜像到本地harbor （可选 但推荐）</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看镜像版本</span></span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line"><span class="comment">#上传镜像到本地harbor</span></span><br><span class="line">docker pull quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">docker image tag quay.io/coreos/flannel:v0.13.0-rc2    hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">docker push hb.sp.com/flannel/flannel:v0.13.0-rc2 </span><br><span class="line"><span class="comment">#修改清单</span></span><br><span class="line">sed -i <span class="string">&quot;s@quay.io/coreos/flannel:v0.13.0-rc2@hb.sp.com/flannel/flannel:v0.13.0-rc2@g&quot;</span> kube-flannel.yml</span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="部署"><a href="#部署" class="headerlink" title="*部署"></a>*部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f kube-flannel.yml</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                    READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kube-flannel-ds-7pfdp   1/1     Running   0          48s   192.168.1.71   k-m1.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-hn6bf   1/1     Running   0          48s   192.168.1.82   k-n2.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-vjr2k   1/1     Running   0          48s   192.168.1.81   k-n1.sp.com   &lt;none&gt;           &lt;none&gt;。</span><br></pre></td></tr></table></figure>
+<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -386,7 +351,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
 
     </footer>
   </div>
@@ -398,7 +363,7 @@
 
     
     <article
-  id="post-9.1 dashboard"
+  id="post-2-作业和实例"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -409,34 +374,35 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/9.1%20dashboard/"
-    >9.1dashboard</a> 
+  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
+    >2.作业和实例</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/9.1%20dashboard/" class="article-date">
+      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
   <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="清单"><a href="#清单" class="headerlink" title="**清单"></a>**清单</h2><p>#dashboard 清单 修改其中的service </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.1/aio/deploy/recommended.yaml</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
+<li><p>实例</p>
+<p>   可以抓取的目标称为实例（Instances）</p>
+</li>
+<li><p>作业</p>
+<p>具有相同目标的实例集合称为作业（Job）</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
 
-<p>#RBAC</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">cat &gt; dashboard.yaml&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">metadata:</span><br><span class="line">  name: admin</span><br><span class="line">  annotations:</span><br><span class="line">    rbac.authorization.kubernetes.io/autoupdate: <span class="string">&quot;true&quot;</span></span><br><span class="line">roleRef:</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  </span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  labels:</span><br><span class="line">    kubernetes.io/cluster-service: <span class="string">&quot;true&quot;</span></span><br><span class="line">    addonmanager.kubernetes.io/mode: Reconcile</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-<h2 id="获取token"><a href="#获取token" class="headerlink" title="##获取token"></a>##获取token</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get sa admin -n kubernetes-dashboard -o yaml </span></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    kubectl.kubernetes.io/last-applied-configuration: |</span><br><span class="line">      &#123;<span class="string">&quot;apiVersion&quot;</span>:<span class="string">&quot;v1&quot;</span>,<span class="string">&quot;kind&quot;</span>:<span class="string">&quot;ServiceAccount&quot;</span>,<span class="string">&quot;metadata&quot;</span>:&#123;<span class="string">&quot;annotations&quot;</span>:&#123;&#125;,<span class="string">&quot;labels&quot;</span>:&#123;<span class="string">&quot;addonmanager.kubernetes.io/mode&quot;</span>:<span class="string">&quot;Reconcile&quot;</span>,<span class="string">&quot;kubernetes.io/cluster-service&quot;</span>:<span class="string">&quot;true&quot;</span>&#125;,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;admin&quot;</span>,<span class="string">&quot;namespace&quot;</span>:<span class="string">&quot;kubernetes-dashboard&quot;</span>&#125;&#125;</span><br><span class="line">  creationTimestamp: <span class="string">&quot;2020-10-26T13:47:39Z&quot;</span></span><br><span class="line">  labels:</span><br><span class="line">    addonmanager.kubernetes.io/mode: Reconcile</span><br><span class="line">    kubernetes.io/cluster-service: <span class="string">&quot;true&quot;</span></span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  resourceVersion: <span class="string">&quot;1212698&quot;</span></span><br><span class="line">  selfLink: /api/v1/namespaces/kubernetes-dashboard/serviceaccounts/admin</span><br><span class="line">  uid: 8edb9d0a-af03-47e0-94fe-4692d46ff3f3</span><br><span class="line">secrets:</span><br><span class="line"><span class="comment">#这个是 这个sa对应的secret名字</span></span><br><span class="line">- name: admin-token-sgxhb</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl describe secrets admin-token-sgxhb -n kubernetes-dashboard </span></span><br><span class="line">Name:         admin-token-sgxhb</span><br><span class="line">Namespace:    kubernetes-dashboard</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: admin</span><br><span class="line">              kubernetes.io/service-account.uid: 8edb9d0a-af03-47e0-94fe-4692d46ff3f3</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">ca.crt:     1046 bytes</span><br><span class="line">namespace:  20 bytes</span><br><span class="line">token:      eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia</span><br><span class="line">3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV</span><br><span class="line">0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2</span><br><span class="line">VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291b</span><br><span class="line">nQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5</span><br><span class="line">c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-q</span><br><span class="line">J5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBg</span><br><span class="line">JM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ</span><br></pre></td></tr></table></figure>
-<h2 id="生成kubeconfig"><a href="#生成kubeconfig" class="headerlink" title="##生成kubeconfig"></a>##生成kubeconfig</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">kubectl config set-cluster kubernetes \</span><br><span class="line">--server=192.168.1.71:6443 \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config set-credentials admin \</span><br><span class="line">--token=eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-qJ5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBgJM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config set-context admin@kubernetes \</span><br><span class="line">--cluster=kubernetes \</span><br><span class="line">--user=admin \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config use-context admin@kubernetes \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="##验证"></a>##验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">clusters:</span><br><span class="line">- cluster:</span><br><span class="line">    server: 192.168.1.71:6443</span><br><span class="line">  name: kubernetes</span><br><span class="line">contexts:</span><br><span class="line">- context:</span><br><span class="line">    cluster: kubernetes</span><br><span class="line">    user: admin</span><br><span class="line">  name: admin@kubernetes</span><br><span class="line">current-context: admin@kubernetes</span><br><span class="line">kind: Config</span><br><span class="line">preferences: &#123;&#125;</span><br><span class="line">users:</span><br><span class="line">- name: admin</span><br><span class="line">  user:</span><br><span class="line">    token: eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-qJ5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBgJM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ</span><br></pre></td></tr></table></figure>
  
       <!-- reward -->
       
@@ -447,7 +413,347 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-11-告警规则与告警"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/"
+    >11.告警规则与告警</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="告警规则"><a href="#告警规则" class="headerlink" title="告警规则"></a>告警规则</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##prometheus.yml </span></span><br><span class="line"><span class="comment">#配置加载的文件  这个文件只要主配置中存在 就会定期去加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - <span class="string">&quot;rules/*.yml&quot;</span></span><br><span class="line"><span class="comment">##rules/node.yml 编写告警规则</span></span><br><span class="line">groups:</span><br><span class="line"><span class="comment"># 报警规则组名称</span></span><br><span class="line">- name: example   </span><br><span class="line">  rules:</span><br><span class="line">  <span class="comment">#规则名称</span></span><br><span class="line">  - alert: InstanceDown</span><br><span class="line">    <span class="comment">#指标阀值表达式</span></span><br><span class="line">    expr: up == 0</span><br><span class="line">    <span class="comment">#持续时间 ， 表示连续触发阀值达5分钟才触发报警</span></span><br><span class="line">    <span class="keyword">for</span>: 5m </span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment"># 自定义标签</span></span><br><span class="line">      severity: page</span><br><span class="line">    <span class="comment">#消息体</span></span><br><span class="line">    annotations:</span><br><span class="line">      <span class="comment"># 自定义摘要&#123;&#123; $labels.instance &#125;&#125; 是引用指标标签instance的值</span></span><br><span class="line">      summary: <span class="string">&quot;Instance &#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; down&quot;</span></span><br><span class="line">      <span class="comment"># 自定义具体描述 &#123;&#123; $labels.job &#125;&#125; 表示引用指标标签job的值</span></span><br><span class="line">      description: <span class="string">&quot;&#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; of job &#123;&#123; <span class="variable">$labels</span>.job &#125;&#125; has been down for more than 5 minutes.&quot;</span> </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="告警状态"><a href="#告警状态" class="headerlink" title="告警状态"></a>告警状态</h2><p>在prometheus 的web页面  alerts选项中可以常看状态</p>
+<p>⦁    Inactive：这里什么都没有发生。<br>⦁    Pending：已触发阈值，但未满足告警持续时间（即rule中的for字段）<br>⦁    Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，经过处理，发送给接受者。</p>
+<h2 id="用过标签分类告警以及分组告警"><a href="#用过标签分类告警以及分组告警" class="headerlink" title="用过标签分类告警以及分组告警"></a>用过标签分类告警以及分组告警</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">route:</span><br><span class="line">  <span class="comment">#通过标签进行分组 标签K/V结构 ,当K的值相等的时候将划分为一组一并发出</span></span><br><span class="line">  <span class="comment">#alertname是默认标签,表示告警名称</span></span><br><span class="line">  group_by: [cluster, alertname]</span><br><span class="line">  <span class="comment"># 告警等待时间 如果等待过程又收到告警并且属同一组将一并发出</span></span><br><span class="line">  group_wait: 10s</span><br><span class="line">  <span class="comment"># 告警间隔 如告警后又出现告警将判断间隔时间延迟发出</span></span><br><span class="line">  group_interval: 10s</span><br><span class="line">  <span class="comment"># 重复告警周期 同一个告警最少间隔时间 </span></span><br><span class="line">  repeat_interval: 20m</span><br><span class="line"><span class="comment"># 标签不匹配的告警都将保留在根节点，并发送到“default-receiver”</span></span><br><span class="line">  receiver: <span class="string">&#x27;default-receiver&#x27;</span> </span><br><span class="line">  routes: <span class="comment">#路由匹配标签来决定将告警发送到那个接收器上 接收器执行发送告警</span></span><br><span class="line"><span class="comment"># 标签service=mysql或者service=cassandra的告警分配到数据库接收端</span></span><br><span class="line">  - receiver: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">    group_wait: 10s</span><br><span class="line">    <span class="comment">#正则匹配标签</span></span><br><span class="line">    match_re:</span><br><span class="line">      service: mysql|cassandra</span><br><span class="line"><span class="comment"># 标签team=frontend的告警都与此子路由匹配</span></span><br><span class="line">  - receiver: <span class="string">&#x27;frontend-pager&#x27;</span></span><br><span class="line">    group_by: [product, environment]</span><br><span class="line">    <span class="comment">#精确匹配标签</span></span><br><span class="line">    match:</span><br><span class="line">      team: frontend </span><br><span class="line"><span class="comment">#定义接收器名称以及发送告警方式</span></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: <span class="string">&#x27;http://127.0.0.1:5001/&#x27;</span></span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">    - to: <span class="string">&#x27;******@163.com&#x27;</span> </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-3-二进制部署prometheus"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/"
+    >3.二进制部署Prometheus 服务端</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="相关包下载地址"><a href="#相关包下载地址" class="headerlink" title="相关包下载地址"></a>相关包下载地址</h2><p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
+<h2 id="部署Prometheus-服务端"><a href="#部署Prometheus-服务端" class="headerlink" title="部署Prometheus 服务端"></a>部署Prometheus 服务端</h2><ol>
+<li><p>下载和部署</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.22.0/prometheus-2.22.0.linux-amd64.tar.gz</span><br><span class="line">tar xf prometheus-2.22.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/prometheus-2.22.0.linux-amd64 /usr/<span class="built_in">local</span>/prometheus</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备UnitFile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/prometheus.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/prometheus/prometheus --config.file=/usr/<span class="built_in">local</span>/prometheus/prometheus.yml --storage.tsdb.retention=3d</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment">#这里只指定了一个配置文件选项,可以添加其它选项  使用 ./prometheus --help 查看其它选项</span></span><br><span class="line"><span class="comment">#常用选项</span></span><br><span class="line"><span class="comment"># --storage.tsdb.path=&quot;data/&quot; 指定数据目录 </span></span><br><span class="line"><span class="comment"># --storage.tsdb.retention=15d 指定留存数据时间范围</span></span><br><span class="line"><span class="comment"># --web.listen-address=&quot;0.0.0.0:9090&quot; 监听地址</span></span><br><span class="line"><span class="comment"># --web.max-connections=512 最大连接数</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p>配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/<span class="built_in">local</span>/prometheus/prometheus.yml</span><br><span class="line"><span class="comment"># my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s <span class="comment"># Set the scrape interval to every 15 seconds. Default is every 1 minute.</span></span><br><span class="line">  evaluation_interval: 15s <span class="comment"># Evaluate rules every 15 seconds. The default is every 1 minute.</span></span><br><span class="line">  <span class="comment"># scrape_timeout is set to the global default (10s).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">      <span class="comment"># - alertmanager:9093</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load rules once and periodically evaluate them according to the global &#x27;evaluation_interval&#x27;.</span></span><br><span class="line">rule_files:</span><br><span class="line">  <span class="comment"># - &quot;first_rules.yml&quot;</span></span><br><span class="line">  <span class="comment"># - &quot;second_rules.yml&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="comment"># Here it&#x27;s Prometheus itself.</span></span><br><span class="line">scrape_configs:</span><br><span class="line">  <span class="comment"># The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  <span class="comment">#作业 默认配置  用于监控prometheus自身</span></span><br><span class="line">  - job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># metrics_path defaults to &#x27;/metrics&#x27;</span></span><br><span class="line">    <span class="comment"># scheme defaults to &#x27;http&#x27;.</span></span><br><span class="line"></span><br><span class="line">    static_configs:</span><br><span class="line">    <span class="comment">#实例</span></span><br><span class="line">    - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动服务</p>
+</li>
+</ol>
+   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> prometheus &amp;&amp; systemctl start prometheus</span><br><span class="line"></span><br><span class="line">ss -tnl |grep 9090</span><br><span class="line">LISTEN     0      128       [::]:9090                  [::]:*  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-4-重写标签"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/"
+    >4.重写标签</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="重写标签"><a href="#重写标签" class="headerlink" title="重写标签"></a>重写标签</h2><p>是配置文件中的一个字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">relabel_configs:</span><br><span class="line">	....</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
+
+<h2 id="action：重新标签动作"><a href="#action：重新标签动作" class="headerlink" title="action：重新标签动作"></a>action：重新标签动作</h2><ul>
+<li>replace：默认，通过regex匹配source_label的值，使用replacement来引用表达式匹配的分组</li>
+<li>keep：只保留regex匹配的目标 source_labels </li>
+<li>drop：删除regex匹配的目标 source_labels </li>
+<li>labeldrop：删除regex匹配的标签</li>
+<li>labelkeep：只保留regex匹配的标签</li>
+<li>hashmod：设置target_label为modulus连接的哈希值source_labels </li>
+<li>labelmap：匹配regex所有标签名称。然后复制匹配标签的值进行分组，replacement分组引用（${1},${2},…）替代</li>
+</ul>
+<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ul>
+<li><p>给作业中所有实例添加标签</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">  <span class="comment">#静态实例</span></span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment">#添加了IDC标签赋值BJ</span></span><br><span class="line">      IDC: <span class="string">&quot;BJ&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看所有带有IDC:BJ标签实例的某指标的总和</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum(指标名称&#123;IDC:<span class="string">&quot;BJ&quot;</span>&#125;)</span><br><span class="line"><span class="comment">#在prometheus页面中填写公式 可获得总值</span></span><br><span class="line"><span class="comment">#sum() 求和</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="标签重写"><a href="#标签重写" class="headerlink" title="标签重写"></a>标签重写</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这个job命名方便识别机房</span></span><br><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#指定动作 默认replace 标签重写</span></span><br><span class="line">   - action: replace</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)</span><br><span class="line">     <span class="comment">#后向引用</span></span><br><span class="line">     replacement: <span class="variable">$1</span></span><br><span class="line">     <span class="comment">#标签的K被修改idc 原有标签还保留 多了一个 idc=&#x27;BJ-Prometheus&#x27;的标签</span></span><br><span class="line">     target_label: idc</span><br></pre></td></tr></table></figure>
+
+<h2 id="keep-和-drop"><a href="#keep-和-drop" class="headerlink" title="keep 和 drop"></a>keep 和 drop</h2><p>实现采集指标的过滤 使得指标是可以选择性采集的</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#keep 表示只采集有指定标签的指标</span></span><br><span class="line">   <span class="comment">#drop 表示不采集有此标签的的指标</span></span><br><span class="line">   - action: keep</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)     </span><br></pre></td></tr></table></figure>
+
+<h2 id="labeldrop和labelkeep"><a href="#labeldrop和labelkeep" class="headerlink" title="labeldrop和labelkeep"></a>labeldrop和labelkeep</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#labeldrop 删除匹配到的标签 配合标签重写 可以实现真正的重命名标签</span></span><br><span class="line">   <span class="comment">#labelkeep 只保留匹配到的标签 其余删除</span></span><br><span class="line">   - action: labeldrop</span><br><span class="line">     <span class="comment">#正则</span></span><br><span class="line">     regex: job</span><br><span class="line">     </span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-6-基于文件的动态实例发现"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
+    >6.基于文件的动态实例发现</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-7-常用函数"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/"
+    >7.常用函数</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><ul>
+<li>rate()<ul>
+<li>函数计算某个时间序列范围内的每秒平均增长率。适合缓慢变化的计数器（counter）</li>
+</ul>
+</li>
+</ul>
+<p>这是一个非常重要的函数，专门配合counter类型数据，取counter在这个时间段中的平均每秒增量。比如监控网络接受字节数的情况，在9:10到9:20期间累计量增加了1000bytes，加入rate([1m])函数后就会使用1000除以60秒，计算出数据大约为16bytes。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rate( node_network_receive_bytes[1m] ) <span class="comment">#获取``1``分钟内每秒的增量</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>irate()<ul>
+<li>函数计算一段时间范围内某个时刻的每秒增长率。适合快速变化的计数器（counter）</li>
+</ul>
+</li>
+<li>sum()<ul>
+<li>求和</li>
+</ul>
+</li>
+<li>increase()<ul>
+<li>和rate()函数一样也是配合Counter使用。区别就是它是取其中一段时间的增量而不是平均值，</li>
+<li>比如</li>
+<li>increase(node_cpu[1m])    #获取CPU总使用时间1分钟的增量</li>
+</ul>
+</li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
 
     </footer>
   </div>
@@ -464,7 +770,7 @@
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
   </nav>
   
 </section>

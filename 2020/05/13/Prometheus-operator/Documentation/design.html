@@ -1,0 +1,43 @@
+<br>
+<div class="alert alert-info" role="alert">
+    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> Starting with v0.12.0, Prometheus Operator requires use of Kubernetes v1.7.x and up.
+</div>
+
+<h1 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h1><p>This document describes the design and interaction between the custom resource definitions that the Prometheus Operator introduces.</p>
+<p>The custom resources that the Prometheus Operator introduces are:</p>
+<ul>
+<li><code>Prometheus</code></li>
+<li><code>ServiceMonitor</code></li>
+<li><code>PodMonitor</code> </li>
+<li><code>Alertmanager</code></li>
+<li><code>PrometheusRule</code></li>
+</ul>
+<h2 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h2><p>The <code>Prometheus</code> custom resource definition (CRD) declaratively defines a desired Prometheus setup to run in a Kubernetes cluster. It provides options to configure replication, persistent storage, and Alertmanagers to which the deployed Prometheus instances send alerts to.</p>
+<p>For each <code>Prometheus</code> resource, the Operator deploys a properly configured <code>StatefulSet</code> in the same namespace. The Prometheus <code>Pod</code>s are configured to mount a <code>Secret</code> called <code>&lt;prometheus-name&gt;</code> containing the configuration for Prometheus.</p>
+<p>The CRD specifies which <code>ServiceMonitor</code>s should be covered by the deployed Prometheus instances based on label selection. The Operator then generates a configuration based on the included <code>ServiceMonitor</code>s and updates it in the <code>Secret</code> containing the configuration. It continuously does so for all changes that are made to <code>ServiceMonitor</code>s or the <code>Prometheus</code> resource itself.</p>
+<p>If no selection of <code>ServiceMonitor</code>s is provided, the Operator leaves management of the <code>Secret</code> to the user, which allows to provide custom configurations while still benefiting from the Operator’s capabilities of managing Prometheus setups.</p>
+<h2 id="ServiceMonitor"><a href="#ServiceMonitor" class="headerlink" title="ServiceMonitor"></a>ServiceMonitor</h2><p>The <code>ServiceMonitor</code> custom resource definition (CRD) allows to declaratively define how a dynamic set of services should be monitored. Which services are selected to be monitored with the desired configuration is defined using label selections. This allows an organization to introduce conventions around how metrics are exposed, and then following these conventions new services are automatically discovered, without the need to reconfigure the system.</p>
+<p>For Prometheus to monitor any application within Kubernetes an <code>Endpoints</code> object needs to exist. <code>Endpoints</code> objects are essentially lists of IP addresses. Typically an <code>Endpoints</code> object is populated by a <code>Service</code> object. A <code>Service</code> object discovers <code>Pod</code>s by a label selector and adds those to the <code>Endpoints</code> object.</p>
+<p>A <code>Service</code> may expose one or more service ports, which are backed by a list of multiple endpoints that point to a <code>Pod</code> in the common case. This is reflected in the respective <code>Endpoints</code> object as well.</p>
+<p>The <code>ServiceMonitor</code> object introduced by the Prometheus Operator in turn discovers those <code>Endpoints</code> objects and configures Prometheus to monitor those <code>Pod</code>s.</p>
+<p>The <code>endpoints</code> section of the <code>ServiceMonitorSpec</code>, is used to configure which ports of these <code>Endpoints</code> are going to be scraped for metrics, and with which parameters. For advanced use cases one may want to monitor ports of backing <code>Pod</code>s, which are not directly part of the service endpoints. Therefore when specifying an endpoint in the <code>endpoints</code> section, they are strictly used.</p>
+<blockquote>
+<p>Note: <code>endpoints</code> (lowercase) is the field in the <code>ServiceMonitor</code> CRD, while <code>Endpoints</code> (capitalized) is the Kubernetes object kind.</p>
+</blockquote>
+<p>Both <code>ServiceMonitors</code> as well as discovered targets may come from any namespace. This is important to allow cross-namespace monitoring use cases, e.g. for meta-monitoring. Using the <code>ServiceMonitorNamespaceSelector</code> of the <code>PrometheusSpec</code>, one can restrict the namespaces <code>ServiceMonitor</code>s are selected from by the respective Prometheus server. Using the <code>namespaceSelector</code> of the <code>ServiceMonitorSpec</code>, one can restrict the namespaces the <code>Endpoints</code> objects are allowed to be discovered from.<br>To discover targets in all namespaces the <code>namespaceSelector</code> has to be empty:</p>
+<pre><code class="yaml">spec:
+  namespaceSelector:
+    any: true</code></pre>
+<h2 id="PodMonitor"><a href="#PodMonitor" class="headerlink" title="PodMonitor"></a>PodMonitor</h2><p>The <code>PodMonitor</code> custom resource definition (CRD) allows to declaratively define how a dynamic set of pods should be monitored.<br>Which pods are selected to be monitored with the desired configuration is defined using label selections.<br>This allows an organization to introduce conventions around how metrics are exposed, and then following these conventions new pods are automatically discovered, without the need to reconfigure the system.</p>
+<p>A <code>Pod</code> is a collection of one or more containers which can expose Prometheus metrics on a number of ports.</p>
+<p>The <code>PodMonitor</code> object introduced by the Prometheus Operator discovers these pods and generates the relevant configuration for the Prometheus server in order to monitor them. </p>
+<p>The <code>PodMetricsEndpoints</code> section of the <code>PodMonitorSpec</code>, is used to configure which ports of a pod are going to be scraped for metrics, and with which parameters.</p>
+<p>Both <code>PodMonitors</code> as well as discovered targets may come from any namespace. This is important to allow cross-namespace monitoring use cases, e.g. for meta-monitoring.<br>Using the <code>namespaceSelector</code> of the <code>PodMonitorSpec</code>, one can restrict the namespaces the <code>Pods</code> are allowed to be discovered from.<br>To discover targets in all namespaces the <code>namespaceSelector</code> has to be empty:</p>
+<pre><code class="yaml">spec:
+  namespaceSelector:
+    any: true</code></pre>
+<h2 id="Alertmanager"><a href="#Alertmanager" class="headerlink" title="Alertmanager"></a>Alertmanager</h2><p>The <code>Alertmanager</code> custom resource definition (CRD) declaratively defines a desired Alertmanager setup to run in a Kubernetes cluster. It provides options to configure replication and persistent storage.</p>
+<p>For each <code>Alertmanager</code> resource, the Operator deploys a properly configured <code>StatefulSet</code> in the same namespace. The Alertmanager pods are configured to include a <code>Secret</code> called <code>&lt;alertmanager-name&gt;</code> which holds the used configuration file in the key <code>alertmanager.yaml</code>.</p>
+<p>When there are two or more configured replicas the operator runs the Alertmanager instances in high availability mode.</p>
+<h2 id="PrometheusRule"><a href="#PrometheusRule" class="headerlink" title="PrometheusRule"></a>PrometheusRule</h2><p>The <code>PrometheusRule</code> CRD declaratively defines a desired Prometheus rule to be consumed by one or more Prometheus instances. </p>
+<p>Alerts and recording rules can be saved and applied as YAML files, and dynamically loaded without requiring any restart.</p>

@@ -1,0 +1,92 @@
+<h1 id="Prometheus-Operator"><a href="#Prometheus-Operator" class="headerlink" title="Prometheus Operator"></a>Prometheus Operator</h1><p><a href="https://travis-ci.org/coreos/prometheus-operator"><img src="https://travis-ci.org/coreos/prometheus-operator.svg?branch=master" alt="Build Status"></a><br><a href="https://goreportcard.com/report/coreos/prometheus-operator"><img src="https://goreportcard.com/badge/coreos/prometheus-operator" alt="Go Report Card" title="Go Report Card"></a><br><a href="http://slack.k8s.io/"><img src="https://img.shields.io/badge/join%20slack-%23prometheus--operator-brightgreen.svg" alt="Slack"></a></p>
+<p><strong>Project status: <em>beta</em></strong> Not all planned features are completed. The API, spec, status and other user facing objects may change, but in a backward compatible way.</p>
+<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>The Prometheus Operator provides <a href="https://kubernetes.io/">Kubernetes</a> native deployment and management of<br><a href="https://prometheus.io/">Prometheus</a> and related monitoring components.  The purpose of this project is to<br>simplify and automate the configuration of a Prometheus based monitoring stack for Kubernetes clusters.</p>
+<p>The Prometheus operator includes, but is not limited to, the following features:</p>
+<ul>
+<li><p><strong>Kubernetes Custom Resources</strong>: Use Kubernetes custom resources to deploy and manage Prometheus, Alertmanager,<br>and related components.</p>
+</li>
+<li><p><strong>Simplified Deployment Configuration</strong>: Configure the fundamentals of Prometheus like versions, persistence,<br>retention policies, and replicas from a native Kubernetes resource.</p>
+</li>
+<li><p><strong>Prometheus Target Configuration</strong>: Automatically generate monitoring target configurations based<br>on familiar Kubernetes label queries; no need to learn a Prometheus specific configuration language.</p>
+</li>
+</ul>
+<p>For an introduction to the Prometheus Operator, see the initial <a href="https://coreos.com/blog/the-prometheus-operator.html">blog<br>post</a>.</p>
+<h2 id="Prometheus-Operator-vs-kube-prometheus-vs-community-helm-chart"><a href="#Prometheus-Operator-vs-kube-prometheus-vs-community-helm-chart" class="headerlink" title="Prometheus Operator vs. kube-prometheus vs. community helm chart"></a>Prometheus Operator vs. kube-prometheus vs. community helm chart</h2><p>The Prometheus Operator uses Kubernetes <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/">custom resources</a> to simplifiy the deployment and configuration of Prometheus, Alertmanager, and related monitoring components.</p>
+<p><a href="https://github.com/coreos/kube-prometheus">kube-prometheus</a> provides example configurations for a complete cluster monitoring<br>stack based on Prometheus and the Prometheus Operator.  This includes deployment of multiple Prometheus and Alertmanager instances,<br>metrics exporters such as the node_exporter for gathering node metrics, scrape target configuration linking Prometheus to various<br>metrics endpoints, and example alerting rules for notification of potential issues in the cluster.</p>
+<p>The <a href="https://github.com/helm/charts/tree/master/stable/prometheus-operator">stable/prometheus-operator</a><br>helm chart provides a similar feature set to kube-prometheus. This chart is maintained by the Helm community.<br>For more information, please see the <a href="https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator">chart’s readme</a></p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><p>Version <code>&gt;=0.39.0</code> of the Prometheus Operator requires a Kubernetes<br>cluster of version <code>&gt;=1.16.0</code>. If you are just starting out with the<br>Prometheus Operator, it is highly recommended to use the latest version.</p>
+<p>If you have an older version of Kubernetes and the Prometheus Operator running,<br>we recommend upgrading Kubernetes first and then the Prometheus Operator.</p>
+<h2 id="CustomResourceDefinitions"><a href="#CustomResourceDefinitions" class="headerlink" title="CustomResourceDefinitions"></a>CustomResourceDefinitions</h2><p>A core feature of the Prometheus Operator is to monitor the Kubernetes API server for changes<br>to specific objects and ensure that the current Prometheus deployments match these objects.<br>The Operator acts on the following <a href="https://kubernetes.io/docs/tasks/access-kubernetes-api/extend-api-custom-resource-definitions/">custom resource definitions (CRDs)</a>:</p>
+<ul>
+<li><p><strong><code>Prometheus</code></strong>, which defines a desired Prometheus deployment.</p>
+</li>
+<li><p><strong><code>Alertmanager</code></strong>, which defines a desired Alertmanager deployment.</p>
+</li>
+<li><p><strong><code>ThanosRuler</code></strong>, which defines a desired Thanos Ruler deployment.</p>
+</li>
+<li><p><strong><code>ServiceMonitor</code></strong>, which declaratively specifies how groups of Kubernetes services should be monitored.<br>The Operator automatically generates Prometheus scrape configuration based on the current state of the objects in the API server.</p>
+</li>
+<li><p><strong><code>PodMonitor</code></strong>, which declaratively specifies how group of pods should be monitored.<br>The Operator automatically generates Prometheus scrape configuration based on the current state of the objects in the API server.</p>
+</li>
+<li><p><strong><code>PrometheusRule</code></strong>, which defines a desired set of Prometheus alerting and/or recording rules.<br>The Operator generates a rule file, which can be used by Prometheus instances.</p>
+</li>
+</ul>
+<p>The Prometheus operator automatically detects changes in the Kubernetes API server to any of the above objects, and ensures that<br>matching deployments and configurations are kept in sync.</p>
+<p>To learn more about the CRDs introduced by the Prometheus Operator have a look<br>at the <a href="Documentation/design.md">design doc</a>.</p>
+<p>To automate validation of your CRD configuration files see about <a href="Documentation/user-guides/linting.md">linting</a>.</p>
+<h2 id="Dynamic-Admission-Control"><a href="#Dynamic-Admission-Control" class="headerlink" title="Dynamic Admission Control"></a>Dynamic Admission Control</h2><p>To prevent invalid Prometheus alerting and recording rules from causing failures in a deployed Prometheus instance,<br>an <a href="https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/">admission webhook</a><br>is provided to validate <code>PrometheusRule</code> resources upon initial creation or update.</p>
+<p>For more information on this feature, see the <a href="Documentation/user-guides/webhook.md">user guide</a>.</p>
+<h2 id="Quickstart"><a href="#Quickstart" class="headerlink" title="Quickstart"></a>Quickstart</h2><p><strong>Note:</strong> this quickstart does not provision an entire monitoring stack; if that is what you are looking for,<br>see the <a href="https://github.com/coreos/kube-prometheus">kube-prometheus</a> project.  If you want the whole stack,<br>but have already applied the <code>bundle.yaml</code>, delete the bundle first (<code>kubectl delete -f bundle.yaml</code>).</p>
+<p>To quickly try out <em>just</em> the Prometheus Operator inside a cluster, <strong>choose a release</strong> and run the following command:</p>
+<pre><code class="sh">kubectl apply -f bundle.yaml</code></pre>
+<blockquote>
+<p>Note: make sure to adapt the namespace in the ClusterRoleBinding if deploying in a namespace other than the default namespace.</p>
+</blockquote>
+<p>To run the Operator outside of a cluster:</p>
+<pre><code class="sh">make
+scripts/run-external.sh &lt;kubectl cluster name&gt;</code></pre>
+<h2 id="Removal"><a href="#Removal" class="headerlink" title="Removal"></a>Removal</h2><p>To remove the operator and Prometheus, first delete any custom resources you created in each namespace. The<br>operator will automatically shut down and remove Prometheus and Alertmanager pods, and associated ConfigMaps.</p>
+<pre><code class="sh">for n in $(kubectl get namespaces -o jsonpath={..metadata.name}); do
+  kubectl delete --all --namespace=$n prometheus,servicemonitor,podmonitor,alertmanager
+done</code></pre>
+<p>After a couple of minutes you can go ahead and remove the operator itself.</p>
+<pre><code class="sh">kubectl delete -f bundle.yaml</code></pre>
+<p>The operator automatically creates services in each namespace where you created a Prometheus or Alertmanager resources,<br>and defines three custom resource definitions. You can clean these up now.</p>
+<pre><code class="sh">for n in $(kubectl get namespaces -o jsonpath={..metadata.name}); do
+  kubectl delete --ignore-not-found --namespace=$n service prometheus-operated alertmanager-operated
+done
+
+kubectl delete --ignore-not-found customresourcedefinitions \
+  prometheuses.monitoring.coreos.com \
+  servicemonitors.monitoring.coreos.com \
+  podmonitors.monitoring.coreos.com \
+  alertmanagers.monitoring.coreos.com \
+  prometheusrules.monitoring.coreos.com</code></pre>
+<h2 id="Development"><a href="#Development" class="headerlink" title="Development"></a>Development</h2><h3 id="Prerequisites-1"><a href="#Prerequisites-1" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><ul>
+<li>golang environment</li>
+<li>docker (used for creating container images, etc.)</li>
+<li>minikube (optional)</li>
+</ul>
+<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><blockquote>
+<p>Ensure that you’re running tests in the following path:<br><code>$GOPATH/src/github.com/coreos/prometheus-operator</code> as tests expect paths to<br>match. If you’re working from a fork, just add the forked repo as a remote and<br>pull against your local coreos checkout before running tests.</p>
+</blockquote>
+<h4 id="Running-unit-tests"><a href="#Running-unit-tests" class="headerlink" title="Running unit tests:"></a>Running <em>unit tests</em>:</h4><p><code>make test-unit</code></p>
+<h4 id="Running-end-to-end-tests-on-local-minikube-cluster"><a href="#Running-end-to-end-tests-on-local-minikube-cluster" class="headerlink" title="Running end-to-end tests on local minikube cluster:"></a>Running <em>end-to-end</em> tests on local minikube cluster:</h4><ol>
+<li><code>minikube start --kubernetes-version=v1.10.0 --memory=4096  --extra-config=apiserver.authorization-mode=RBAC</code></li>
+<li><code>eval $(minikube docker-env) &amp;&amp; make image</code> - build Prometheus Operator<br> docker image on minikube’s docker</li>
+<li><code>make test-e2e</code></li>
+</ol>
+<h4 id="Running-end-to-end-tests-on-local-kind-cluster"><a href="#Running-end-to-end-tests-on-local-kind-cluster" class="headerlink" title="Running end-to-end tests on local kind cluster:"></a>Running <em>end-to-end</em> tests on local kind cluster:</h4><ol>
+<li><code>kind create cluster --image=kindest/node:&lt;latest&gt;</code>. e.g <code>v1.16.2</code> version. </li>
+<li><code>export KUBECONFIG=&quot;$(kind get kubeconfig-path --name=&quot;kind&quot;)&quot;</code></li>
+<li><code>make image</code> - build Prometheus Operator  docker image locally.</li>
+<li><code>for n in &quot;operator&quot; &quot;config-reloader&quot;; do kind load docker-image &quot;quay.io/coreos/prometheus-$n:$(git rev-parse --short HEAD)&quot;; done</code> - publish<br>built locally images to be accessible inside kind. </li>
+<li><code>make test-e2e</code></li>
+</ol>
+<h2 id="Contributing"><a href="#Contributing" class="headerlink" title="Contributing"></a>Contributing</h2><p>Many files (documentation, manifests, …) in this repository are<br>auto-generated. E.g. <code>bundle.yaml</code> originates from the <em>Jsonnet</em> files in<br><code>/jsonnet/prometheus-operator</code>. Before proposing a pull request:</p>
+<ol>
+<li>Commit your changes.</li>
+<li>Run <code>make generate</code>.</li>
+<li>Commit the generated changes.</li>
+</ol>
+<h2 id="Security"><a href="#Security" class="headerlink" title="Security"></a>Security</h2><p>If you find a security vulnerability related to the Prometheus Operator, please<br>do not report it by opening a GitHub issue, but instead please send an e-mail to<br>the maintainers of the project found in the <a href="OWNERS">OWNERS</a> file.</p>

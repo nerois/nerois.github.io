@@ -1,0 +1,37 @@
+<h1 id="Linting"><a href="#Linting" class="headerlink" title="Linting"></a>Linting</h1><p>This document describes how to use the standalone linting tool to validate your Prometheus Operator <a href="../design.md">CRD-based</a> configuration files.</p>
+<h2 id="Getting-linter"><a href="#Getting-linter" class="headerlink" title="Getting linter"></a>Getting linter</h2><p>To use the linter either get it with <code>go get -u github.com/coreos/prometheus-operator/cmd/po-lint</code> and executable is <code>$GOPATH/bin/po-lint</code>, or use the container image from <code>quay.io/coreos/po-tooling</code> and executable is <code>/go/bin/po-lint</code>.</p>
+<h2 id="Using-linter"><a href="#Using-linter" class="headerlink" title="Using linter"></a>Using linter</h2><p>The <code>po-lint</code> executable takes a list of yaml files to check as command arguments. It will output any errors to stderr and returns with exit code <code>1</code> on errors, <code>0</code> otherwise.</p>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><p>Here is an example script to lint a <code>src</code> sub-directory full of Prometheus Operator CRD files with ether local <code>po-lint</code> or Dockerized version:</p>
+<pre><code class="sh">#!/bin/sh
+
+LINTER=&quot;quay.io/coreos/prometheus-operator-lint&quot;
+SCRIPT=$(basename &quot;$0&quot;)
+
+lint_files() {
+  if [ -x &quot;$(command -v po-lint)&quot; ]; then
+    echo &quot;Linting &#39;${2}&#39; files in directory &#39;${1}&#39;...&quot;
+    had_errors=0
+    for file in $(find &quot;${1}&quot; -name &quot;${2}&quot;); do
+      echo &quot;${file}&quot;
+      po-lint &quot;${file}&quot;
+      retval=$?
+      if [ $retval -ne 0 ]; then
+        had_errors=1
+      fi
+    done
+    exit ${had_errors}
+  elif [ -x &quot;$(command -v docker)&quot; ]; then
+    echo &quot;Using Dockerized linter.&quot;
+    docker run \
+           --rm \
+           --volume &quot;$(pwd):/data:ro&quot; \
+           --entrypoint &quot;/data/${SCRIPT}&quot; \
+           --workdir /data \
+           &quot;${LINTER}&quot; &quot;${1}&quot; &quot;${2}&quot;
+  else
+    echo &quot;Linter executable not found.&quot;
+    exit 1
+  fi
+}
+
+lint_files &quot;src&quot; &quot;*.yaml&quot;</code></pre>

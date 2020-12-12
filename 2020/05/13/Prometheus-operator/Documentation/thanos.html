@@ -1,0 +1,69 @@
+<h1 id="Thanos-and-the-Prometheus-Operator"><a href="#Thanos-and-the-Prometheus-Operator" class="headerlink" title="Thanos and the Prometheus Operator"></a>Thanos and the Prometheus Operator</h1><p><em>Note: This guide is valid for Prometheus Operator v0.28+ and Thanos v0.2+ and above.</em></p>
+<p><a href="https://github.com/thanos-io/thanos/">Thanos</a> is a set of components that can be composed into a highly available,<br>multi Prometheus metric system with potentially unlimited storage capacity, if your Object Storage allows for it.</p>
+<p>Before continuing with Prometheus Operator Thanos integration, it is recommended to read more about Thanos in the <a href="https://thanos.io/getting-started.md/">documentation</a>.</p>
+<h2 id="What-Prometheus-Operator-helps-with"><a href="#What-Prometheus-Operator-helps-with" class="headerlink" title="What Prometheus Operator helps with?"></a>What Prometheus Operator helps with?</h2><p>Prometheus Operator operates <code>Prometheus</code> and optionally <code>ThanosRuler</code> components.<br>Other Thanos components, such as the querier and store gateway, must be configured<br>separately.  The Thanos system integrates with Prometheus by adding a Thanos<br>sidecar to each Prometheus instance.  The Thanos sidecar can be configured directly in the <code>Prometheus</code> CRD. This Sidecar can hook into the Thanos querying system as well as <strong>optionally</strong> back up your data in object storage.</p>
+<p>Each component other than the sidecar and <code>ThanosRuler</code> is deployed independently of the Prometheus Operator and its Thanos configuration. The<br><a href="https://github.com/thanos-io/kube-thanos/">kube-thanos</a> project has some starting points for other Thanos components deployments.</p>
+<p>In short, for the Thanos integration using the Prometheus Operator to work correctly you will need to have these extra components installed and configured.</p>
+<h2 id="Prometheus-Custom-Resource-with-Thanos-Sidecar"><a href="#Prometheus-Custom-Resource-with-Thanos-Sidecar" class="headerlink" title="Prometheus Custom Resource with Thanos Sidecar"></a>Prometheus Custom Resource with Thanos Sidecar</h2><p>The <code>Prometheus</code> CRD has support for adding a Thanos sidecar to the Prometheus<br>Pod. To enable the sidecar, reference the following examples.</p>
+<p>This is the simplest configuration change that needs to be made to your<br>Prometheus Custom Resource, after creating the secret.</p>
+<pre><code>...
+spec:
+  ...
+  thanos:
+    baseImage: quay.io/thanos/thanos
+    version: v0.8.1
+...</code></pre>
+<p>Note: If you’re using Istio you may need to also set <code>ListenLocal</code> on the Thanos spec due to Istio’s forwarding of traffic to localhost.</p>
+<h2 id="Configuring-Thanos-Object-Storage"><a href="#Configuring-Thanos-Object-Storage" class="headerlink" title="Configuring Thanos Object Storage"></a>Configuring Thanos Object Storage</h2><p>If you want sidecar to be able to upload blocks to object storage you need to tell Prometheus Operator about it.</p>
+<p>In this mode, sidecar assumes an existing Kubernetes Secret containing the Thanos configuration.<br>Inside this secret you configure how to run Thanos with your object storage.</p>
+<p>For more information and examples about the configuration itself, take a look at the Thanos documentation:<br><a href="https://github.com/thanos-io/thanos/blob/master/docs/storage.md">https://github.com/thanos-io/thanos/blob/master/docs/storage.md</a></p>
+<p>Once you have written your configuration save it to a file.<br>Here’s an example:</p>
+<pre><code class="yaml">type: s3
+config:
+  bucket: thanos
+  endpoint: ams3.digitaloceanspaces.com
+  access_key: XXX
+  secret_key: XXX</code></pre>
+<p>Let’s assume you saved this file to <code>/tmp/thanos-config.yaml</code>. You can use the following command to create a secret called <code>thanos-objstore-config</code> inside your cluster in the <code>monitoring</code> namespace.</p>
+<pre><code>kubectl -n monitoring create secret generic thanos-objstore-config --from-file=thanos.yaml=/tmp/thanos-config.yaml</code></pre>
+<p>And then you can specify this secret inside Thanos part of the Prometheus CRD we mentioned <a href="#prometheus-custom-resource-with-thanos-sidecar">earlier</a>:</p>
+<pre><code>...
+spec:
+  ...
+  thanos:
+    baseImage: quay.io/thanos/thanos
+    version: v0.8.1
+    objectStorageConfig:
+      key: thanos.yaml
+      name: thanos-objstore-config
+...</code></pre>
+<p>This will attach Thanos sidecar that will backup all <em>new blocks</em> that Prometheus produces every 2 hours to the object storage.</p>
+<p>NOTE: This option will also disable local Prometheus compaction. This means that Thanos compactor is the main singleton component<br>responsible for compactions on a global, object storage level.</p>
+<h2 id="Thanos-Ruler"><a href="#Thanos-Ruler" class="headerlink" title="Thanos Ruler"></a>Thanos Ruler</h2><p>The <a href="https://github.com/thanos-io/thanos/blob/master/docs/components/rule.md">Thanos Ruler</a> component allows recording and alerting rules to be processed across<br>multiple Promtheus instances.  A <code>ThanosRuler</code> instance requires at least one <code>queryEndpoint</code> which points to the location of Thanos Queriers or Prometheus instances.  The <code>queryEndpoints</code> are used to configure the <code>--query</code> arguments(s) of the Thanos runtime.</p>
+<pre><code>...
+apiVersion: monitoring.coreos.com/v1
+kind: ThanosRuler
+metadata:
+  name: thanos-ruler-demo
+  labels:
+    example: thanos-ruler
+  namespace: monitoring
+spec:
+  image: quay.io/thanos/thanos
+  ruleSelector:
+    matchLabels:
+      role: my-thanos-rules
+  queryEndpoints:
+    - dnssrv+_http._tcp.my-thanos-querier.monitoring.svc.cluster.local</code></pre>
+<p>The recording and alerting rules used by a <code>ThanosRuler</code> component, are configured using the same <code>PrometheusRule</code> objects which are used by Prometheus.  In the given example, the rules contained in any <code>PrometheusRule</code> object which match the label <code>role=my-thanos-rules</code> will be added to the Thanos Ruler POD.</p>
+<h2 id="Other-Thanos-Components"><a href="#Other-Thanos-Components" class="headerlink" title="Other Thanos Components"></a>Other Thanos Components</h2><p>Deploying the sidecar was the first step towards getting Thanos up and running, but there are more components to be deployed, that complete Thanos:</p>
+<ul>
+<li><a href="https://thanos.io/components/query.md/">Querier</a></li>
+</ul>
+<p>Additionally, when object storage backup is desired:</p>
+<ul>
+<li><a href="https://thanos.io/components/store.md/">Store</a></li>
+<li><a href="https://thanos.io/components/compact.md/">Compactor</a></li>
+</ul>
+<p>Again, take a look at the Thanos documentation for more details on these components: <a href="https://thanos.io/quick-tutorial.md">https://thanos.io/quick-tutorial.md</a></p>
+<p>kube-thanos project has already supported several thanos components.<br>For more details, please checkout <a href="https://github.com/thanos-io/kube-thanos/">kube-thanos</a>.</p>

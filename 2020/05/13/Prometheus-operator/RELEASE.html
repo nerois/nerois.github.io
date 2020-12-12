@@ -1,0 +1,57 @@
+<h1 id="Release-schedule"><a href="#Release-schedule" class="headerlink" title="Release schedule"></a>Release schedule</h1><p>Following <a href="https://github.com/prometheus/prometheus/blob/master/RELEASE.md">Prometheus</a> and <a href="https://github.com/thanos-io/thanos/blob/master/docs/release-process.md">Thanos</a>, this project aims for a predictible release schedule.</p>
+<p>Release cadence of first pre-releases being cut is 6 weeks.</p>
+<table>
+<thead>
+<tr>
+<th>Release</th>
+<th>Date of first pre-release (year-month-day)</th>
+<th>Release shepherd</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v0.39</td>
+<td>2020-05-06</td>
+<td>Pawel Krupa (GitHub: @paulfantom)</td>
+</tr>
+<tr>
+<td>v0.40</td>
+<td>2020-06-17</td>
+<td>Lili Cosic (GitHub: @lilic)</td>
+</tr>
+<tr>
+<td>v0.41</td>
+<td>2020-07-29</td>
+<td><strong>searching for volunteer</strong></td>
+</tr>
+</tbody></table>
+<h1 id="How-to-cut-a-new-release"><a href="#How-to-cut-a-new-release" class="headerlink" title="How to cut a new release"></a>How to cut a new release</h1><blockquote>
+<p>This guide is strongly based on the <a href="https://github.com/prometheus/prometheus/wiki/HOWTO-cut-a-new-release">Prometheus release instructions</a>.</p>
+</blockquote>
+<h2 id="Branch-management-and-versioning-strategy"><a href="#Branch-management-and-versioning-strategy" class="headerlink" title="Branch management and versioning strategy"></a>Branch management and versioning strategy</h2><p>We use <a href="http://semver.org/">Semantic Versioning</a>.</p>
+<p>We maintain a separate branch for each minor release, named <code>release-&lt;major&gt;.&lt;minor&gt;</code>, e.g. <code>release-1.1</code>, <code>release-2.0</code>.</p>
+<p>The usual flow is to merge new features and changes into the master branch and to merge bug fixes into the latest release branch. Bug fixes are then merged into master from the latest release branch. The master branch should always contain all commits from the latest release branch.</p>
+<p>If a bug fix got accidentally merged into master, cherry-pick commits have to be created in the latest release branch, which then have to be merged back into master. Try to avoid that situation.</p>
+<p>Maintaining the release branches for older minor releases happens on a best effort basis.</p>
+<h2 id="Prepare-your-release"><a href="#Prepare-your-release" class="headerlink" title="Prepare your release"></a>Prepare your release</h2><p>For a patch release, work in the branch of the minor release you want to patch.</p>
+<p>For a new major or minor release, create the corresponding release branch based on the master branch.</p>
+<p>Bump the version in the <code>VERSION</code> file in the root of the repository. Once that’s done, a number of files have to be re-generated, this is automated with the following make target:</p>
+<pre><code class="bash">$ make generate</code></pre>
+<p>Now that all version information has been updated, an entry for the new version can be added to the <code>CHANGELOG.md</code> file.</p>
+<p>Entries in the <code>CHANGELOG.md</code> are meant to be in this order:</p>
+<ul>
+<li><code>[CHANGE]</code></li>
+<li><code>[FEATURE]</code></li>
+<li><code>[ENHANCEMENT]</code></li>
+<li><code>[BUGFIX]</code></li>
+</ul>
+<p>Create a PR for the version and changelog changes to be reviewed.</p>
+<h2 id="Draft-the-new-release"><a href="#Draft-the-new-release" class="headerlink" title="Draft the new release"></a>Draft the new release</h2><p>Once the PR for the new release has been merged, make sure there is a release branch for the respective release. For new minor releases create the <code>release-&lt;major&gt;.&lt;minor&gt;</code> branch, for patch releases, merge  the master branch into the existing release branch. Should the release be a patch release for an older minor release, cherry-pick the respective changes.</p>
+<p>Push the new or updated release branch to the upstream repository.</p>
+<p>Tag the new release with a tag named <code>v&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code>, e.g. <code>v2.1.3</code>. Note the <code>v</code> prefix.</p>
+<p>You can do the tagging on the commandline:</p>
+<pre><code class="bash">$ tag=$(&lt; VERSION) &amp;&amp; git tag -s &quot;v${tag}&quot; -m &quot;v${tag}&quot;
+$ git push origin &quot;v${tag}&quot;</code></pre>
+<p>Signed tag with a GPG key is appreciated, but in case you can’t add a GPG key to your Github account using the following <a href="https://help.github.com/articles/generating-a-gpg-key/">procedure</a>, you can replace the <code>-s</code> flag by <code>-a</code> flag of the <code>git tag</code> command to only annotate the tag without signing.</p>
+<p>Our CI pipeline will automatically push a new docker image to quay.io.</p>
+<p>Go to  <a href="https://github.com/coreos/prometheus-operator/releases/new">https://github.com/coreos/prometheus-operator/releases/new</a>, associate the new release with the before pushed tag, paste in changes made to <code>CHANGELOG.md</code> and click “Publish release”.</p>
+<p>Take a breath. You’re done releasing.</p>

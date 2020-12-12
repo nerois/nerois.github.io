@@ -1,0 +1,25 @@
+<br>
+<div class="alert alert-info" role="alert">
+    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> Starting with v0.12.0, Prometheus Operator requires use of Kubernetes v1.7.x and up.
+</div>
+
+
+<p><strong>Deprecation Warning:</strong> The <em>custom configuration</em> option of the Prometheus Operator will be deprecated in favor of the <a href="./additional-scrape-config.md"><em>additional scrape config</em></a> option.</p>
+<h1 id="Custom-Configuration"><a href="#Custom-Configuration" class="headerlink" title="Custom Configuration"></a>Custom Configuration</h1><p>There are a few reasons, why one may want to provide a custom configuration to Prometheus instances, instead of having the Prometheus Operator generate the configuration based on <code>ServiceMonitor</code> objects.</p>
+<blockquote>
+<p>Note that custom configurations are not the primary goal the Prometheus Operator is solving. Changes made in the Prometheus Operator, may affect custom configurations in a breaking way. Additionally the Prometheus Operator attempts to generate configurations in a forward and backward compatible way, with custom configurations, this is up to the user to manage gracefully.</p>
+</blockquote>
+<p>Use cases include:</p>
+<ul>
+<li>The necessity to use a service discovery mechanism other than the Kubernetes service discovery, such as AWS SD, Azure SD, etc.</li>
+<li>Cases that are not (yet) very well supported by the Prometheus Operator, such as performing blackbox probes.</li>
+</ul>
+<p>Note that because the Prometheus Operator does not generate the Prometheus configuration in this case, any fields of the Prometheus resource, which influence the configuration will have no effect, and one has to specify this explicitly. The features that will not be supported, meaning they will have to be configured manually:</p>
+<ul>
+<li><code>serviceMonitorSelector</code>: Auto-generating Prometheus configuration from <code>ServiceMonitor</code> objects. This means, that creating <code>ServiceMonitor</code> objects is not how a Prometheus instance is configured, but rather the raw configuration has to be written.</li>
+<li><code>alerting</code>: Alertmanager discovery as available in the Prometheus object is translated to the Prometheus configuration, meaning this configuration has to be done manually.</li>
+<li><code>scrapeInterval</code></li>
+<li><code>evaluationInterval</code></li>
+<li><code>externalLabels</code></li>
+</ul>
+<p>In order to enable to specify a custom configuration, specify neither <code>serviceMonitorSelector</code> nor <code>podMonitorSelector</code>. When these fields are empty, the Prometheus Operator will not attempt to manage the <code>Secret</code>, that contains the Prometheus configuration. The <code>Secret</code>, that contains the Prometheus configuration is called <code>prometheus-&lt;name-of-prometheus-object&gt;</code>, in the same namespace as the Prometheus object. Within this <code>Secret</code>, the key that contains the Prometheus configuration is called <code>prometheus.yaml.gz</code>.</p>

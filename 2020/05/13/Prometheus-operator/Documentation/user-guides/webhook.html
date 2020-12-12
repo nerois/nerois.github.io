@@ -1,0 +1,41 @@
+<h1 id="Admission-webhooks"><a href="#Admission-webhooks" class="headerlink" title="Admission webhooks"></a>Admission webhooks</h1><p>This document describes how to set up an admission webhook to validate<br>PrometheusRules, and thus preventing Prometheus from loading invalid<br>configuration.</p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><p>This guide assumes that you have already <a href="Documentation/user-guides/getting-started.md">deployed the Prometheus<br>Operator</a> and that <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#how-do-i-turn-on-an-admission-controller">admission<br>controllers are<br>enabled</a><br>on your cluster.</p>
+<p>Admission webhooks require TLS, and as such this guide also assumes that you<br>have a TLS certificate and key ready.</p>
+<h2 id="Preparing-the-Operator"><a href="#Preparing-the-Operator" class="headerlink" title="Preparing the Operator"></a>Preparing the Operator</h2><p>A secret needs to be created from the TLS certificate and key, assuming the<br>certificate is in <code>tls.crt</code> and the key in <code>tls.key</code>:</p>
+<pre><code class="bash">kubectl create secret tls prometheus-operator-certs --cert=tls.crt --key=tls.key</code></pre>
+<p>The Prometheus Operator will serve the admission webhook. However, to do so, it<br>requires being available over TLS, and not only plain HTTP. Thus the following<br>flags need to be added to the Prometheus Operator deployment:</p>
+<ul>
+<li><p><code>--web.enable-tls=true</code> to enable the Prometheus Operator to serve its API<br>over TLS,</p>
+</li>
+<li><p><code>--web.cert-file</code> to load the TLS certificate to use,</p>
+</li>
+<li><p><code>--web.key-file</code> to load the associate key.</p>
+</li>
+</ul>
+<h2 id="Deploying-the-admission-webhook"><a href="#Deploying-the-admission-webhook" class="headerlink" title="Deploying the admission webhook"></a>Deploying the admission webhook</h2><p>Two variants of the admission webhook are available: a validating webhook and a<br>mutating webhook. Both reject invalid <code>PrometheusRule</code> resources. The mutating<br>variant also adds annotations to validated <code>PrometheusRule</code>s</p>
+<p>The following example deploys the validating admission webhook:</p>
+<pre><code class="yaml">apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: prometheus-operator-rulesvalidation
+webhooks:
+  - clientConfig:
+      caBundle: SOMECABASE64ENCODED==
+      service:
+        name: prometheus-operator
+        namespace: default
+        path: /admission-prometheusrules/validate
+    failurePolicy: Fail
+    name: prometheusrulemutate.monitoring.coreos.com
+    namespaceSelector: {}
+    rules:
+      - apiGroups:
+          - monitoring.coreos.com
+        apiVersions:
+          - &#39;*&#39;
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - prometheusrules</code></pre>
+<p>The <code>caBundle</code> contains the base64-encoded CA certificate used to sign the<br>webhook’s certificate.</p>
