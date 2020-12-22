@@ -108,6 +108,68 @@
     
     
     <article
+  id="post-2-作业和实例"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
+    >2.作业和实例</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
+<li><p>实例</p>
+<p>   可以抓取的目标称为实例（Instances）</p>
+</li>
+<li><p>作业</p>
+<p>具有相同目标的实例集合称为作业（Job）</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-11-告警规则与告警"
   class="article article-type-post"
   itemscope
@@ -652,69 +714,6 @@
   <h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><p>##先创建一个测试的pod</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cat&lt;&lt;EOF | kubectl apply -f -</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: busybox</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: busybox</span><br><span class="line">    image: busybox:1.28</span><br><span class="line">    command:</span><br><span class="line">      - sleep</span><br><span class="line">      - &quot;36000&quot;</span><br><span class="line">    imagePullPolicy: IfNotPresent</span><br><span class="line">  restartPolicy: Always</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">##查看运行情况</span><br><span class="line">─➤  kubectl get pod -o wide</span><br><span class="line">NAME      READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">busybox   1&#x2F;1     Running   0          35s   10.244.52.4   k-n2.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">##查看coredns 是否起作用</span><br><span class="line">─➤  kubectl exec -ti busybox -- nslookup kubernetes</span><br><span class="line">Server:    10.96.0.10</span><br><span class="line">Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      kubernetes</span><br><span class="line">Address 1: 10.96.0.1 kubernetes.default.svc.cluster.local</span><br><span class="line"></span><br><span class="line">##是否可以正常解析 并链接外网</span><br><span class="line">~]# kubectl exec -ti busybox -- ping www.baidu.com</span><br><span class="line">PING www.baidu.com (103.235.46.39): 56 data bytes</span><br><span class="line">64 bytes from 103.235.46.39: seq&#x3D;1 ttl&#x3D;52 time&#x3D;20.764 ms</span><br><span class="line">64 bytes from 103.235.46.39: seq&#x3D;2 ttl&#x3D;52 time&#x3D;20.434 ms</span><br><span class="line">64 bytes from 103.235.46.39: seq&#x3D;3 ttl&#x3D;52 time&#x3D;20.579 ms</span><br><span class="line"></span><br><span class="line">~]# kubectl cluster-info</span><br><span class="line">Kubernetes master is running at https:&#x2F;&#x2F;192.168.1.71:6443</span><br><span class="line">CoreDNS is running at https:&#x2F;&#x2F;192.168.1.71:6443&#x2F;api&#x2F;v1&#x2F;namespaces&#x2F;kube-system&#x2F;services&#x2F;kube-dns:dns&#x2F;proxy</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-1 基础环境准备"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1%20%E5%9F%BA%E7%A1%80%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87/"
-    >1基础环境准备</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/1%20%E5%9F%BA%E7%A1%80%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ul>
-<li>1 所有节点时间同步<br>2 所有节点关闭swap<br>3 所有节点关闭firewalld<br>4 所有节点关闭selinux<br>5 所有节点开启ipv4流量传递IPtables的链</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;&#x2F;etc&#x2F;sysctl.d&#x2F;k8s.conf &lt;&lt; EOF</span><br><span class="line">net.ipv4.tcp_keepalive_time &#x3D; 600</span><br><span class="line">net.ipv4.tcp_keepalive_intvl &#x3D; 30</span><br><span class="line">net.ipv4.tcp_keepalive_probes &#x3D; 10</span><br><span class="line">net.ipv6.conf.all.disable_ipv6 &#x3D; 1</span><br><span class="line">net.ipv6.conf.default.disable_ipv6 &#x3D; 1</span><br><span class="line">net.ipv6.conf.lo.disable_ipv6 &#x3D; 1</span><br><span class="line">net.ipv4.neigh.default.gc_stale_time &#x3D; 120</span><br><span class="line">net.ipv4.conf.all.rp_filter &#x3D; 0</span><br><span class="line">net.ipv4.conf.default.rp_filter &#x3D; 0</span><br><span class="line">net.ipv4.conf.default.arp_announce &#x3D; 2</span><br><span class="line">net.ipv4.conf.lo.arp_announce &#x3D; 2</span><br><span class="line">net.ipv4.conf.all.arp_announce &#x3D; 2</span><br><span class="line">net.ipv4.ip_forward &#x3D; 1</span><br><span class="line">net.ipv4.tcp_max_tw_buckets &#x3D; 5000</span><br><span class="line">net.ipv4.tcp_syncookies &#x3D; 1</span><br><span class="line">net.ipv4.tcp_max_syn_backlog &#x3D; 1024</span><br><span class="line">net.ipv4.tcp_synack_retries &#x3D; 2</span><br><span class="line">net.bridge.bridge-nf-call-ip6tables &#x3D; 1</span><br><span class="line">net.bridge.bridge-nf-call-iptables &#x3D; 1</span><br><span class="line">net.netfilter.nf_conntrack_max &#x3D; 2310720</span><br><span class="line">fs.inotify.max_user_watches&#x3D;89100</span><br><span class="line">fs.may_detach_mounts &#x3D; 1</span><br><span class="line">fs.file-max &#x3D; 52706963</span><br><span class="line">fs.nr_open &#x3D; 52706963</span><br><span class="line">net.bridge.bridge-nf-call-arptables &#x3D; 1</span><br><span class="line">vm.swappiness &#x3D; 0</span><br><span class="line">vm.overcommit_memory&#x3D;1</span><br><span class="line">vm.panic_on_oom&#x3D;0</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">echo &#39;ip_conntrack&#39; &gt;&#x2F;etc&#x2F;modules-load.d&#x2F;k8s.conf &amp;&amp; modprobe ip_conntrack &amp;&amp; modprobe br_netfilter &amp;&amp; sysctl -p &#x2F;etc&#x2F;sysctl.d&#x2F;k8s.conf</span><br><span class="line">echo &#39;#!&#x2F;bin&#x2F;bash \n modprobe br_netfilter&#39; &gt; &#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;br_netfilter.modules &amp;&amp;chmod 755 &#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;br_netfilter.modules &amp;&amp; source &#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;br_netfilter.modules</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>6 所有节点开启ipvs</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">yum install ipvsadm ipset jq sysstat conntrack libseccomp conntrack-tools socat -y</span><br><span class="line">cat &gt;&#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;ipvs.modules&lt;&lt;&#39;EOF&#39;</span><br><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">ipvs_mods_dir&#x3D;&quot;&#x2F;usr&#x2F;lib&#x2F;modules&#x2F;$(uname -r)&#x2F;kernel&#x2F;net&#x2F;netfilter&#x2F;ipvs&quot;</span><br><span class="line">for mod in $(ls $ipvs_mods_dir | grep -o &quot;^[^.]*&quot;); do</span><br><span class="line">    &#x2F;sbin&#x2F;modinfo -F filename $mod  &amp;&gt; &#x2F;dev&#x2F;null</span><br><span class="line">    if [ $? -eq 0 ]; then</span><br><span class="line">        &#x2F;sbin&#x2F;modprobe $mod</span><br><span class="line">    fi</span><br><span class="line">done</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">chmod 755 &#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;ipvs.modules</span><br><span class="line">source &#x2F;etc&#x2F;sysconfig&#x2F;modules&#x2F;ipvs.modules</span><br></pre></td></tr></table></figure>
-
 
  
       <!-- reward -->
