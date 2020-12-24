@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    MongoDB副本集群 |  Nero 的个人博客
+    用户认证 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-Mongodb副本集群"
+  id="post-认证"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,14 +60,14 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  MongoDB副本集群
+  用户认证
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/" class="article-date">
+      <a href="/2019/05/18/%E8%AE%A4%E8%AF%81/" class="article-date">
   <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
 </a> 
   <div class="article-category">
@@ -84,28 +84,43 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="副本集的搭建"><a href="#副本集的搭建" class="headerlink" title="副本集的搭建"></a>副本集的搭建</h1><h2 id="节点规划"><a href="#节点规划" class="headerlink" title="节点规划"></a>节点规划</h2><ol>
-<li>192.168.1.81 </li>
-<li>192.168.1.82</li>
-<li>192.168.1.83</li>
-</ol>
-<h2 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集</h2><p>主要功能在于数据的安全  当集群其中任意一台主机down, 将会随机或者根据优先级提升一台为主</p>
-<p>集群必须保证大于1节点可用,也就是单节点集群不能正常工作</p>
-<p>只有主节点可以写入 其他节点只读</p>
-<p>优先级相等的时候 故障节点恢复 不会从新选举主节点 </p>
-<p>优先级不同的时候 故障节点恢复 会根据优先级大小重新选举 优先级最大的为主 </p>
-<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>所有主机按照单机部署方式安装统一使用一下配置 然后启动服务</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /etc/mongodb/mongodb.conf</span><br><span class="line">systemLog:</span><br><span class="line">  destination: file</span><br><span class="line">  logAppend: <span class="literal">true</span></span><br><span class="line">  path: /var/<span class="built_in">log</span>/mongodb/mongodb.log</span><br><span class="line">storage:</span><br><span class="line">  dbPath: /data/mongodb</span><br><span class="line">  <span class="comment">#用于数据故障恢复和持久化数据的,它以日志方式来记录</span></span><br><span class="line">  journal:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line"><span class="comment">#使用fork方式 后台运行</span></span><br><span class="line">processManagement:</span><br><span class="line">  fork: <span class="literal">true</span></span><br><span class="line">  pidFilePath: /var/run/mongodb/mongod.pid</span><br><span class="line">  timeZoneInfo: /usr/share/zoneinfo</span><br><span class="line">net:</span><br><span class="line">  port: 27017</span><br><span class="line">  bindIp: 0.0.0.0</span><br><span class="line"><span class="comment">#副本配置 </span></span><br><span class="line">replication:</span><br><span class="line">  <span class="comment">#设置一个副本集群名称所有节点必须一致</span></span><br><span class="line">  replSetName: nero-claster</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+  <h1 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h1><h2 id="数据库用户角色（Database-User-Roles"><a href="#数据库用户角色（Database-User-Roles" class="headerlink" title="数据库用户角色（Database User Roles)"></a><strong>数据库用户角色（Database User Roles)</strong></h2><ul>
+<li>read : 授权User只读数据的权限，允许用户读取指定的数据库</li>
+<li>readWrite 授权User读/写数据的权限，允许用户读/写指定的数据库</li>
+</ul>
+<h2 id="数据库管理角色（Database-Admininstration-Roles"><a href="#数据库管理角色（Database-Admininstration-Roles" class="headerlink" title="数据库管理角色（Database Admininstration Roles)"></a><strong>数据库管理角色（Database Admininstration Roles)</strong></h2><ul>
+<li>dbAdmin：在当前的数据库中执行管理操作，如索引的创建、删除、统计、查看等</li>
+<li>dbOwner：在当前的数据库中执行任意操作，增、删、改、查等</li>
+<li>userAdmin ：在当前的数据库中管理User<strong>，</strong>创建、删除和管理用户。</li>
+</ul>
+<h2 id="备份和还原角色（Backup-and-Restoration-Roles"><a href="#备份和还原角色（Backup-and-Restoration-Roles" class="headerlink" title="备份和还原角色（Backup and Restoration Roles)"></a><strong>备份和还原角色（Backup and Restoration Roles)</strong></h2><ul>
+<li>backup</li>
+<li>restore</li>
+</ul>
+<h2 id="跨库角色（All-Database-Roles"><a href="#跨库角色（All-Database-Roles" class="headerlink" title="跨库角色（All-Database Roles)"></a><strong>跨库角色（All-Database Roles)</strong></h2><ul>
+<li>readAnyDatabase：授权在所有的数据库上读取数据的权限，只在admin 中可用</li>
+<li>readWriteAnyDatabase：授权在所有的数据库上读写数据的权限，只在admin 中可用</li>
+<li>userAdminAnyDatabase：授权在所有的数据库上管理User的权限，只在admin中可用</li>
+<li>dbAdminAnyDatabase： 授权管理所有数据库的权限，只在admin 中可用</li>
+</ul>
+<h2 id="集群管理角色（Cluster-Administration-Roles"><a href="#集群管理角色（Cluster-Administration-Roles" class="headerlink" title="集群管理角色（Cluster Administration Roles)"></a><strong>集群管理角色（Cluster Administration Roles)</strong></h2><ul>
+<li>clusterAdmin：授权管理集群的最高权限，只在admin中可用</li>
+<li>clusterManager：授权管理和监控集群的权限</li>
+<li>clusterMonoitor：授权监控集群的权限，对监控工具具有readonly的权限</li>
+<li>hostManager：管理server</li>
+</ul>
+<h2 id="超级角色（super-master-Roles"><a href="#超级角色（super-master-Roles" class="headerlink" title="超级角色（super master  Roles)"></a><strong>超级角色（super master  Roles)</strong></h2><ul>
+<li>root ：超级账户和权限，只在admin中可用le</li>
+</ul>
+<h1 id="单机开启认证"><a href="#单机开启认证" class="headerlink" title="单机开启认证"></a>单机开启认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  authorization: enabled</span><br></pre></td></tr></table></figure>
 
-<h2 id="集群调试"><a href="#集群调试" class="headerlink" title="集群调试"></a>集群调试</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#mongo 命令行客户端执行 任意节点都可</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#把集群信息保存到config这个变量中</span></span><br><span class="line">config = &#123; _id:<span class="string">&quot;nero-claster&quot;</span>, members:[</span><br><span class="line">  &#123;_id:0,host:<span class="string">&quot;192.168.1.81:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:1,host:<span class="string">&quot;192.168.1.82:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:2,host:<span class="string">&quot;192.168.1.83:27017&quot;</span>&#125;]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#切换到 admin库</span></span><br><span class="line">use admin</span><br><span class="line"><span class="comment">#副本集初始化，需要一定时间</span></span><br><span class="line">rs.initiate( config )	</span><br><span class="line"><span class="comment">#副本集状态，一个primary，其它SECONDARY。primary是主，只有primary能写入</span></span><br><span class="line">rs.status()</span><br><span class="line"><span class="comment">#查看slave的延时情况</span></span><br><span class="line">rs.printSlaveReplicationInfo()</span><br></pre></td></tr></table></figure>
+<h1 id="单机创建用户并授予角色权限"><a href="#单机创建用户并授予角色权限" class="headerlink" title="单机创建用户并授予角色权限"></a>单机创建用户并授予角色权限</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"><span class="comment">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span></span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: <span class="string">&quot;shijiange&quot;</span>,</span><br><span class="line">  <span class="built_in">pwd</span>: <span class="string">&quot;mypwd&quot;</span>,</span><br><span class="line">  roles: [ &#123; role: <span class="string">&quot;root&quot;</span>, db: <span class="string">&quot;admin&quot;</span>&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
-<h2 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h2><p>primary的选举依赖于各个实例的优先优先级，默认优先级都是1</p>
-<p>如果优先级不一致 将会以最高优先级当选为primary</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#配置优先级</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#获取成员对应id编号</span></span><br><span class="line">rs.config().members</span><br><span class="line"><span class="comment">#获取集群配置 保存到conf变量</span></span><br><span class="line">conf = rs.config()</span><br><span class="line"><span class="comment">#修改conf变量中的members字段中对应成员的优先级</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#id 0 的优先级10 , id 1 优先级5 , id 2 优先级 2</span></span><br><span class="line">conf.members[0].priority = 10   </span><br><span class="line">conf.members[1].priority = 5</span><br><span class="line">conf.members[2].priority = 2</span><br><span class="line"></span><br><span class="line"><span class="comment">#确认conf变量无误</span></span><br><span class="line">conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#使用conf变量 重新生效配置</span></span><br><span class="line">rs.reconfig(conf)</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="副本集开启认证"><a href="#副本集开启认证" class="headerlink" title="副本集开启认证"></a>副本集开启认证</h1><h2 id="副本集开启认证集群必须开启秘钥通讯"><a href="#副本集开启认证集群必须开启秘钥通讯" class="headerlink" title="副本集开启认证集群必须开启秘钥通讯"></a>副本集开启认证集群必须开启秘钥通讯</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#生成key 所有节点key必须一致</span></span><br><span class="line">openssl rand -base64 756 &gt; /data/mongodb/shijiange.key</span><br><span class="line">chmod 700 /data/mongodb/shijiange.key</span><br><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line"></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  keyFile: /data/mongodb/shijiange.key</span><br><span class="line">  authorization: enabled</span><br><span class="line">  </span><br><span class="line"><span class="comment">#配置调试集群 以及优先级</span></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
 
-<h2 id="副本集的伸缩"><a href="#副本集的伸缩" class="headerlink" title="副本集的伸缩"></a>副本集的伸缩</h2><h3 id="增加节点"><a href="#增加节点" class="headerlink" title="增加节点"></a>增加节点</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">rs.add(<span class="string">&#x27;192.168.2.84:27017&#x27;</span>)</span><br><span class="line"><span class="comment">#默认优先级为1 自行修改 </span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="创建用户并赋予角色"><a href="#创建用户并赋予角色" class="headerlink" title="创建用户并赋予角色"></a>创建用户并赋予角色</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: &quot;shijiange&quot;,</span><br><span class="line">  pwd: &quot;mypwd&quot;,</span><br><span class="line">  roles: [ &#123; role: &quot;root&quot;, db: &quot;admin&quot;&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
-<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">rs.remove(<span class="string">&#x27;192.168.2.84:27017&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="登录并认证"><a href="#登录并认证" class="headerlink" title="登录并认证"></a>登录并认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开启认证后 必须登录 否则不能进行读写操作</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#登录方法1</span></span><br><span class="line">~]<span class="comment"># mongo</span></span><br><span class="line">&gt;use admin</span><br><span class="line">&gt;db.auth(<span class="string">&#x27;shijiange&#x27;</span>, <span class="string">&#x27;mypwd&#x27;</span>)</span><br><span class="line"><span class="comment">#登录方法2</span></span><br><span class="line">~]<span class="comment"># mongo -ushijiange -pmypwd --authenticationDatabase admin</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -125,19 +140,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2019/05/18/%E4%BA%B2%E5%92%8C%E6%80%A7.%E5%8F%8D%E4%BA%B2%E5%92%8C%E6%80%A7/" class="article-nav-link">
+      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            亲和,反亲和
+            备份与恢复
           
         </div>
       </a>
     
     
-      <a href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2019/05/13/ConfigMap/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">MongoDB单机部署</div>
+        <div class="article-nav-title">ConfigMap</div>
       </a>
     
   </nav>

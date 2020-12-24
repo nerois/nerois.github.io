@@ -108,6 +108,96 @@
     
     
     <article
+  id="post-认证"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/%E8%AE%A4%E8%AF%81/"
+    >用户认证</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/%E8%AE%A4%E8%AF%81/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h1><h2 id="数据库用户角色（Database-User-Roles"><a href="#数据库用户角色（Database-User-Roles" class="headerlink" title="数据库用户角色（Database User Roles)"></a><strong>数据库用户角色（Database User Roles)</strong></h2><ul>
+<li>read : 授权User只读数据的权限，允许用户读取指定的数据库</li>
+<li>readWrite 授权User读/写数据的权限，允许用户读/写指定的数据库</li>
+</ul>
+<h2 id="数据库管理角色（Database-Admininstration-Roles"><a href="#数据库管理角色（Database-Admininstration-Roles" class="headerlink" title="数据库管理角色（Database Admininstration Roles)"></a><strong>数据库管理角色（Database Admininstration Roles)</strong></h2><ul>
+<li>dbAdmin：在当前的数据库中执行管理操作，如索引的创建、删除、统计、查看等</li>
+<li>dbOwner：在当前的数据库中执行任意操作，增、删、改、查等</li>
+<li>userAdmin ：在当前的数据库中管理User<strong>，</strong>创建、删除和管理用户。</li>
+</ul>
+<h2 id="备份和还原角色（Backup-and-Restoration-Roles"><a href="#备份和还原角色（Backup-and-Restoration-Roles" class="headerlink" title="备份和还原角色（Backup and Restoration Roles)"></a><strong>备份和还原角色（Backup and Restoration Roles)</strong></h2><ul>
+<li>backup</li>
+<li>restore</li>
+</ul>
+<h2 id="跨库角色（All-Database-Roles"><a href="#跨库角色（All-Database-Roles" class="headerlink" title="跨库角色（All-Database Roles)"></a><strong>跨库角色（All-Database Roles)</strong></h2><ul>
+<li>readAnyDatabase：授权在所有的数据库上读取数据的权限，只在admin 中可用</li>
+<li>readWriteAnyDatabase：授权在所有的数据库上读写数据的权限，只在admin 中可用</li>
+<li>userAdminAnyDatabase：授权在所有的数据库上管理User的权限，只在admin中可用</li>
+<li>dbAdminAnyDatabase： 授权管理所有数据库的权限，只在admin 中可用</li>
+</ul>
+<h2 id="集群管理角色（Cluster-Administration-Roles"><a href="#集群管理角色（Cluster-Administration-Roles" class="headerlink" title="集群管理角色（Cluster Administration Roles)"></a><strong>集群管理角色（Cluster Administration Roles)</strong></h2><ul>
+<li>clusterAdmin：授权管理集群的最高权限，只在admin中可用</li>
+<li>clusterManager：授权管理和监控集群的权限</li>
+<li>clusterMonoitor：授权监控集群的权限，对监控工具具有readonly的权限</li>
+<li>hostManager：管理server</li>
+</ul>
+<h2 id="超级角色（super-master-Roles"><a href="#超级角色（super-master-Roles" class="headerlink" title="超级角色（super master  Roles)"></a><strong>超级角色（super master  Roles)</strong></h2><ul>
+<li>root ：超级账户和权限，只在admin中可用le</li>
+</ul>
+<h1 id="单机开启认证"><a href="#单机开启认证" class="headerlink" title="单机开启认证"></a>单机开启认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  authorization: enabled</span><br></pre></td></tr></table></figure>
+
+<h1 id="单机创建用户并授予角色权限"><a href="#单机创建用户并授予角色权限" class="headerlink" title="单机创建用户并授予角色权限"></a>单机创建用户并授予角色权限</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"><span class="comment">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span></span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: <span class="string">&quot;shijiange&quot;</span>,</span><br><span class="line">  <span class="built_in">pwd</span>: <span class="string">&quot;mypwd&quot;</span>,</span><br><span class="line">  roles: [ &#123; role: <span class="string">&quot;root&quot;</span>, db: <span class="string">&quot;admin&quot;</span>&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="副本集开启认证"><a href="#副本集开启认证" class="headerlink" title="副本集开启认证"></a>副本集开启认证</h1><h2 id="副本集开启认证集群必须开启秘钥通讯"><a href="#副本集开启认证集群必须开启秘钥通讯" class="headerlink" title="副本集开启认证集群必须开启秘钥通讯"></a>副本集开启认证集群必须开启秘钥通讯</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#生成key 所有节点key必须一致</span></span><br><span class="line">openssl rand -base64 756 &gt; /data/mongodb/shijiange.key</span><br><span class="line">chmod 700 /data/mongodb/shijiange.key</span><br><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line"></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  keyFile: /data/mongodb/shijiange.key</span><br><span class="line">  authorization: enabled</span><br><span class="line">  </span><br><span class="line"><span class="comment">#配置调试集群 以及优先级</span></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建用户并赋予角色"><a href="#创建用户并赋予角色" class="headerlink" title="创建用户并赋予角色"></a>创建用户并赋予角色</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: &quot;shijiange&quot;,</span><br><span class="line">  pwd: &quot;mypwd&quot;,</span><br><span class="line">  roles: [ &#123; role: &quot;root&quot;, db: &quot;admin&quot;&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="登录并认证"><a href="#登录并认证" class="headerlink" title="登录并认证"></a>登录并认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开启认证后 必须登录 否则不能进行读写操作</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#登录方法1</span></span><br><span class="line">~]<span class="comment"># mongo</span></span><br><span class="line">&gt;use admin</span><br><span class="line">&gt;db.auth(<span class="string">&#x27;shijiange&#x27;</span>, <span class="string">&#x27;mypwd&#x27;</span>)</span><br><span class="line"><span class="comment">#登录方法2</span></span><br><span class="line">~]<span class="comment"># mongo -ushijiange -pmypwd --authenticationDatabase admin</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-ConfigMap"
   class="article article-type-post"
   itemscope
@@ -701,67 +791,13 @@
 </article>
 
     
-    <article
-  id="post-6-基于文件的动态实例发现"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
-    >6.基于文件的动态实例发现</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
+    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
   </nav>
   
 </section>
