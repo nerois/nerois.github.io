@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    MongoDB |  Nero 的个人博客
+    备份与恢复 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -48,165 +48,135 @@
       
     <main class="content on">
       <section class="outer">
-  
-  <article class="articles">
+  <article
+  id="post-备份与恢复"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
     
-    
-    <h1 class="page-type-title">MongoDB</h1>
-    
-    
-  
-  
-  
-  
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2019" class="archive-year">2019</a>
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  备份与恢复
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
     </div>
-    <div class="archives">
       
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/" class="archive-article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">05/18</time>
-</a>
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
        
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/"
-    >MongoDB副本集群</a> 
-</h2>
+  <h1 id="mongodump-备份数据"><a href="#mongodump-备份数据" class="headerlink" title="mongodump 备份数据"></a>mongodump 备份数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#备份所有数据到目录</span></span><br><span class="line">mongodump -h 127.0.0.1:27017 -o /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="mongorestore-导入备份好的数据"><a href="#mongorestore-导入备份好的数据" class="headerlink" title="mongorestore 导入备份好的数据"></a>mongorestore 导入备份好的数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从备份目录恢复数据</span></span><br><span class="line">mongorestore -h 127.0.0.1:27018 /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
+
  
-
-    </header>
-    
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
-
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/" class="archive-article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">05/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/"
-    >MongoDB单机部署</a> 
-</h2>
- 
-
-    </header>
-    
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
-
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/" class="archive-article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">05/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/"
-    >MongoDB索引</a> 
-</h2>
- 
-
-    </header>
-    
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
-
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/" class="archive-article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">05/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/"
-    >mongo基础</a> 
-</h2>
- 
-
-    </header>
-    
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
-
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="archive-article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">05/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/"
-    >备份与恢复</a> 
-</h2>
- 
-
-    </header>
-    
-      
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
-
-    
-    
-  </div>
-</article>
-      
+      <!-- reward -->
       
     </div>
-  </div>
-  
-  
+    
 
-  
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            mongo基础
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/05/13/ConfigMap/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">ConfigMap</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
 </section>
       <footer class="footer">
   <div class="outer">
@@ -329,6 +299,23 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
