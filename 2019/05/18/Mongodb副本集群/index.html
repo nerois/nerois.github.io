@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    ConfigMap |  Nero 的个人博客
+    MongoDB副本集群 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-ConfigMap"
+  id="post-Mongodb副本集群"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  ConfigMap
+  MongoDB副本集群
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2019/05/13/ConfigMap/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+      <a href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/">K8S资源清单</a>
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
   </div>
  
     </div>
@@ -84,21 +84,20 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h2><p>configmap 是一个标准的K8S资源,其功能通常作为某个pod的文件(通常是配置文件) 或 变量传输</p>
-<p>内部是由单个或多个KV形式的键值对组成  </p>
-<p>作为配置文件挂在到pod的时候 键是文件名称 值是文件内容</p>
-<p>作为变量传输时 可以传输configmap中某个K的值左右某个pod的环境变量的值</p>
-<p>需要注意的事如果你的pod已经启动并引用了configmap 此时你修改configmap的内容 pod中是不会及时同步(但会同步时间一般1分钟左右)  就算同步一般的pod没有检查配置  文件变更自动重载的功能 所以最有效 的方法还是重新 启动pod</p>
-<p>confmap最大作用在于 如果一个pod 有10个副本 且pod具有自动重载配置的功能 此时使用configmap作为配置文件就可以批量的修改配置文件而且实现不中断任何pod 使其生效</p>
-<h2 id="创建ConfigMap的方式"><a href="#创建ConfigMap的方式" class="headerlink" title="创建ConfigMap的方式"></a>创建ConfigMap的方式</h2><h3 id="1-陈述式"><a href="#1-陈述式" class="headerlink" title="1 陈述式"></a>1 陈述式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns]  --from-literal=[k]=[v] --from-literal=[k]=[v]</span><br><span class="line"><span class="comment">#定义configmap的k/v 通常用于传输环境变量 --from-literal 可以多个</span></span><br></pre></td></tr></table></figure>
+  <h1 id="副本集的搭建"><a href="#副本集的搭建" class="headerlink" title="副本集的搭建"></a>副本集的搭建</h1><h2 id="节点规划"><a href="#节点规划" class="headerlink" title="节点规划"></a>节点规划</h2><ol>
+<li>192.168.1.81 </li>
+<li>192.168.1.82</li>
+<li>192.168.1.83</li>
+</ol>
+<h2 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集</h2><p>主要功能在于数据的安全  当集群其中任意一台主机down, 将会随机或者根据优先级提升一台为主</p>
+<p>集群必须保证大于1节点可用,也就是单节点集群不能正常工作</p>
+<p>只有主节点可以写入 其他节点只读</p>
+<p>优先级相等的时候 故障节点恢复 不会从新选举主节点 </p>
+<p>优先级不同的时候 故障节点恢复 会根据优先级大小重新选举 优先级最大的为主 </p>
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>所有主机按照单机部署方式安装统一使用一下配置 然后启动服务</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /etc/mongodb/mongodb.conf</span><br><span class="line">systemLog:</span><br><span class="line">  destination: file</span><br><span class="line">  logAppend: <span class="literal">true</span></span><br><span class="line">  path: /var/<span class="built_in">log</span>/mongodb/mongodb.log</span><br><span class="line">storage:</span><br><span class="line">  dbPath: /data/mongodb</span><br><span class="line">  <span class="comment">#用于数据故障恢复和持久化数据的,它以日志方式来记录</span></span><br><span class="line">  journal:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line"><span class="comment">#使用fork方式 后台运行</span></span><br><span class="line">processManagement:</span><br><span class="line">  fork: <span class="literal">true</span></span><br><span class="line">  pidFilePath: /var/run/mongodb/mongod.pid</span><br><span class="line">  timeZoneInfo: /usr/share/zoneinfo</span><br><span class="line">net:</span><br><span class="line">  port: 27017</span><br><span class="line">  bindIp: 0.0.0.0</span><br><span class="line"><span class="comment">#副本配置 </span></span><br><span class="line">replication:</span><br><span class="line">  <span class="comment">#设置一个副本集群名称所有节点必须一致</span></span><br><span class="line">  replSetName: nero-claster</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[conf_file] </span><br><span class="line"><span class="comment">#k/v来自于文件 文件名称作为K 文件内容作为V --from-file 可以多个</span></span><br><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[键名]=[conf_file] </span><br><span class="line"><span class="comment">#v来自于文件内容 而K是自定义的  --from-file 可以多个</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-声明式"><a href="#2-声明式" class="headerlink" title="2 声明式"></a>2 声明式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: configmap_name</span><br><span class="line">  namespace: ns</span><br><span class="line">data:</span><br><span class="line">  <span class="comment">#这个语法相当于 --from-literal</span></span><br><span class="line">  k: <span class="string">&quot;v&quot;</span></span><br><span class="line">  <span class="comment">#这个语法相当于 --from-file</span></span><br><span class="line">  key_name.cnf: |-</span><br><span class="line">    <span class="comment">#[配置文件内容]</span></span><br><span class="line">    &#123;</span><br><span class="line">    server_name www.abc.com;</span><br><span class="line">    listen       80;</span><br><span class="line">    location / &#123;</span><br><span class="line">      </span><br><span class="line">    	&#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ConfigMap的引用"><a href="#ConfigMap的引用" class="headerlink" title="ConfigMap的引用"></a>ConfigMap的引用</h2><h3 id="1变量传输"><a href="#1变量传输" class="headerlink" title="1变量传输"></a>1变量传输</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name:</span><br><span class="line">  labels:</span><br><span class="line">    app:</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name:</span><br><span class="line">      image:</span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      env:</span><br><span class="line">         <span class="comment"># 容器环境变量 可以定义多个</span></span><br><span class="line">        - name: REDIS_HOST</span><br><span class="line">         <span class="comment"># 值来自哪里</span></span><br><span class="line">          valueFrom:</span><br><span class="line">            <span class="comment">#引用configmap的键</span></span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              <span class="comment">#来自哪个configmap中的哪个键的值</span></span><br><span class="line">              name: configmap_name               </span><br><span class="line">              key: REDIS_HOST</span><br><span class="line">            <span class="comment">#或 引用secret的键</span></span><br><span class="line">            secretKeyRef:</span><br><span class="line">              key:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="2文件挂载"><a href="#2文件挂载" class="headerlink" title="2文件挂载"></a>2文件挂载</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: <span class="built_in">test</span></span><br><span class="line">  labels:</span><br><span class="line">    app: <span class="built_in">test</span></span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: <span class="built_in">test</span></span><br><span class="line">      image: <span class="built_in">test</span>:<span class="built_in">test</span></span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      volumeMounts:</span><br><span class="line">        <span class="comment">#挂载点</span></span><br><span class="line">        - mountPath: /etc/nginx/</span><br><span class="line">          name: conf</span><br><span class="line">  volumes:</span><br><span class="line">    - name: conf</span><br><span class="line">      configMap:</span><br><span class="line">        <span class="comment">#引用configmap</span></span><br><span class="line">        name: configmap_name</span><br><span class="line">        <span class="comment">#默认权限</span></span><br><span class="line">        defaultMode: 0644</span><br><span class="line">        <span class="comment">#items 字段可以不写 默认使用K作为文件名称V作为文件内容使用默认权限</span></span><br><span class="line">        items:</span><br><span class="line">            <span class="comment">#使用哪个K</span></span><br><span class="line">          - key: server.conf</span><br><span class="line">            <span class="comment">#文件存放位置 相对于上面的挂载点</span></span><br><span class="line">            path: conf.d/nginx.conf</span><br><span class="line">            <span class="comment">#文件权限 如果不写 使用上面的默认权限</span></span><br><span class="line">            mode: 0644</span><br><span class="line">          - key: server2.conf</span><br><span class="line">            path: conf.d/nginx2.conf</span><br><span class="line">            mode: 0777</span><br></pre></td></tr></table></figure>
+<h2 id="集群调试"><a href="#集群调试" class="headerlink" title="集群调试"></a>集群调试</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#命令行客户端执行</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#把集群信息保存到config这个变量中</span></span><br><span class="line">config = &#123; _id:<span class="string">&quot;nero-claster&quot;</span>, members:[</span><br><span class="line">  &#123;_id:0,host:<span class="string">&quot;192.168.1.81:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:1,host:<span class="string">&quot;192.168.1.82:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:2,host:<span class="string">&quot;192.168.1.83:27017&quot;</span>&#125;]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#切换到 admin库</span></span><br><span class="line">use admin</span><br><span class="line"><span class="comment">#副本集初始化，需要一定时间</span></span><br><span class="line">rs.initiate( config )	</span><br><span class="line"><span class="comment">#副本集状态，一个primary，其它SECONDARY。primary是主，只有primary能写入</span></span><br><span class="line">rs.status()</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -110,7 +109,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
 
     </footer>
   </div>
@@ -118,19 +117,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/" class="article-nav-link">
+      <a href="/2019/05/18/%E4%BA%B2%E5%92%8C%E6%80%A7.%E5%8F%8D%E4%BA%B2%E5%92%8C%E6%80%A7/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            mongo基础
+            亲和,反亲和
           
         </div>
       </a>
     
     
-      <a href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-nav-link">
+      <a href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">2.常用模块</div>
+        <div class="article-nav-title">MongoDB单机部署</div>
       </a>
     
   </nav>

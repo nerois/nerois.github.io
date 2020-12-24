@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="摇旗呐喊的热情,携光阴渐远去,人世间悲喜烂剧,昼夜轮播不停,纷飞的滥情男女,情仇爱恨别离,一代人终将老去，但总有人正年轻" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    mongo基础 |  Nero 的个人博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-mongo基础"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  mongo基础
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><ol>
+<li>database  #数据库</li>
+<li>collection  #集合  相当于mysql的表</li>
+<li>filed          #字段  但不想mysql一样 所有行的字段必须一致  mongo是可以不一致的 但一般不这样使用</li>
+<li>document #每行的记录</li>
+</ol>
+<h1 id="基础操作"><a href="#基础操作" class="headerlink" title="基础操作"></a>基础操作</h1><h2 id="查询数据库"><a href="#查询数据库" class="headerlink" title="查询数据库"></a>查询数据库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">╰─➤  mongo</span><br><span class="line"><span class="comment">#查询数据库  下面三个库是默认生成的</span></span><br><span class="line">&gt; show dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line"><span class="built_in">local</span>   0.000GB</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="正确关闭mongodb的方法"><a href="#正确关闭mongodb的方法" class="headerlink" title="正确关闭mongodb的方法"></a>正确关闭mongodb的方法</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#切换到 admin 库</span></span><br><span class="line">&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line"><span class="comment">#关闭服务</span></span><br><span class="line">&gt; db.shutdownServer()</span><br><span class="line">2020-12-21T16:51:52.502+0800 I  NETWORK  [js] DBClientConnection failed to receive message from 127.0.0.1:27017 - HostUnreachable: Connection closed by peer</span><br><span class="line">server should be down...</span><br><span class="line">&gt; <span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="创建库"><a href="#创建库" class="headerlink" title="创建库"></a>创建库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#use 命令当库存在的时候 切换到此库 当不存在时 写入数据时创建此库</span></span><br><span class="line">use database_name</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建集合和字段"><a href="#创建集合和字段" class="headerlink" title="创建集合和字段"></a>创建集合和字段</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#切换到一个不存在的库</span><br><span class="line">&gt; use shijiange </span><br><span class="line">switched to db shijiange</span><br><span class="line">#插入数据 到一个不存在的表(集合) myuser</span><br><span class="line">&gt; db.myuser.insert(&#123; name: &#39;shijiange1&#39;, age: 27 &#125;)</span><br><span class="line">WriteResult(&#123; &quot;nInserted&quot; : 1 &#125;)</span><br><span class="line">#发现由于我们插入数据触发写操作 库被自动创建</span><br><span class="line">&gt; show dbs</span><br><span class="line">admin      0.000GB</span><br><span class="line">config     0.000GB</span><br><span class="line">local      0.000GB</span><br><span class="line">shijiange  0.000GB</span><br></pre></td></tr></table></figure>
+
+<h2 id="查询数据"><a href="#查询数据" class="headerlink" title="查询数据"></a>查询数据</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&gt; use shijiange </span><br><span class="line">switched to db shijiange</span><br><span class="line">&gt; show tables</span><br><span class="line">myuser</span><br><span class="line"><span class="comment">#全量查询  如果本页面不够现实 他会分页 it 命令翻页</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06585a78ed0ef0786cf2b&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b6&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b7&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 26 &#125;</span><br><span class="line"><span class="comment">#条件查询</span></span><br><span class="line">&gt; db.myuser.find( &#123; name: <span class="string">&#x27;shijiange1&#x27;</span> &#125; )</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06585a78ed0ef0786cf2b&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#pretty() 易读方式 查询</span></span><br><span class="line">&gt; db.myuser.find().pretty()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 20</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 28</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 38</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#限制条目</span></span><br><span class="line">&gt; db.myuser.find().<span class="built_in">limit</span>(2)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#跳过条目数</span></span><br><span class="line"><span class="comment">#跳过前两条显示之后的两条</span></span><br><span class="line">&gt; db.myuser.find().skip(2).<span class="built_in">limit</span>(2)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#混合使用</span></span><br><span class="line">&gt; db.myuser.find().<span class="built_in">limit</span>(2).pretty()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 20</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 28</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#排序</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#升序</span></span><br><span class="line">&gt; db.myuser.find().sort(&#123;age: 1&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f40&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan2&quot;</span>, <span class="string">&quot;age&quot;</span> : 68 &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#降序</span></span><br><span class="line">&gt; db.myuser.find().sort(&#123;age: -1&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f40&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan2&quot;</span>, <span class="string">&quot;age&quot;</span> : 68 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="比较查询"><a href="#比较查询" class="headerlink" title="比较查询"></a>比较查询</h2><ul>
+<li>$gt    #大于</li>
+<li>$lt    #小于</li>
+<li>$gte    #大于或等于</li>
+<li>$lte    #小于或等于</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#示例</span></span><br><span class="line">&gt; db.myuser.find(&#123; age: &#123;<span class="variable">$lt</span>: 30&#125; &#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&gt; </span><br></pre></td></tr></table></figure>
+
+<h2 id="与或查询"><a href="#与或查询" class="headerlink" title="与或查询"></a>与或查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#或</span></span><br><span class="line">&gt; db.myuser.find(&#123;<span class="variable">$or</span>:[&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;,&#123;name: <span class="string">&#x27;shijiange2&#x27;</span>&#125;]&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line"><span class="comment">#与</span></span><br><span class="line">db.myuser.find(&#123;<span class="variable">$and</span>:[&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;,&#123;name: <span class="string">&#x27;shijiange2&#x27;</span>&#125;]&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="正则查询"><a href="#正则查询" class="headerlink" title="正则查询"></a>正则查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#类似grep匹配 包含即可匹配</span></span><br><span class="line">&gt; db.myuser.find(&#123; name: &#123;<span class="variable">$regex</span>: <span class="string">&quot;shijiange[2-3]&quot;</span>&#125; &#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&gt; use shijiange</span><br><span class="line">switched to db shijiange</span><br><span class="line">&gt; show tables</span><br><span class="line">myuser</span><br><span class="line"><span class="comment">#条件删除</span></span><br><span class="line">&gt; db.myuser.remove(&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nRemoved&quot;</span> : 1 &#125;)</span><br><span class="line"><span class="comment">#验证 shijiange1 的数据没有了</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b6&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b7&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 26 &#125;</span><br><span class="line"><span class="comment">#删除表内所有数据</span></span><br><span class="line">&gt; db.myuser.remove(&#123;&#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nRemoved&quot;</span> : 2 &#125;)</span><br><span class="line"><span class="comment">#发现表内什么都没有了</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&gt; </span><br><span class="line"><span class="comment">#删除集合 myuser</span></span><br><span class="line">&gt; db.myuser.drop()</span><br><span class="line"><span class="literal">true</span></span><br><span class="line"><span class="comment">#查看集合 发现确实删除了</span></span><br><span class="line">&gt; show tables</span><br><span class="line">&gt; </span><br></pre></td></tr></table></figure>
+
+<h2 id="修改数据"><a href="#修改数据" class="headerlink" title="修改数据"></a>修改数据</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06e9b591eadd5db5b3ffb&quot;</span>), <span class="string">&quot;arg&quot;</span> : 1, <span class="string">&quot;int&quot;</span> : 2 &#125;</span><br><span class="line"><span class="comment">#修改 arg: 1 为 arg: 2 </span></span><br><span class="line">&gt; db.myuser.update(&#123; arg: 1 &#125;,&#123; <span class="variable">$set</span>: &#123; arg: 2 &#125; &#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nMatched&quot;</span> : 1, <span class="string">&quot;nUpserted&quot;</span> : 0, <span class="string">&quot;nModified&quot;</span> : 1 &#125;)</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06e9b591eadd5db5b3ffb&quot;</span>), <span class="string">&quot;arg&quot;</span> : 2, <span class="string">&quot;int&quot;</span> : 2 &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="删库"><a href="#删库" class="headerlink" title="删库"></a>删库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#切换到想要删除的库</span></span><br><span class="line">&gt; use shijiange</span><br><span class="line">switched to db shijiange</span><br><span class="line"><span class="comment">#删除库</span></span><br><span class="line">&gt; db.dropDatabase()</span><br><span class="line">&#123; <span class="string">&quot;dropped&quot;</span> : <span class="string">&quot;shijiange&quot;</span>, <span class="string">&quot;ok&quot;</span> : 1 &#125;</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">&gt; show dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line"><span class="built_in">local</span>   0.000GB</span><br><span class="line"><span class="comment">#自带库千万别动</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mongodb实时监控之mongostat</span><br><span class="line">mongostat可以实时监控mongodb的状态，一直刷新输出</span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat --<span class="built_in">help</span></span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat  -h 127.0.0.1:27017</span><br><span class="line"></span><br><span class="line">测试脚本</span><br><span class="line">use shijiange</span><br><span class="line"><span class="keyword">for</span>(i=1; i&lt;=300000;i++)&#123;</span><br><span class="line">  db.myuser.insert( &#123;name:<span class="string">&#x27;mytest&#x27;</span>+i, age:i&#125; )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mongodb监控之serverStatus</span><br><span class="line">serverStatus可用来获取mongodb的状态信息</span><br><span class="line">db.serverStatus()			<span class="comment">#查看所有的监控信息</span></span><br><span class="line">db.serverStatus().network	<span class="comment">#单独查看网络流量信息</span></span><br><span class="line">db.serverStatus().opcounters	<span class="comment">#统计增、删、改、查的次数</span></span><br><span class="line">db.serverStatus().connections<span class="comment">#连接</span></span><br><span class="line"></span><br><span class="line">使用非交互式shell进行获取</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus()&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus().opcounters&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            MongoDB索引
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/05/13/ConfigMap/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">ConfigMap</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2020
+        <i class="ri-heart-fill heart_icon"></i> Nero
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.png" alt="Nero 的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+</body>
+
+</html>

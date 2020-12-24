@@ -523,6 +523,293 @@
 
     
     <article
+  id="post-Mongodb副本集群"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/"
+    >MongoDB副本集群</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/Mongodb%E5%89%AF%E6%9C%AC%E9%9B%86%E7%BE%A4/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="副本集的搭建"><a href="#副本集的搭建" class="headerlink" title="副本集的搭建"></a>副本集的搭建</h1><h2 id="节点规划"><a href="#节点规划" class="headerlink" title="节点规划"></a>节点规划</h2><ol>
+<li>192.168.1.81 </li>
+<li>192.168.1.82</li>
+<li>192.168.1.83</li>
+</ol>
+<h2 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集</h2><p>主要功能在于数据的安全  当集群其中任意一台主机down, 将会随机或者根据优先级提升一台为主</p>
+<p>集群必须保证大于1节点可用,也就是单节点集群不能正常工作</p>
+<p>只有主节点可以写入 其他节点只读</p>
+<p>优先级相等的时候 故障节点恢复 不会从新选举主节点 </p>
+<p>优先级不同的时候 故障节点恢复 会根据优先级大小重新选举 优先级最大的为主 </p>
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>所有主机按照单机部署方式安装统一使用一下配置 然后启动服务</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /etc/mongodb/mongodb.conf</span><br><span class="line">systemLog:</span><br><span class="line">  destination: file</span><br><span class="line">  logAppend: <span class="literal">true</span></span><br><span class="line">  path: /var/<span class="built_in">log</span>/mongodb/mongodb.log</span><br><span class="line">storage:</span><br><span class="line">  dbPath: /data/mongodb</span><br><span class="line">  <span class="comment">#用于数据故障恢复和持久化数据的,它以日志方式来记录</span></span><br><span class="line">  journal:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line"><span class="comment">#使用fork方式 后台运行</span></span><br><span class="line">processManagement:</span><br><span class="line">  fork: <span class="literal">true</span></span><br><span class="line">  pidFilePath: /var/run/mongodb/mongod.pid</span><br><span class="line">  timeZoneInfo: /usr/share/zoneinfo</span><br><span class="line">net:</span><br><span class="line">  port: 27017</span><br><span class="line">  bindIp: 0.0.0.0</span><br><span class="line"><span class="comment">#副本配置 </span></span><br><span class="line">replication:</span><br><span class="line">  <span class="comment">#设置一个副本集群名称所有节点必须一致</span></span><br><span class="line">  replSetName: nero-claster</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<h2 id="集群调试"><a href="#集群调试" class="headerlink" title="集群调试"></a>集群调试</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#命令行客户端执行</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#把集群信息保存到config这个变量中</span></span><br><span class="line">config = &#123; _id:<span class="string">&quot;nero-claster&quot;</span>, members:[</span><br><span class="line">  &#123;_id:0,host:<span class="string">&quot;192.168.1.81:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:1,host:<span class="string">&quot;192.168.1.82:27017&quot;</span>&#125;,</span><br><span class="line">  &#123;_id:2,host:<span class="string">&quot;192.168.1.83:27017&quot;</span>&#125;]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#切换到 admin库</span></span><br><span class="line">use admin</span><br><span class="line"><span class="comment">#副本集初始化，需要一定时间</span></span><br><span class="line">rs.initiate( config )	</span><br><span class="line"><span class="comment">#副本集状态，一个primary，其它SECONDARY。primary是主，只有primary能写入</span></span><br><span class="line">rs.status()</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-Mongodb单机部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/"
+    >MongoDB单机部署</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/Mongodb%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="MongoDB单机部署"><a href="#MongoDB单机部署" class="headerlink" title="MongoDB单机部署"></a>MongoDB单机部署</h1><h2 id="二进制部署"><a href="#二进制部署" class="headerlink" title="二进制部署"></a>二进制部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.2.11.tgz</span><br><span class="line">tar xf mongodb-linux-x86_64-rhel70-4.2.11.tgz</span><br><span class="line">mv mongodb-linux-x86_64-rhel70-4.2.11 /usr/<span class="built_in">local</span>/mongodb</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">useradd -M mongodb -s /sbin/nologin </span><br><span class="line">chown -R mongodb:mongodb /usr/<span class="built_in">local</span>/mongodb</span><br><span class="line"><span class="comment">#准备数据目录</span></span><br><span class="line">mkdir -p /data/mongodb</span><br><span class="line">chown -R mongodb:mongodb /data/mongodb</span><br><span class="line"><span class="comment">#准备配置目录</span></span><br><span class="line">mkdir -p /etc/mongodb/</span><br><span class="line">chown -R mongodb:mongodb /etc/mongodb/</span><br><span class="line"><span class="comment">#准备日志目录</span></span><br><span class="line">mkdir -p /var/<span class="built_in">log</span>/mongodb/</span><br><span class="line">chown -R mongodb:mongodb /var/<span class="built_in">log</span>/mongodb/</span><br><span class="line"></span><br><span class="line"><span class="comment">#环境变量</span></span><br><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /etc/profile.d/mongodb.sh </span><br><span class="line"><span class="built_in">export</span> PATH=/usr/<span class="built_in">local</span>/mongodb/bin/:<span class="variable">$PATH</span></span><br><span class="line">EOF</span><br><span class="line"><span class="built_in">source</span> /etc/profile.d/mongodb.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#内存优化 临时生效</span></span><br><span class="line"><span class="built_in">echo</span> never &gt;/sys/kernel/mm/transparent_hugepage/enabled</span><br><span class="line"><span class="built_in">echo</span> never &gt;/sys/kernel/mm/transparent_hugepage/defrag</span><br><span class="line"><span class="comment">#内存优化重启后永久生效</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;echo never &gt;/sys/kernel/mm/transparent_hugepage/enabled&#x27;</span> &gt;&gt; /etc/rc.d/rc.local</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;echo never &gt;/sys/kernel/mm/transparent_hugepage/defrag&#x27;</span> &gt;&gt; /etc/rc.d/rc.local</span><br><span class="line">chmod +x /etc/rc.d/rc.local</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#准备配置文件 单机简单示例</span></span><br><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /etc/mongodb/mongodb.conf</span><br><span class="line">systemLog:</span><br><span class="line">  destination: file</span><br><span class="line">  logAppend: <span class="literal">true</span></span><br><span class="line">  path: /var/<span class="built_in">log</span>/mongodb/mongodb.log</span><br><span class="line">storage:</span><br><span class="line">  dbPath: /data/mongodb</span><br><span class="line">  <span class="comment">#用于数据故障恢复和持久化数据的,它以日志方式来记录</span></span><br><span class="line">  journal:</span><br><span class="line">    enabled: <span class="literal">true</span></span><br><span class="line"><span class="comment">#使用fork方式 后台运行</span></span><br><span class="line">processManagement:</span><br><span class="line">  fork: <span class="literal">true</span></span><br><span class="line">  pidFilePath: /var/run/mongodb/mongod.pid</span><br><span class="line">  timeZoneInfo: /usr/share/zoneinfo</span><br><span class="line">net:</span><br><span class="line">  port: 27017</span><br><span class="line">  bindIp: 0.0.0.0</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#UnitFile</span></span><br><span class="line"></span><br><span class="line">cat &lt;&lt;<span class="string">&#x27;EOF&#x27;</span> &gt; /usr/lib/systemd/system/mongod.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=MongoDB Database Server</span><br><span class="line">Documentation=https://docs.mongodb.org/manual</span><br><span class="line">After=network-online.target</span><br><span class="line">Wants=network-online.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">User=mongodb</span><br><span class="line">Group=mongodb</span><br><span class="line">Environment=<span class="string">&quot;OPTIONS=-f /etc/mongodb/mongodb.conf&quot;</span></span><br><span class="line">EnvironmentFile=-/etc/sysconfig/mongod</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/mongodb/bin/mongod <span class="variable">$OPTIONS</span></span><br><span class="line">ExecStartPre=/usr/bin/mkdir -p /var/run/mongodb</span><br><span class="line">ExecStartPre=/usr/bin/chown mongodb:mongodb /var/run/mongodb</span><br><span class="line">ExecStartPre=/usr/bin/chmod 0755 /var/run/mongodb</span><br><span class="line">PermissionsStartOnly=<span class="literal">true</span></span><br><span class="line">PIDFile=/var/run/mongodb/mongod.pid</span><br><span class="line">Type=forking</span><br><span class="line"><span class="comment"># file size</span></span><br><span class="line">LimitFSIZE=infinity</span><br><span class="line"><span class="comment"># cpu time</span></span><br><span class="line">LimitCPU=infinity</span><br><span class="line"><span class="comment"># virtual memory size</span></span><br><span class="line">LimitAS=infinity</span><br><span class="line"><span class="comment"># open files</span></span><br><span class="line">LimitNOFILE=64000</span><br><span class="line"><span class="comment"># processes/threads</span></span><br><span class="line">LimitNPROC=64000</span><br><span class="line"><span class="comment"># locked memory</span></span><br><span class="line">LimitMEMLOCK=infinity</span><br><span class="line"><span class="comment"># total threads (user+kernel)</span></span><br><span class="line">TasksMax=infinity</span><br><span class="line">TasksAccounting=<span class="literal">false</span></span><br><span class="line"><span class="comment"># Recommended limits for mongod as specified in</span></span><br><span class="line"><span class="comment"># https://docs.mongodb.com/manual/reference/ulimit/#recommended-ulimit-settings</span></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload &amp;&amp;  systemctl start mongod &amp;&amp; systemc <span class="built_in">enable</span> mongod</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">╰─➤  ss -tnl |grep 27017</span><br><span class="line">LISTEN     0      128          *:27017                    *:* </span><br><span class="line">╰─➤  ll /data/mongodb</span><br><span class="line">总用量 272K</span><br><span class="line">-rw------- 1 mongodb mongodb  20K 12月 21 16:21 collection-0--1221164907931845333.wt</span><br><span class="line">-rw------- 1 mongodb mongodb  36K 12月 21 16:22 collection-2--1221164907931845333.wt</span><br><span class="line">-rw------- 1 mongodb mongodb 4.0K 12月 21 16:20 collection-4--1221164907931845333.wt</span><br><span class="line">drwx------ 2 mongodb mongodb  113 12月 21 16:25 diagnostic.data</span><br><span class="line">-rw------- 1 mongodb mongodb  20K 12月 21 16:21 index-1--1221164907931845333.wt</span><br><span class="line">-rw------- 1 mongodb mongodb  36K 12月 21 16:22 index-3--1221164907931845333.wt</span><br><span class="line">-rw------- 1 mongodb mongodb 4.0K 12月 21 16:20 index-5--1221164907931845333.wt</span><br><span class="line">-rw------- 1 mongodb mongodb  12K 12月 21 16:23 index-6--1221164907931845333.wt</span><br><span class="line">drwx------ 2 mongodb mongodb  110 12月 21 16:21 journal</span><br><span class="line">-rw------- 1 mongodb mongodb  20K 12月 21 16:21 _mdb_catalog.wt</span><br><span class="line">-rw------- 1 mongodb mongodb    5 12月 21 16:21 mongod.lock</span><br><span class="line">-rw------- 1 mongodb mongodb  36K 12月 21 16:23 sizeStorer.wt</span><br><span class="line">-rw------- 1 mongodb mongodb  114 12月 21 16:18 storage.bson</span><br><span class="line">-rw------- 1 mongodb mongodb   46 12月 21 16:18 WiredTiger</span><br><span class="line">-rw------- 1 mongodb mongodb 4.0K 12月 21 16:21 WiredTigerLAS.wt</span><br><span class="line">-rw------- 1 mongodb mongodb   21 12月 21 16:18 WiredTiger.lock</span><br><span class="line">-rw------- 1 mongodb mongodb 1.3K 12月 21 16:24 WiredTiger.turtle</span><br><span class="line">-rw------- 1 mongodb mongodb  60K 12月 21 16:24 WiredTiger.wt</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-mongodb索引"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/"
+    >MongoDB索引</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="慢查询"><a href="#慢查询" class="headerlink" title="慢查询"></a>慢查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#慢查询状态 默认超过100毫秒 视为慢查询 会写入日志</span></span><br><span class="line">&gt; db.getProfilingStatus()</span><br><span class="line">&#123; <span class="string">&quot;was&quot;</span> : 0, <span class="string">&quot;slowms&quot;</span> : 100, <span class="string">&quot;sampleRate&quot;</span> : 1 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查询过程详情 多用于查看此语句是否全表扫描</span></span><br><span class="line">&gt; db.myuser.find( &#123;age:9999&#125; ).explain(<span class="literal">true</span>)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;queryPlanner&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;plannerVersion&quot;</span> : 1,</span><br><span class="line">                <span class="string">&quot;namespace&quot;</span> : <span class="string">&quot;shijiange.myuser&quot;</span>,</span><br><span class="line">                <span class="string">&quot;indexFilterSet&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">                <span class="string">&quot;parsedQuery&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;winningPlan&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;stage&quot;</span> : <span class="string">&quot;COLLSCAN&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;filter&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                        <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        <span class="string">&quot;direction&quot;</span> : <span class="string">&quot;forward&quot;</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;rejectedPlans&quot;</span> : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;executionStats&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;executionSuccess&quot;</span> : <span class="literal">true</span>,</span><br><span class="line">                <span class="string">&quot;nReturned&quot;</span> : 1,</span><br><span class="line">                <span class="comment">#查询时间 毫秒</span></span><br><span class="line">                <span class="string">&quot;executionTimeMillis&quot;</span> : 198,</span><br><span class="line">                <span class="string">&quot;totalKeysExamined&quot;</span> : 0,</span><br><span class="line">                <span class="comment">#总查询条目数条目数过大 可能就是全表查询</span></span><br><span class="line">                <span class="string">&quot;totalDocsExamined&quot;</span> : 500000,</span><br><span class="line">                <span class="string">&quot;executionStages&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;stage&quot;</span> : <span class="string">&quot;COLLSCAN&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;filter&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                        <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        <span class="string">&quot;nReturned&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;executionTimeMillisEstimate&quot;</span> : 0,</span><br><span class="line">                        <span class="string">&quot;works&quot;</span> : 500002,</span><br><span class="line">                        <span class="string">&quot;advanced&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;needTime&quot;</span> : 500000,</span><br><span class="line">                        <span class="string">&quot;needYield&quot;</span> : 0,</span><br><span class="line">                        <span class="string">&quot;saveState&quot;</span> : 3906,</span><br><span class="line">                        <span class="string">&quot;restoreState&quot;</span> : 3906,</span><br><span class="line">                        <span class="string">&quot;isEOF&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;direction&quot;</span> : <span class="string">&quot;forward&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;docsExamined&quot;</span> : 500000</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;allPlansExecution&quot;</span> : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;serverInfo&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;host&quot;</span> : <span class="string">&quot;k-n1.sp.com&quot;</span>,</span><br><span class="line">                <span class="string">&quot;port&quot;</span> : 27017,</span><br><span class="line">                <span class="string">&quot;version&quot;</span> : <span class="string">&quot;4.2.11&quot;</span>,</span><br><span class="line">                <span class="string">&quot;gitVersion&quot;</span> : <span class="string">&quot;ea38428f0c6742c7c2c7f677e73d79e17a2aab96&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;ok&quot;</span> : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="建立索引"><a href="#建立索引" class="headerlink" title="建立索引"></a>建立索引</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#对某一个字段添加索引</span></span><br><span class="line">db.myuser.ensureIndex( &#123;name:1&#125; )</span><br><span class="line"><span class="comment">#添加唯一索引  &#123;unique:true&#125; 唯一索引仅适用于字段值没有相等条目的情况</span></span><br><span class="line">db.myuser.ensureIndex( &#123;userid:1&#125;,&#123;unique:<span class="literal">true</span>&#125; ) </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-mongo基础"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/"
+    >mongo基础</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/mongo%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><ol>
+<li>database  #数据库</li>
+<li>collection  #集合  相当于mysql的表</li>
+<li>filed          #字段  但不想mysql一样 所有行的字段必须一致  mongo是可以不一致的 但一般不这样使用</li>
+<li>document #每行的记录</li>
+</ol>
+<h1 id="基础操作"><a href="#基础操作" class="headerlink" title="基础操作"></a>基础操作</h1><h2 id="查询数据库"><a href="#查询数据库" class="headerlink" title="查询数据库"></a>查询数据库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">╰─➤  mongo</span><br><span class="line"><span class="comment">#查询数据库  下面三个库是默认生成的</span></span><br><span class="line">&gt; show dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line"><span class="built_in">local</span>   0.000GB</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="正确关闭mongodb的方法"><a href="#正确关闭mongodb的方法" class="headerlink" title="正确关闭mongodb的方法"></a>正确关闭mongodb的方法</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#切换到 admin 库</span></span><br><span class="line">&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line"><span class="comment">#关闭服务</span></span><br><span class="line">&gt; db.shutdownServer()</span><br><span class="line">2020-12-21T16:51:52.502+0800 I  NETWORK  [js] DBClientConnection failed to receive message from 127.0.0.1:27017 - HostUnreachable: Connection closed by peer</span><br><span class="line">server should be down...</span><br><span class="line">&gt; <span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="创建库"><a href="#创建库" class="headerlink" title="创建库"></a>创建库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#use 命令当库存在的时候 切换到此库 当不存在时 写入数据时创建此库</span></span><br><span class="line">use database_name</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建集合和字段"><a href="#创建集合和字段" class="headerlink" title="创建集合和字段"></a>创建集合和字段</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#切换到一个不存在的库</span><br><span class="line">&gt; use shijiange </span><br><span class="line">switched to db shijiange</span><br><span class="line">#插入数据 到一个不存在的表(集合) myuser</span><br><span class="line">&gt; db.myuser.insert(&#123; name: &#39;shijiange1&#39;, age: 27 &#125;)</span><br><span class="line">WriteResult(&#123; &quot;nInserted&quot; : 1 &#125;)</span><br><span class="line">#发现由于我们插入数据触发写操作 库被自动创建</span><br><span class="line">&gt; show dbs</span><br><span class="line">admin      0.000GB</span><br><span class="line">config     0.000GB</span><br><span class="line">local      0.000GB</span><br><span class="line">shijiange  0.000GB</span><br></pre></td></tr></table></figure>
+
+<h2 id="查询数据"><a href="#查询数据" class="headerlink" title="查询数据"></a>查询数据</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&gt; use shijiange </span><br><span class="line">switched to db shijiange</span><br><span class="line">&gt; show tables</span><br><span class="line">myuser</span><br><span class="line"><span class="comment">#全量查询  如果本页面不够现实 他会分页 it 命令翻页</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06585a78ed0ef0786cf2b&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b6&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b7&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 26 &#125;</span><br><span class="line"><span class="comment">#条件查询</span></span><br><span class="line">&gt; db.myuser.find( &#123; name: <span class="string">&#x27;shijiange1&#x27;</span> &#125; )</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06585a78ed0ef0786cf2b&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#pretty() 易读方式 查询</span></span><br><span class="line">&gt; db.myuser.find().pretty()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 20</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 28</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 38</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#限制条目</span></span><br><span class="line">&gt; db.myuser.find().<span class="built_in">limit</span>(2)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#跳过条目数</span></span><br><span class="line"><span class="comment">#跳过前两条显示之后的两条</span></span><br><span class="line">&gt; db.myuser.find().skip(2).<span class="built_in">limit</span>(2)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#混合使用</span></span><br><span class="line">&gt; db.myuser.find().<span class="built_in">limit</span>(2).pretty()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 20</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>),</span><br><span class="line">        <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;age&quot;</span> : 28</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#排序</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#升序</span></span><br><span class="line">&gt; db.myuser.find().sort(&#123;age: 1&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f40&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan2&quot;</span>, <span class="string">&quot;age&quot;</span> : 68 &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#降序</span></span><br><span class="line">&gt; db.myuser.find().sort(&#123;age: -1&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f40&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan2&quot;</span>, <span class="string">&quot;age&quot;</span> : 68 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3f&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan1&quot;</span>, <span class="string">&quot;age&quot;</span> : 58 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="比较查询"><a href="#比较查询" class="headerlink" title="比较查询"></a>比较查询</h2><ul>
+<li>$gt    #大于</li>
+<li>$lt    #小于</li>
+<li>$gte    #大于或等于</li>
+<li>$lte    #小于或等于</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#示例</span></span><br><span class="line">&gt; db.myuser.find(&#123; age: &#123;<span class="variable">$lt</span>: 30&#125; &#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811d62ad68dbbee69f41&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;zhangsan3&quot;</span>, <span class="string">&quot;age&quot;</span> : 25 &#125;</span><br><span class="line">&gt; </span><br></pre></td></tr></table></figure>
+
+<h2 id="与或查询"><a href="#与或查询" class="headerlink" title="与或查询"></a>与或查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#或</span></span><br><span class="line">&gt; db.myuser.find(&#123;<span class="variable">$or</span>:[&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;,&#123;name: <span class="string">&#x27;shijiange2&#x27;</span>&#125;]&#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3c&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange1&quot;</span>, <span class="string">&quot;age&quot;</span> : 20 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line"><span class="comment">#与</span></span><br><span class="line">db.myuser.find(&#123;<span class="variable">$and</span>:[&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;,&#123;name: <span class="string">&#x27;shijiange2&#x27;</span>&#125;]&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="正则查询"><a href="#正则查询" class="headerlink" title="正则查询"></a>正则查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#类似grep匹配 包含即可匹配</span></span><br><span class="line">&gt; db.myuser.find(&#123; name: &#123;<span class="variable">$regex</span>: <span class="string">&quot;shijiange[2-3]&quot;</span>&#125; &#125;)</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3d&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 28 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0811c62ad68dbbee69f3e&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 38 &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&gt; use shijiange</span><br><span class="line">switched to db shijiange</span><br><span class="line">&gt; show tables</span><br><span class="line">myuser</span><br><span class="line"><span class="comment">#条件删除</span></span><br><span class="line">&gt; db.myuser.remove(&#123;name: <span class="string">&#x27;shijiange1&#x27;</span>&#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nRemoved&quot;</span> : 1 &#125;)</span><br><span class="line"><span class="comment">#验证 shijiange1 的数据没有了</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b6&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange2&quot;</span>, <span class="string">&quot;age&quot;</span> : 27 &#125;</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe0670b5decea8cd3f7c4b7&quot;</span>), <span class="string">&quot;name&quot;</span> : <span class="string">&quot;shijiange3&quot;</span>, <span class="string">&quot;age&quot;</span> : 26 &#125;</span><br><span class="line"><span class="comment">#删除表内所有数据</span></span><br><span class="line">&gt; db.myuser.remove(&#123;&#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nRemoved&quot;</span> : 2 &#125;)</span><br><span class="line"><span class="comment">#发现表内什么都没有了</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&gt; </span><br><span class="line"><span class="comment">#删除集合 myuser</span></span><br><span class="line">&gt; db.myuser.drop()</span><br><span class="line"><span class="literal">true</span></span><br><span class="line"><span class="comment">#查看集合 发现确实删除了</span></span><br><span class="line">&gt; show tables</span><br><span class="line">&gt; </span><br></pre></td></tr></table></figure>
+
+<h2 id="修改数据"><a href="#修改数据" class="headerlink" title="修改数据"></a>修改数据</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06e9b591eadd5db5b3ffb&quot;</span>), <span class="string">&quot;arg&quot;</span> : 1, <span class="string">&quot;int&quot;</span> : 2 &#125;</span><br><span class="line"><span class="comment">#修改 arg: 1 为 arg: 2 </span></span><br><span class="line">&gt; db.myuser.update(&#123; arg: 1 &#125;,&#123; <span class="variable">$set</span>: &#123; arg: 2 &#125; &#125;)</span><br><span class="line">WriteResult(&#123; <span class="string">&quot;nMatched&quot;</span> : 1, <span class="string">&quot;nUpserted&quot;</span> : 0, <span class="string">&quot;nModified&quot;</span> : 1 &#125;)</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">&gt; db.myuser.find()</span><br><span class="line">&#123; <span class="string">&quot;_id&quot;</span> : ObjectId(<span class="string">&quot;5fe06e9b591eadd5db5b3ffb&quot;</span>), <span class="string">&quot;arg&quot;</span> : 2, <span class="string">&quot;int&quot;</span> : 2 &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="删库"><a href="#删库" class="headerlink" title="删库"></a>删库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#切换到想要删除的库</span></span><br><span class="line">&gt; use shijiange</span><br><span class="line">switched to db shijiange</span><br><span class="line"><span class="comment">#删除库</span></span><br><span class="line">&gt; db.dropDatabase()</span><br><span class="line">&#123; <span class="string">&quot;dropped&quot;</span> : <span class="string">&quot;shijiange&quot;</span>, <span class="string">&quot;ok&quot;</span> : 1 &#125;</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">&gt; show dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line"><span class="built_in">local</span>   0.000GB</span><br><span class="line"><span class="comment">#自带库千万别动</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mongodb实时监控之mongostat</span><br><span class="line">mongostat可以实时监控mongodb的状态，一直刷新输出</span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat --<span class="built_in">help</span></span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat  -h 127.0.0.1:27017</span><br><span class="line"></span><br><span class="line">测试脚本</span><br><span class="line">use shijiange</span><br><span class="line"><span class="keyword">for</span>(i=1; i&lt;=300000;i++)&#123;</span><br><span class="line">  db.myuser.insert( &#123;name:<span class="string">&#x27;mytest&#x27;</span>+i, age:i&#125; )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mongodb监控之serverStatus</span><br><span class="line">serverStatus可用来获取mongodb的状态信息</span><br><span class="line">db.serverStatus()			<span class="comment">#查看所有的监控信息</span></span><br><span class="line">db.serverStatus().network	<span class="comment">#单独查看网络流量信息</span></span><br><span class="line">db.serverStatus().opcounters	<span class="comment">#统计增、删、改、查的次数</span></span><br><span class="line">db.serverStatus().connections<span class="comment">#连接</span></span><br><span class="line"></span><br><span class="line">使用非交互式shell进行获取</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus()&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus().opcounters&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-ConfigMap"
   class="article article-type-post"
   itemscope
@@ -580,261 +867,6 @@
     <footer class="article-footer">
        
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-2 ansible常用模块"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/"
-    >2.常用模块</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/2%20ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ansible/">ansible</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="Ansible常用模块"><a href="#Ansible常用模块" class="headerlink" title="Ansible常用模块"></a>Ansible常用模块</h2><h3 id="Command模块"><a href="#Command模块" class="headerlink" title="Command模块"></a>Command模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#此模块是默认模块  所以不需要-m指定模块名称</span></span><br><span class="line"><span class="comment">#用于执行远程linux简单命令   </span></span><br><span class="line"><span class="comment">#不支持变量引用 管道  &lt; &gt; | $ ; &amp; 等操作 原因是他并不是使用shell环境执行的命令</span></span><br><span class="line"><span class="comment">#如果想要支持 请看下个模块</span></span><br><span class="line"></span><br><span class="line">~]  ansible all -a <span class="string">&#x27;hostname&#x27;</span>     </span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn1.sp.com</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn2.sp.com</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tm1.sp.com</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="shell模块"><a href="#shell模块" class="headerlink" title="shell模块"></a>shell模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#与默认模块相似 都是远程执行命令 但支持shell的特性 如变量引用 管道等</span></span><br><span class="line"><span class="comment">#但也不推荐太复杂的操作 很可能也会失败 </span></span><br><span class="line"><span class="comment">#推荐写好脚本 推送到远程批量执行 详情见下个模块</span></span><br><span class="line">~]  ansible all -m shell -a <span class="string">&#x27;systemctl stop firewalld &amp;&amp; systemctl disable firewalld&#x27;</span></span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.</span><br><span class="line">Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.</span><br><span class="line"></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;ifconfig eth0 |grep &quot;inet &quot;&#x27;</span></span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.81  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.82  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">        inet 192.168.1.71  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        </span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;echo $HOSTNAME&#x27;</span>                                            1 ↵</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn1.sp.com</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tn2.sp.com</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">tm1.sp.com</span><br><span class="line"><span class="comment">#chdir</span></span><br><span class="line"><span class="comment">#用于执行命令前切换目录</span></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;chdir=/etc/ cat fstab&#x27;</span>                                     1 ↵</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=0a713d9c-6ce3-4034-ab9e-1621b028c9b8 /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>script模块2</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#是一个执行脚本的模块 流程是 先把脚本推送到远程 然后在在远程主机执行此脚本</span></span><br><span class="line">示例:</span><br><span class="line">~] vim selinux.sh</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">sed -i <span class="string">&quot;s/^SELINUX=.*/SELINUX=disabled/g&quot;</span> /etc/selinux/config &amp;&amp; setenforce 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">~] ansible all -m script -a <span class="string">&quot;/root/selinux.sh&quot;</span> </span><br><span class="line">192.168.1.82 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.82 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.82 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;22</span><br><span class="line">192.168.1.81 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.81 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.81 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;</span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;rc&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;stderr&quot;</span>: <span class="string">&quot;Shared connection to 192.168.1.71 closed.\r\n&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stderr_lines&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;Shared connection to 192.168.1.71 closed.&quot;</span></span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;stdout&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">    <span class="string">&quot;stdout_lines&quot;</span>: []</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#creates  如果远程文件存在 将不执行  常用于创建文件前判断文件是否存在</span></span><br><span class="line">~] ansible all -m script -a <span class="string">&quot;creates=/etc/fstab etho ok&quot;</span></span><br><span class="line">192.168.1.82 | SKIPPED</span><br><span class="line">192.168.1.81 | SKIPPED</span><br><span class="line">192.168.1.71 | SKIPPED</span><br><span class="line"></span><br><span class="line"><span class="comment">#removes  远程文件存在 才执行 常用于删除文件前判断文件是否存在</span></span><br><span class="line"><span class="comment">#当时没转杯脚本 shell模块也支持 </span></span><br><span class="line">~] ansible all -m shell -a <span class="string">&#x27;removes=/etc/fstab echo ok&#x27;</span></span><br><span class="line">192.168.1.82 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br><span class="line">192.168.1.81 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br><span class="line">192.168.1.71 | CHANGED | rc=0 &gt;&gt;</span><br><span class="line">ok</span><br></pre></td></tr></table></figure>
-
-<h3 id="copy模块"><a href="#copy模块" class="headerlink" title="copy模块"></a>copy模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#本地文件复制到远程主机</span></span><br><span class="line"><span class="comment">#backup=yes 如果目标存在是否做备份  可选  </span></span><br><span class="line"><span class="comment">#mode=600 指定目标文件的权限   可选  </span></span><br><span class="line"><span class="comment">#owner=root 指定文件所有者 要求目标主机必须存在此用户  可选1</span></span><br><span class="line"><span class="comment">#src 源文件 dest 目标文件</span></span><br><span class="line">~] ansible master -m copy -a <span class="string">&#x27;src=f1 dest=/root/ backup=yes mode=600 owner=root&#x27;</span></span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;gid&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;group&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;0600&quot;</span>, </span><br><span class="line">    <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;path&quot;</span>: <span class="string">&quot;/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;secontext&quot;</span>: <span class="string">&quot;unconfined_u:object_r:admin_home_t:s0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;size&quot;</span>: 4, </span><br><span class="line">    <span class="string">&quot;state&quot;</span>: <span class="string">&quot;file&quot;</span>, </span><br><span class="line">    <span class="string">&quot;uid&quot;</span>: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#指定内容自动生成目标文件</span></span><br><span class="line">~] ansible master -m copy  -a <span class="string">&#x27;content=&quot;123\n321\n&quot; dest=/root/f2 backup=yes mode=600 owner=root &#x27;</span> </span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;c0beba7825cc1b6fb2b2ac00b60a2f6a41e7d510&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/f2&quot;</span>, </span><br><span class="line">    <span class="string">&quot;gid&quot;</span>: 0, </span><br><span class="line">    <span class="string">&quot;group&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;md5sum&quot;</span>: <span class="string">&quot;8505d51e034e71d37cef01f5e2849472&quot;</span>, </span><br><span class="line">    <span class="string">&quot;mode&quot;</span>: <span class="string">&quot;0600&quot;</span>, </span><br><span class="line">    <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;root&quot;</span>, </span><br><span class="line">    <span class="string">&quot;secontext&quot;</span>: <span class="string">&quot;system_u:object_r:admin_home_t:s0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;size&quot;</span>: 7, </span><br><span class="line">    <span class="string">&quot;src&quot;</span>: <span class="string">&quot;/root/.ansible/tmp/ansible-tmp-1604925832.19-6444-235748674593184/source&quot;</span>, </span><br><span class="line">    <span class="string">&quot;state&quot;</span>: <span class="string">&quot;file&quot;</span>, </span><br><span class="line">    <span class="string">&quot;uid&quot;</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="fetch模块"><a href="#fetch模块" class="headerlink" title="fetch模块"></a>fetch模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从远程拉取文件到本地</span></span><br><span class="line"><span class="comment">#注意src只能是文件不能是目录</span></span><br><span class="line">~] ansible master -m fetch -a <span class="string">&quot;src=/root/f1 dest=.&quot;</span></span><br><span class="line">192.168.1.71 | CHANGED =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">&quot;checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;dest&quot;</span>: <span class="string">&quot;/root/192.168.1.71/root/f1&quot;</span>, </span><br><span class="line">    <span class="string">&quot;md5sum&quot;</span>: <span class="string">&quot;ba1f2511fc30423bdbb183fe33f3dd0f&quot;</span>, </span><br><span class="line">    <span class="string">&quot;remote_checksum&quot;</span>: <span class="string">&quot;a8fdc205a9f19cc1c7507a60c4f01b13d11d7fd0&quot;</span>, </span><br><span class="line">    <span class="string">&quot;remote_md5sum&quot;</span>: null</span><br><span class="line">&#125;</span><br><span class="line">~] ll</span><br><span class="line">total 28K</span><br><span class="line">drwxr-xr-x. 3 root root   18 Nov  9 20:55 192.168.1.71</span><br><span class="line">~] <span class="built_in">cd</span> 192.168.1.71 &amp;&amp; free</span><br><span class="line">.</span><br><span class="line">└── root</span><br><span class="line">    └── f1</span><br><span class="line"><span class="comment">#可以看到 它吧目标主机的目录结构都保留下来了</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="file模块"><a href="#file模块" class="headerlink" title="file模块"></a>file模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># path 目标文件</span></span><br><span class="line"><span class="comment"># owner 指定文件所有者</span></span><br><span class="line"><span class="comment"># mode 指定权限 如 755</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置文件属性</span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/a.sh owner=root mode=755&quot;</span></span><br><span class="line"><span class="comment">#创建空文件</span></span><br><span class="line">ansible master -m file <span class="string">&quot;name=/root/b.sh owner=root mode=755&quot;</span></span><br><span class="line"><span class="comment">#创建软连接</span></span><br><span class="line">ansible master -m file <span class="string">&quot;src=/root/b.sh dest=/root/c.sh state=link&quot;</span></span><br><span class="line"><span class="comment">#创建硬链接</span></span><br><span class="line">ansible master -m file <span class="string">&quot;src=/root/b.sh dest=/root/d.sh state=head&quot;</span></span><br><span class="line"><span class="comment">#创建目录</span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/dir owner=root mode=755 state=directory&quot;</span></span><br><span class="line"><span class="comment">#删除目录 或 文件 </span></span><br><span class="line">ansible master -m file <span class="string">&quot;path=/root/dir state=absent&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="hostname模块"><a href="#hostname模块" class="headerlink" title="hostname模块"></a>hostname模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#用于修改主机名</span></span><br><span class="line"><span class="comment">#注意修改主机名通常只是一个主机修改 多个主机同一个主机名 显然是不合理的</span></span><br><span class="line">ansible 192.168.1.11 -m hostname -a <span class="string">&#x27;name=123.abc.com&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>Cron计划任务模块</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#支持的时间点 minute hour day month weekday</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#创建计划任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;minute=k*/5 job=&#x27;/usr/sbin/ntpdate ntp.aliyun.com &amp;&gt;/dev/null&#x27; name=Synctime&quot;</span></span><br><span class="line"><span class="comment">#删除计划任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;state=absent name=Synctime&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>yum模块</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=httpd state=latest&#x27;</span> </span><br><span class="line"><span class="comment">#卸载包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=httpd state=absent&#x27;</span> </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-1 ansible基础"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/"
-    >1.ansible入门基础</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/1%20ansible%E5%9F%BA%E7%A1%80/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ansible/">ansible</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="ansible入门"><a href="#ansible入门" class="headerlink" title="ansible入门"></a>ansible入门</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><h5 id="配置-etc-ansible-hosts-主机清单"><a href="#配置-etc-ansible-hosts-主机清单" class="headerlink" title="配置/etc/ansible/hosts 主机清单"></a>配置/etc/ansible/hosts 主机清单</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># cat /etc/ansible/hosts</span></span><br><span class="line">[master]192.168.1.71</span><br><span class="line">[node]</span><br><span class="line">192.168.1.8[1:2]</span><br><span class="line"><span class="comment">#主机清单支持 ip 主机名 如果ssh端口非默认22端口 可以在ip或主机名后加上端口 如 192.168.1.71:2222</span></span><br><span class="line"><span class="comment">#如果主机名 或 ip 有连贯数字 可以使用 [] 来指定数字范围 如 192.168.1.8[1:2] 就是 192.168.1.81 和192.168.1.82</span></span><br></pre></td></tr></table></figure>
-
-<h5 id="确保-etc-ansible-ansible-cfg配置中启用如下配置"><a href="#确保-etc-ansible-ansible-cfg配置中启用如下配置" class="headerlink" title="确保/etc/ansible/ansible.cfg配置中启用如下配置"></a>确保/etc/ansible/ansible.cfg配置中启用如下配置</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">host_key_checking = False</span><br><span class="line"><span class="comment">#ansible采用ssh进行连接 当第一次连接会有交互性提示 此配置忽略交互性提示 </span></span><br></pre></td></tr></table></figure>
-
-<h5 id="所有主机免秘钥认证"><a href="#所有主机免秘钥认证" class="headerlink" title="所有主机免秘钥认证"></a>所有主机免秘钥认证</h5><h2 id="验证测试"><a href="#验证测试" class="headerlink" title="验证测试"></a>验证测试</h2><h3 id="ping模块"><a href="#ping模块" class="headerlink" title="ping模块"></a>ping模块</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#语法</span></span><br><span class="line">ansible [hosts] -m ping</span><br><span class="line"><span class="comment">#hosts 可以是 主机名或者ip 但更多的时候应该使用组名 如上面我们写的master 和node 都是组名</span></span><br><span class="line"><span class="comment">#hosts 也支持通配符 如 192.168.1.* </span></span><br><span class="line"><span class="comment">#一个组包含一个或者多个主机</span></span><br><span class="line"><span class="comment">#all 表示清单中所有主机</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line">~]<span class="comment"># ansible all -m ping</span></span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#ping模块 通过ssh方式测试是否连通主机 如果连通 返回 pong</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="ansible-的与或非"><a href="#ansible-的与或非" class="headerlink" title="ansible 的与或非"></a>ansible 的与或非</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑或 :</span></span><br><span class="line">ansible master:node -m ping </span><br><span class="line">ansible master:node -m ping </span><br><span class="line">192.168.1.82 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.81 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#可以看到这里的逻辑或 是指 多个主机 或者多组主机 都执行任务</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑与 :&amp;</span></span><br><span class="line">ansible <span class="string">&quot;master:&amp;node&quot;</span> -m ping</span><br><span class="line">[WARNING]: No hosts matched, nothing to <span class="keyword">do</span></span><br><span class="line"><span class="comment">#注意双引号 否则报错</span></span><br><span class="line"><span class="comment">#这里为什么会没有主机呢 </span></span><br><span class="line"><span class="comment">#因为这里的逻辑与 是取 两个组的交集 我指定的这两个组没有交集 </span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#逻辑非 :!</span></span><br><span class="line">ansible <span class="string">&#x27;master:!node&#x27;</span> -m ping</span><br><span class="line">192.168.1.71 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;ansible_facts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;discovered_interpreter_python&quot;</span>: <span class="string">&quot;/usr/bin/python&quot;</span></span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">&quot;changed&quot;</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">&quot;ping&quot;</span>: <span class="string">&quot;pong&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#注意这里的必须是单引号 否则shell 会把特殊符号替换 导致报错</span></span><br><span class="line"><span class="comment">#这里的逻辑非 是指  在master中存在 但不在node中存在 </span></span><br></pre></td></tr></table></figure> 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-1-指标类型"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
-    >1.指标类型</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-10-alertmanager部署"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
-    >10.alertmanager部署</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
 
     </footer>
   </div>
