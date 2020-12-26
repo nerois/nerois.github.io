@@ -108,6 +108,60 @@
     
     
     <article
+  id="post-version"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/05/13/version/"
+    >version</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/05/13/version/" class="article-date">
+  <time datetime="2020-05-13T03:14:26.000Z" itemprop="datePublished">2020-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus-operator/">prometheus-operator</a> / <a class="article-category-link" href="/categories/prometheus-operator/%E5%B8%B8%E7%94%A8%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99/">常用告警规则</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">groups:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">kubernetes-system</span></span><br><span class="line">  <span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">alert:</span> <span class="string">K8S版本不匹配</span></span><br><span class="line">    <span class="attr">annotations:</span></span><br><span class="line">      <span class="attr">message:</span> <span class="string">&#x27;<span class="template-variable">&#123;&#123; $labels.cluster &#125;&#125;</span> 集群存在 <span class="template-variable">&#123;&#123; $value &#125;&#125;</span> 各不同的Kubernetes版本running！&#x27;</span></span><br><span class="line">    <span class="attr">expr:</span> <span class="string">|</span></span><br><span class="line">      <span class="string">count(count</span> <span class="string">by</span> <span class="string">(gitVersion)</span> <span class="string">(label_replace(kubernetes_build_info&#123;job!~&quot;kube-dns|coredns&quot;&#125;,&quot;gitVersion&quot;,&quot;$1&quot;,&quot;gitVersion&quot;,&quot;(v[0-9]*.[0-9]*.[0-9]*).*&quot;)))</span> <span class="string">&gt;</span> <span class="number">1</span></span><br><span class="line">    <span class="attr">for:</span> <span class="string">15m</span></span><br><span class="line">    <span class="attr">labels:</span></span><br><span class="line">      <span class="attr">severity:</span> <span class="string">warning</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">alert:</span> <span class="string">K8S的APISERVER错误</span></span><br><span class="line">    <span class="attr">annotations:</span></span><br><span class="line">      <span class="attr">message:</span> <span class="string">&#x27;<span class="template-variable">&#123;&#123; $labels.cluster &#125;&#125;</span> 集群K8S API server client <span class="template-variable">&#123;&#123; $labels.job &#125;&#125;</span>/<span class="template-variable">&#123;&#123; $labels.instance &#125;&#125;</span> 存在 <span class="template-variable">&#123;&#123; $value | humanizePercentage &#125;&#125;</span> 的请求错误！&#x27;</span></span><br><span class="line">    <span class="attr">expr:</span> <span class="string">|</span></span><br><span class="line">      <span class="string">(sum(rate(rest_client_requests_total&#123;code=~&quot;5..&quot;&#125;[5m]))</span> <span class="string">by</span> <span class="string">(instance,</span> <span class="string">job,</span> <span class="string">cluster)</span></span><br><span class="line">        <span class="string">/</span></span><br><span class="line">      <span class="string">sum(rate(rest_client_requests_total[5m]))</span> <span class="string">by</span> <span class="string">(instance,</span> <span class="string">job,</span> <span class="string">cluster))</span></span><br><span class="line">      <span class="string">&gt;</span> <span class="number">0.01</span></span><br><span class="line">    <span class="attr">for:</span> <span class="string">15m</span></span><br><span class="line">    <span class="attr">labels:</span></span><br><span class="line">      <span class="attr">severity:</span> <span class="string">warning</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus-operator/" rel="tag">prometheus-operator</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-Kube-prometheus-分解部署"
   class="article article-type-post"
   itemscope
@@ -795,64 +849,6 @@
 <h2 id="删库"><a href="#删库" class="headerlink" title="删库"></a>删库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#切换到想要删除的库</span></span><br><span class="line">&gt; use shijiange</span><br><span class="line">switched to db shijiange</span><br><span class="line"><span class="comment">#删除库</span></span><br><span class="line">&gt; db.dropDatabase()</span><br><span class="line">&#123; <span class="string">&quot;dropped&quot;</span> : <span class="string">&quot;shijiange&quot;</span>, <span class="string">&quot;ok&quot;</span> : 1 &#125;</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">&gt; show dbs</span><br><span class="line">admin   0.000GB</span><br><span class="line">config  0.000GB</span><br><span class="line"><span class="built_in">local</span>   0.000GB</span><br><span class="line"><span class="comment">#自带库千万别动</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mongodb实时监控之mongostat</span><br><span class="line">mongostat可以实时监控mongodb的状态，一直刷新输出</span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat --<span class="built_in">help</span></span><br><span class="line">/usr/<span class="built_in">local</span>/mongodb/bin/mongostat  -h 127.0.0.1:27017</span><br><span class="line"></span><br><span class="line">测试脚本</span><br><span class="line">use shijiange</span><br><span class="line"><span class="keyword">for</span>(i=1; i&lt;=300000;i++)&#123;</span><br><span class="line">  db.myuser.insert( &#123;name:<span class="string">&#x27;mytest&#x27;</span>+i, age:i&#125; )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mongodb监控之serverStatus</span><br><span class="line">serverStatus可用来获取mongodb的状态信息</span><br><span class="line">db.serverStatus()			<span class="comment">#查看所有的监控信息</span></span><br><span class="line">db.serverStatus().network	<span class="comment">#单独查看网络流量信息</span></span><br><span class="line">db.serverStatus().opcounters	<span class="comment">#统计增、删、改、查的次数</span></span><br><span class="line">db.serverStatus().connections<span class="comment">#连接</span></span><br><span class="line"></span><br><span class="line">使用非交互式shell进行获取</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus()&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;db.serverStatus().opcounters&#x27;</span> | /usr/<span class="built_in">local</span>/mongodb/bin/mongo 127.0.0.1:27017</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-备份与恢复"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/"
-    >备份与恢复</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="mongodump-备份数据"><a href="#mongodump-备份数据" class="headerlink" title="mongodump 备份数据"></a>mongodump 备份数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#备份所有数据到目录</span></span><br><span class="line">mongodump -h 127.0.0.1:27017 -o /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="mongorestore-导入备份好的数据"><a href="#mongorestore-导入备份好的数据" class="headerlink" title="mongorestore 导入备份好的数据"></a>mongorestore 导入备份好的数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从备份目录恢复数据</span></span><br><span class="line">mongorestore -h 127.0.0.1:27018 /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->

@@ -108,6 +108,64 @@
     
     
     <article
+  id="post-备份与恢复"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/"
+    >备份与恢复</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="mongodump-备份数据"><a href="#mongodump-备份数据" class="headerlink" title="mongodump 备份数据"></a>mongodump 备份数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#备份所有数据到目录</span></span><br><span class="line">mongodump -h 127.0.0.1:27017 -o /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="mongorestore-导入备份好的数据"><a href="#mongorestore-导入备份好的数据" class="headerlink" title="mongorestore 导入备份好的数据"></a>mongorestore 导入备份好的数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从备份目录恢复数据</span></span><br><span class="line">mongorestore -h 127.0.0.1:27018 /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-认证"
   class="article article-type-post"
   itemscope
@@ -693,84 +751,6 @@
    <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> prometheus &amp;&amp; systemctl start prometheus</span><br><span class="line"></span><br><span class="line">ss -tnl |grep 9090</span><br><span class="line">LISTEN     0      128       [::]:9090                  [::]:*  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
  
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-4-重写标签"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/"
-    >4.重写标签</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="重写标签"><a href="#重写标签" class="headerlink" title="重写标签"></a>重写标签</h2><p>是配置文件中的一个字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">relabel_configs:</span><br><span class="line">	....</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
-
-<h2 id="action：重新标签动作"><a href="#action：重新标签动作" class="headerlink" title="action：重新标签动作"></a>action：重新标签动作</h2><ul>
-<li>replace：默认，通过regex匹配source_label的值，使用replacement来引用表达式匹配的分组</li>
-<li>keep：只保留regex匹配的目标 source_labels </li>
-<li>drop：删除regex匹配的目标 source_labels </li>
-<li>labeldrop：删除regex匹配的标签</li>
-<li>labelkeep：只保留regex匹配的标签</li>
-<li>hashmod：设置target_label为modulus连接的哈希值source_labels </li>
-<li>labelmap：匹配regex所有标签名称。然后复制匹配标签的值进行分组，replacement分组引用（${1},${2},…）替代</li>
-</ul>
-<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ul>
-<li><p>给作业中所有实例添加标签</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">  <span class="comment">#静态实例</span></span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment">#添加了IDC标签赋值BJ</span></span><br><span class="line">      IDC: <span class="string">&quot;BJ&quot;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看所有带有IDC:BJ标签实例的某指标的总和</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum(指标名称&#123;IDC:<span class="string">&quot;BJ&quot;</span>&#125;)</span><br><span class="line"><span class="comment">#在prometheus页面中填写公式 可获得总值</span></span><br><span class="line"><span class="comment">#sum() 求和</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="标签重写"><a href="#标签重写" class="headerlink" title="标签重写"></a>标签重写</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这个job命名方便识别机房</span></span><br><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#指定动作 默认replace 标签重写</span></span><br><span class="line">   - action: replace</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)</span><br><span class="line">     <span class="comment">#后向引用</span></span><br><span class="line">     replacement: <span class="variable">$1</span></span><br><span class="line">     <span class="comment">#标签的K被修改idc 原有标签还保留 多了一个 idc=&#x27;BJ-Prometheus&#x27;的标签</span></span><br><span class="line">     target_label: idc</span><br></pre></td></tr></table></figure>
-
-<h2 id="keep-和-drop"><a href="#keep-和-drop" class="headerlink" title="keep 和 drop"></a>keep 和 drop</h2><p>实现采集指标的过滤 使得指标是可以选择性采集的</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#keep 表示只采集有指定标签的指标</span></span><br><span class="line">   <span class="comment">#drop 表示不采集有此标签的的指标</span></span><br><span class="line">   - action: keep</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)     </span><br></pre></td></tr></table></figure>
-
-<h2 id="labeldrop和labelkeep"><a href="#labeldrop和labelkeep" class="headerlink" title="labeldrop和labelkeep"></a>labeldrop和labelkeep</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#labeldrop 删除匹配到的标签 配合标签重写 可以实现真正的重命名标签</span></span><br><span class="line">   <span class="comment">#labelkeep 只保留匹配到的标签 其余删除</span></span><br><span class="line">   - action: labeldrop</span><br><span class="line">     <span class="comment">#正则</span></span><br><span class="line">     regex: job</span><br><span class="line">     </span><br></pre></td></tr></table></figure> 
       <!-- reward -->
       
     </div>

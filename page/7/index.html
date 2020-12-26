@@ -108,6 +108,75 @@
     
     
     <article
+  id="post-3.2 生成kubeconfig"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3.2%20%E7%94%9F%E6%88%90kubeconfig/"
+    >3.2生成kubeconfig</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3.2%20%E7%94%9F%E6%88%90kubeconfig/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="利用证书生成组件的kubeconfig"><a href="#利用证书生成组件的kubeconfig" class="headerlink" title="**利用证书生成组件的kubeconfig"></a>**利用证书生成组件的kubeconfig</h2><p>所有的操作都在master01的节点上进行</p>
+<h2 id="kube-controller-manager"><a href="#kube-controller-manager" class="headerlink" title="**kube-controller-manager"></a>**kube-controller-manager</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/kubernetes</span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;system:kube-controller-manager&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;sa&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;controller-manager.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#KUBE_APISERVER 指向vip或者apiserver 如果打算做高可用 就指向vip</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="kube-scheduler"><a href="#kube-scheduler" class="headerlink" title="**kube-scheduler"></a>**kube-scheduler</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/kubernetes</span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;system:kube-scheduler&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;kube-scheduler&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;scheduler.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="admin-kubectl"><a href="#admin-kubectl" class="headerlink" title="**admin(kubectl)"></a>**admin(kubectl)</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_USER=<span class="string">&quot;kubernetes-admin&quot;</span></span><br><span class="line">KUBE_CERT=<span class="string">&quot;admin&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;admin.kubeconfig&quot;</span></span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#客户端认证</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --client-certificate=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.crt \</span><br><span class="line">  --client-key=/etc/kubernetes/pki/<span class="variable">$&#123;KUBE_CERT&#125;</span>.key \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#添加上下文</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;KUBE_USER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;KUBE_USER&#125;</span>@<span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#验证 </span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="分发kubeconfig及证书其他-master-节点"><a href="#分发kubeconfig及证书其他-master-节点" class="headerlink" title="**分发kubeconfig及证书其他 master 节点"></a>**分发kubeconfig及证书其他 master 节点</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r /etc/kubernetes k-m2:/etc/</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="分发etcd证书到所有etcd节点"><a href="#分发etcd证书到所有etcd节点" class="headerlink" title="**分发etcd证书到所有etcd节点"></a>**分发etcd证书到所有etcd节点</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -rp /etc/kubernetes/pki/etcd  k-n1:/etc/kubernetes/pki</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-3.1 生成证书"
   class="article article-type-post"
   itemscope
@@ -707,85 +776,6 @@
 
 <h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ipvsadm -ln                                                                                                                        127 ↵</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  10.96.0.1:443 rr</span><br><span class="line">  -&gt; 192.168.1.71:6443            Masq    1      0          0     </span><br></pre></td></tr></table></figure>
 
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-8 网络插件 calico与flannel"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/"
-    >8网络插件calico与flannel</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/8%20%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6%20calico%E4%B8%8Eflannel/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <p>###calico 与 flannel 选一即可</p>
-<h2 id="calico"><a href="#calico" class="headerlink" title="**calico"></a>**calico</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://docs.projectcalico.org/v3.8/manifests/calico.yaml </span><br><span class="line">sed -i -e <span class="string">&quot;s?192.168.0.0/16?10.244.0.0/16?g&quot;</span> calico.yaml</span><br><span class="line"><span class="comment">#最好下载好镜像上传至内部harbor</span></span><br><span class="line"><span class="comment">#然后修改此文件中的镜像指向内部harbor </span></span><br><span class="line">calico/cni:v3.8.9</span><br><span class="line">calico/pod2daemon-flexvol:v3.8.9</span><br><span class="line">calico/node:v3.8.9</span><br><span class="line">calico/kube-controllers:v3.8.9</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="替换镜像"><a href="#替换镜像" class="headerlink" title="**替换镜像"></a>**替换镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&quot;s@calico/cni:v3.8.9@hb.sp.com/calico/cni:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/pod2daemon-flexvol:v3.8.9@hb.sp.com/calico/pod2daemon-flexvol:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/node:v3.8.9@hb.sp.com/calico/node:v3.8.9@g&quot;</span> calico.yaml </span><br><span class="line">sed -i <span class="string">&quot;s@calico/kube-controllers:v3.8.9@hb.sp.com/calico/kube-controllers:v3.8.9@g&quot;</span> calico.yaml </span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f calico.yaml</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get nodes</span></span><br><span class="line">NAME          STATUS   ROLES    AGE   VERSION</span><br><span class="line">k-m1.sp.com   Ready    master   9h    v1.15.12</span><br><span class="line">k-n1.sp.com   Ready    node     25h   v1.15.12</span><br><span class="line">k-n2.sp.com   Ready    node     24h   v1.15.12</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl get pod -n kube-system</span></span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">calico-kube-controllers-867fb4cbb9-tl9d8   1/1     Running   0          51m</span><br><span class="line">calico-node-7nxjj                          1/1     Running   0          51m</span><br><span class="line">calico-node-td9mh                          1/1     Running   0          51m</span><br><span class="line">calico-node-wmbqv                          1/1     Running   0          51m</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="flannel"><a href="#flannel" class="headerlink" title="**flannel"></a>**flannel</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/coreos/flannel 中推荐方法</span><br><span class="line"></span><br><span class="line">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="迁移镜像到本地harbor-（可选-但推荐）"><a href="#迁移镜像到本地harbor-（可选-但推荐）" class="headerlink" title="*迁移镜像到本地harbor （可选 但推荐）"></a>*迁移镜像到本地harbor （可选 但推荐）</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看镜像版本</span></span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">        image: quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line"><span class="comment">#上传镜像到本地harbor</span></span><br><span class="line">docker pull quay.io/coreos/flannel:v0.13.0-rc2</span><br><span class="line">docker image tag quay.io/coreos/flannel:v0.13.0-rc2    hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">docker push hb.sp.com/flannel/flannel:v0.13.0-rc2 </span><br><span class="line"><span class="comment">#修改清单</span></span><br><span class="line">sed -i <span class="string">&quot;s@quay.io/coreos/flannel:v0.13.0-rc2@hb.sp.com/flannel/flannel:v0.13.0-rc2@g&quot;</span> kube-flannel.yml</span><br><span class="line">cat kube-flannel.yml|grep image</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br><span class="line">        image: hb.sp.com/flannel/flannel:v0.13.0-rc2</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="部署"><a href="#部署" class="headerlink" title="*部署"></a>*部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f kube-flannel.yml</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                    READY   STATUS    RESTARTS   AGE   IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kube-flannel-ds-7pfdp   1/1     Running   0          48s   192.168.1.71   k-m1.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-hn6bf   1/1     Running   0          48s   192.168.1.82   k-n2.sp.com   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-flannel-ds-vjr2k   1/1     Running   0          48s   192.168.1.81   k-n1.sp.com   &lt;none&gt;           &lt;none&gt;。</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
