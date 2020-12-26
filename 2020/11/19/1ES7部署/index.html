@@ -109,6 +109,10 @@
 <h1 id="cerebor-初识"><a href="#cerebor-初识" class="headerlink" title="cerebor 初识"></a>cerebor 初识</h1><p>浏览器访问<a target="_blank" rel="noopener" href="http://es1.sp.com:9000/">http://es1.sp.com:9000/</a></p>
 <p><img src="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/image-20201119170314763.png" alt="image-20201119170314763"></p>
 <p><img src="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/image-20201119171008449.png" alt="image-20201119171008449"></p>
+<p>设置默认分片和副本数量</p>
+<p><img src="/2020/11/19/1ES7%E9%83%A8%E7%BD%B2/image-20201226210409518.png" alt="image-20201226210409518"></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">_template/log</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;template&quot;</span>: <span class="string">&quot;*&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;number_of_shards&quot;</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="attr">&quot;number_of_replicas&quot;</span>: <span class="string">&quot;1&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
  
       <!-- reward -->
       
