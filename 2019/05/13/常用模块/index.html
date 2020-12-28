@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="摇旗呐喊的热情,携光阴渐远去,人世间悲喜烂剧,昼夜轮播不停,纷飞的滥情男女,情仇爱恨别离,一代人终将老去，但总有人正年轻" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    1.ansible入门基础 |  Nero 的个人博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-常用模块"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  1.ansible入门基础
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/ansible/">ansible</a>
+  </div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="常用模块"><a href="#常用模块" class="headerlink" title="常用模块"></a>常用模块</h1><ul>
+<li>command                 # 执行shell命令(不支持管道等特殊字符)</li>
+<li>shell                           # 执行shell命令</li>
+<li>scripts                        # 执行shell脚本</li>
+<li>yum_repository      # 配置yum仓库</li>
+<li>联网下载        get_url</li>
+<li>安装            yum</li>
+<li>配置            copy</li>
+<li>启动            service、systemd</li>
+<li>创建用户与组    user、group</li>
+<li>授权            file</li>
+<li>定时任务        crond</li>
+<li>挂载            mount</li>
+<li>firewalld        firewall</li>
+<li>selinux            selinux</li>
+</ul>
+<h2 id="ad-hoc"><a href="#ad-hoc" class="headerlink" title="ad-hoc"></a>ad-hoc</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看帮助</span></span><br><span class="line">ansible-doc -l        <span class="comment"># 查看所有模块说明</span></span><br><span class="line">ansible-doc copy      <span class="comment"># 表示指定模块方法</span></span><br><span class="line">ansible-doc -s copy   <span class="comment"># 表示指定模块参数</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m shell -a <span class="string">&#x27;df -h&#x27;</span>    </span><br></pre></td></tr></table></figure>
+
+<h2 id="script"><a href="#script" class="headerlink" title="script"></a>script</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#执行脚本</span></span><br><span class="line">ansible all -m script -a <span class="string">&quot;./test.sh&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=wget &#x27;</span></span><br><span class="line"><span class="comment">#卸载</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=wget state=absent&#x27;</span></span><br><span class="line"><span class="comment">#更新所有软件包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&quot;name=* state=latest&quot;</span></span><br><span class="line"><span class="comment">#name可以是一个rpm包的url下载路径或者本地绝对路径</span></span><br><span class="line"><span class="comment">#state 指定使用yum的方法 present安装软件包 absent移除软件包 latest安装最新软件包 </span></span><br><span class="line"><span class="comment">#默认state=present</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="copy"><a href="#copy" class="headerlink" title="copy"></a>copy</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#复制</span></span><br><span class="line">ansible all -m copy -a <span class="string">&quot;src=./anaconda-ks.cfg dest=/tmp/ owner=root group=root mode=0600 backup=yes&quot;</span></span><br><span class="line"><span class="comment">#backup默认是no 将直接覆盖目标路径 backup=yes时 将在目标目录生成文件名加日期的文件作为备份</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#使用content直接指定文本内容 并在目标主机生成文件</span></span><br><span class="line">ansible all -m copy -a <span class="string">&#x27;content=&quot;/data 192.168.1.0/24(rw,sync,no_all_squash)&quot; dest=/etc/exports&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="file"><a href="#file" class="headerlink" title="file"></a>file</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改权限 recurse 是递归 默认recurse=no , state=directory 声明此路径是目录默认是文件</span></span><br><span class="line">ansible all -m file -a <span class="string">&quot;path=/app state=directory mode=0600 owner=www group=www recurse=yes&quot;</span></span><br><span class="line"><span class="comment">#创建一个空文件</span></span><br><span class="line">ansible all -m file -a <span class="string">&quot;path=/app/file1 state=touch  ...&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">directory <span class="comment">#目录</span></span><br><span class="line">touch <span class="comment">#创建</span></span><br><span class="line">link  <span class="comment">#软连接</span></span><br><span class="line">absent <span class="comment">#删除</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="get-url"><a href="#get-url" class="headerlink" title="get_url"></a>get_url</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#长用于下载一些文件dist可以是目录 也可以是文件</span></span><br><span class="line">ansible all -m get_url -a <span class="string">&quot;url=https://.../file.rpm dist=/usr/local/src mode=0600 checksum =md5:lkixjhdiujjdldljj&quot;</span></span><br><span class="line"></span><br><span class="line">checksum <span class="comment">#用于哈希验证 可省略 </span></span><br></pre></td></tr></table></figure>
+
+<h2 id="systemd"><a href="#systemd" class="headerlink" title="systemd"></a>systemd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m systemd -a <span class="string">&quot; name=nginx state=stopped enabled=no&quot;</span></span><br><span class="line"><span class="comment">#enabled是设定此服务是否开机自动启动</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">startde <span class="comment">#启动</span></span><br><span class="line">restarted <span class="comment">#重新启动</span></span><br><span class="line">stopped <span class="comment">#停止</span></span><br><span class="line">reload <span class="comment">#重载服务</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="group"><a href="#group" class="headerlink" title="group"></a>group</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#删除组</span></span><br><span class="line">ansible all -m group -a <span class="string">&quot;name=test state=absent&quot;</span></span><br><span class="line"><span class="comment">#创建组</span></span><br><span class="line">ansible all -m group -a <span class="string">&quot;name=test gid=8888 &quot;</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">absent <span class="comment">#删除</span></span><br><span class="line">present <span class="comment">#创建 默认就是创建</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建用户</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero comment=&#x27;nidelaofuqin&#x27; uid=8888 group=root create_home=no&quot;</span></span><br><span class="line"><span class="comment">#删除用户</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero state=absent remove=yes&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加秘钥对</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa&quot;</span></span><br><span class="line"></span><br><span class="line">create_home <span class="comment">#是否创建家目录默认创建</span></span><br><span class="line">remove <span class="comment">#是否删除家目录</span></span><br><span class="line">name <span class="comment">#名称</span></span><br><span class="line">shell <span class="comment">#指定shell 如 shell=/bin/bash</span></span><br><span class="line">comment <span class="comment">#描述</span></span><br><span class="line">uid <span class="comment">#uid</span></span><br><span class="line">group <span class="comment">#加入那个组 这个组必须事先存在</span></span><br><span class="line">groups <span class="comment">#附加组 如 groups=www,root</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加密码</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给密码做哈希  salt 是盐</span></span><br><span class="line">╰─➤  ansible localhost -m debug -a <span class="string">&quot;msg=&#123;&#123; &#x27;123456&#x27; | password_hash(&#x27;sha512&#x27;, &#x27;salt&#x27;) &#125;&#125;&quot;</span> </span><br><span class="line">localhost | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;msg&quot;</span>: <span class="string">&quot;<span class="variable">$6</span><span class="variable">$salt</span><span class="variable">$MktMKPZJ6t59GfxcJU20DwcwQzfMvOlHFVZiOVD71w</span>.igcOo1R7vBYR65JquIQ/7siC7VRpmteKvZmfSkNc69.&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加密码 注意一定要单引号</span></span><br><span class="line">ansible all -m user -a <span class="string">&#x27;name=nero password=$6$salt$MktMKPZJ6t59GfxcJU20DwcwQzfMvOlHFVZiOVD71w.igcOo1R7vBYR65JquIQ/7siC7VRpmteKvZmfSkNc69.&#x27;</span></span><br><span class="line"><span class="comment">#也可以在创建用户的时候直接给定密码</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="cron"><a href="#cron" class="headerlink" title="cron"></a>cron</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加定时任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test minute=0 hour=5,2 job=&#x27;/bin/bash test.sh &amp;&gt;/dev/null&#x27;&quot;</span></span><br><span class="line"><span class="comment">#删除定时任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test state=absent&quot;</span></span><br><span class="line"><span class="comment">#注释定时任务 必须跟job</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test disable=yes job=&#x27;/bin/bash test.sh &amp;&gt;/dev/null&#x27;&quot;</span></span><br><span class="line">╰─➤  crontab -l</span><br><span class="line"><span class="comment">#Ansible: test</span></span><br><span class="line"><span class="comment">#* * * * * /bin/bash test.sh &amp;&gt;/dev/null</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#name 可以自定义 且建议都写上 因为 ansible删除的时候也是基于name的值 </span></span><br><span class="line">minute hour day month weekday <span class="comment">#分,时,日,月,星期</span></span><br><span class="line"><span class="comment">#如果是*可以省略</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m mount -a <span class="string">&quot;src=172.16.1.7:/data path=/data fstype=nfs opts=defaults state=mounted&quot;</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">present     <span class="comment"># 开机挂载，仅将挂载配置写入/etc/fstab</span></span><br><span class="line">mounted     <span class="comment"># 挂载设备，并将配置写入/etc/fstab</span></span><br><span class="line">unmounted   <span class="comment"># 卸载设备，不会清除/etc/fstab写入的配置</span></span><br><span class="line">absent      <span class="comment"># 卸载设备，会清理/etc/fstab写入的配置</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/05/13/%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            1.ansible入门基础
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">1.指标类型</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2020
+        <i class="ri-heart-fill heart_icon"></i> Nero
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.png" alt="Nero 的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+</body>
+
+</html>
