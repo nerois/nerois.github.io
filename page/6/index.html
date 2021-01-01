@@ -108,6 +108,79 @@
     
     
     <article
+  id="post-3-二进制部署prometheus"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/"
+    >3.二进制部署Prometheus 服务端</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="相关包下载地址"><a href="#相关包下载地址" class="headerlink" title="相关包下载地址"></a>相关包下载地址</h2><p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
+<h2 id="部署Prometheus-服务端"><a href="#部署Prometheus-服务端" class="headerlink" title="部署Prometheus 服务端"></a>部署Prometheus 服务端</h2><ol>
+<li><p>下载和部署</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.22.0/prometheus-2.22.0.linux-amd64.tar.gz</span><br><span class="line">tar xf prometheus-2.22.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/prometheus-2.22.0.linux-amd64 /usr/<span class="built_in">local</span>/prometheus</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>准备UnitFile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/prometheus.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/prometheus/prometheus --config.file=/usr/<span class="built_in">local</span>/prometheus/prometheus.yml --storage.tsdb.retention=3d</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment">#这里只指定了一个配置文件选项,可以添加其它选项  使用 ./prometheus --help 查看其它选项</span></span><br><span class="line"><span class="comment">#常用选项</span></span><br><span class="line"><span class="comment"># --storage.tsdb.path=&quot;data/&quot; 指定数据目录 </span></span><br><span class="line"><span class="comment"># --storage.tsdb.retention=15d 指定留存数据时间范围</span></span><br><span class="line"><span class="comment"># --web.listen-address=&quot;0.0.0.0:9090&quot; 监听地址</span></span><br><span class="line"><span class="comment"># --web.max-connections=512 最大连接数</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p>配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/<span class="built_in">local</span>/prometheus/prometheus.yml</span><br><span class="line"><span class="comment"># my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s <span class="comment"># Set the scrape interval to every 15 seconds. Default is every 1 minute.</span></span><br><span class="line">  evaluation_interval: 15s <span class="comment"># Evaluate rules every 15 seconds. The default is every 1 minute.</span></span><br><span class="line">  <span class="comment"># scrape_timeout is set to the global default (10s).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">      <span class="comment"># - alertmanager:9093</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load rules once and periodically evaluate them according to the global &#x27;evaluation_interval&#x27;.</span></span><br><span class="line">rule_files:</span><br><span class="line">  <span class="comment"># - &quot;first_rules.yml&quot;</span></span><br><span class="line">  <span class="comment"># - &quot;second_rules.yml&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="comment"># Here it&#x27;s Prometheus itself.</span></span><br><span class="line">scrape_configs:</span><br><span class="line">  <span class="comment"># The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  <span class="comment">#作业 默认配置  用于监控prometheus自身</span></span><br><span class="line">  - job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># metrics_path defaults to &#x27;/metrics&#x27;</span></span><br><span class="line">    <span class="comment"># scheme defaults to &#x27;http&#x27;.</span></span><br><span class="line"></span><br><span class="line">    static_configs:</span><br><span class="line">    <span class="comment">#实例</span></span><br><span class="line">    - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动服务</p>
+</li>
+</ol>
+   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> prometheus &amp;&amp; systemctl start prometheus</span><br><span class="line"></span><br><span class="line">ss -tnl |grep 9090</span><br><span class="line">LISTEN     0      128       [::]:9090                  [::]:*  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-4-重写标签"
   class="article article-type-post"
   itemscope
@@ -674,66 +747,6 @@
 </article>
 
     
-    <article
-  id="post-3 master准备"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/3%20master%E5%87%86%E5%A4%87/"
-    >3master准备</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/3%20master%E5%87%86%E5%A4%87/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="所有master节点下载server端二进制包"><a href="#所有master节点下载server端二进制包" class="headerlink" title="所有master节点下载server端二进制包"></a>所有master节点下载server端二进制包</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wget https://dl.k8s.io/v1.15.2/kubernetes-server-linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line">tar xvf kubernetes-server-linux-amd64.tar.gz &amp;&amp; \</span><br><span class="line">mkdir -p /opt/kube/bin/ &amp;&amp; \</span><br><span class="line">cp -p kubernetes/server/bin/kube&#123;<span class="built_in">let</span>,ctl,-apiserver,-controller-manager,-scheduler,-proxy&#125;  /opt/kube/bin/</span><br><span class="line"></span><br><span class="line">vim /etc/profile.d/k8s.sh</span><br><span class="line"><span class="built_in">export</span> PATH=/opt/kube/bin/:<span class="variable">$PATH</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> /etc/profile.d/k8s.sh</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="证书创建"><a href="#证书创建" class="headerlink" title="**证书创建"></a>**证书创建</h2><p>所有的操作都在master01的节点上进行<br>在master01上创建证书，然后分发到各个节点<br>#所有节点创建相关目录</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/kubernetes/pki/etcd &amp;&amp; \</span><br><span class="line"><span class="built_in">cd</span> /etc/kubernetes/pki/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cat &gt; /etc/kubernetes/pki/openssl.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[ req ]</span><br><span class="line">default_bits = 2048</span><br><span class="line">default_md = sha256</span><br><span class="line">distinguished_name = req_distinguished_name</span><br><span class="line"></span><br><span class="line">[req_distinguished_name]</span><br><span class="line"></span><br><span class="line">[ v3_ca ]</span><br><span class="line">basicConstraints = critical, CA:TRUE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign</span><br><span class="line"></span><br><span class="line">[ v3_req_server ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_client ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = clientAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_apiserver ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line">subjectAltName = @alt_names_cluster</span><br><span class="line"></span><br><span class="line">[ v3_req_etcd ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth, clientAuth</span><br><span class="line">subjectAltName = @alt_names_etcd</span><br><span class="line"></span><br><span class="line">[ alt_names_cluster ]</span><br><span class="line">DNS.1 = kubernetes</span><br><span class="line">DNS.2 = kubernetes.default</span><br><span class="line">DNS.3 = kubernetes.default.svc</span><br><span class="line">DNS.4 = kubernetes.default.svc.cluster.local</span><br><span class="line">DNS.5 = localhost</span><br><span class="line">IP.1 = 10.96.0.1  <span class="comment">##kubernetes.default.svc.cluster.local</span></span><br><span class="line">IP.2 = 127.0.0.1  <span class="comment">##localhost</span></span><br><span class="line">IP.3 = 192.168.1.77    <span class="comment">##vip</span></span><br><span class="line">IP.4 = 192.168.1.71  <span class="comment">##master01</span></span><br><span class="line">IP.5 = 192.168.1.81  <span class="comment">##node1</span></span><br><span class="line">IP.6 = 192.168.1.82</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[ alt_names_etcd ]</span><br><span class="line">DNS.1 = localhost</span><br><span class="line">IP.1 = 127.0.0.1</span><br><span class="line">IP.2 = 192.168.1.71   <span class="comment">##etcd节点</span></span><br><span class="line">IP.3 = 192.168.1.81</span><br><span class="line">IP.4 = 192.168.1.82</span><br><span class="line">EOF</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
@@ -751,7 +764,7 @@
     <ul>
       <li>
         Copyrights &copy;
-        2015-2020
+        2015-2021
         <i class="ri-heart-fill heart_icon"></i> Nero
       </li>
     </ul>

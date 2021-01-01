@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-     Nero 的个人博客
+    配置 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -47,433 +47,8 @@
         style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
       
     <main class="content on">
-      
-<section class="cover">
-    
-  <div class="cover-frame">
-    <div class="bg-box">
-      <img src="/images/back4.jpg" alt="image frame" />
-    </div>
-    <div class="cover-inner text-center text-white">
-      <h1><a href="/">Nero 的个人博客</a></h1>
-      <div id="subtitle-box">
-        
-        <span id="subtitle"></span>
-        
-      </div>
-      <div>
-        
-        <img
-          src="/images/logo.png"
-          class="cover-logo"
-          alt="Nero 的个人博客"
-        />
-        
-      </div>
-    </div>
-  </div>
-  <div class="cover-learn-more">
-    <a href="javascript:void(0)" class="anchor"><i class="ri-arrow-down-line"></i></a>
-  </div>
-</section>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js"></script>
-
-
-<!-- Subtitle -->
-
-  <script>
-    try {
-      var typed = new Typed("#subtitle", {
-        strings: ['摇旗呐喊的热情,携光阴渐远去,', '人世间悲喜烂剧,昼夜轮播不停,', '纷飞的滥情男女, 情仇爱恨别离,一代人终将老去，但总有人正年轻'],
-        startDelay: 0,
-        typeSpeed: 200,
-        loop: true,
-        backSpeed: 100,
-        showCursor: true
-      });
-    } catch (err) {
-      console.log(err)
-    }
-  </script>
-  
-<div id="main">
-  <section class="outer">
-  
-  <article class="articles">
-    
-    
-    
-    
-    <article
-  id="post-备份与恢复"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/"
-    >备份与恢复</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/18/%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D/" class="article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="mongodump-备份数据"><a href="#mongodump-备份数据" class="headerlink" title="mongodump 备份数据"></a>mongodump 备份数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#备份所有数据到目录</span></span><br><span class="line">mongodump -h 127.0.0.1:27017 -o /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
-
-
-
-<h1 id="mongorestore-导入备份好的数据"><a href="#mongorestore-导入备份好的数据" class="headerlink" title="mongorestore 导入备份好的数据"></a>mongorestore 导入备份好的数据</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从备份目录恢复数据</span></span><br><span class="line">mongorestore -h 127.0.0.1:27018 /data/mongodbbackup/</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-认证"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/18/%E8%AE%A4%E8%AF%81/"
-    >用户认证</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/18/%E8%AE%A4%E8%AF%81/" class="article-date">
-  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h1><h2 id="数据库用户角色（Database-User-Roles"><a href="#数据库用户角色（Database-User-Roles" class="headerlink" title="数据库用户角色（Database User Roles)"></a><strong>数据库用户角色（Database User Roles)</strong></h2><ul>
-<li>read : 授权User只读数据的权限，允许用户读取指定的数据库</li>
-<li>readWrite 授权User读/写数据的权限，允许用户读/写指定的数据库</li>
-</ul>
-<h2 id="数据库管理角色（Database-Admininstration-Roles"><a href="#数据库管理角色（Database-Admininstration-Roles" class="headerlink" title="数据库管理角色（Database Admininstration Roles)"></a><strong>数据库管理角色（Database Admininstration Roles)</strong></h2><ul>
-<li>dbAdmin：在当前的数据库中执行管理操作，如索引的创建、删除、统计、查看等</li>
-<li>dbOwner：在当前的数据库中执行任意操作，增、删、改、查等</li>
-<li>userAdmin ：在当前的数据库中管理User<strong>，</strong>创建、删除和管理用户。</li>
-</ul>
-<h2 id="备份和还原角色（Backup-and-Restoration-Roles"><a href="#备份和还原角色（Backup-and-Restoration-Roles" class="headerlink" title="备份和还原角色（Backup and Restoration Roles)"></a><strong>备份和还原角色（Backup and Restoration Roles)</strong></h2><ul>
-<li>backup</li>
-<li>restore</li>
-</ul>
-<h2 id="跨库角色（All-Database-Roles"><a href="#跨库角色（All-Database-Roles" class="headerlink" title="跨库角色（All-Database Roles)"></a><strong>跨库角色（All-Database Roles)</strong></h2><ul>
-<li>readAnyDatabase：授权在所有的数据库上读取数据的权限，只在admin 中可用</li>
-<li>readWriteAnyDatabase：授权在所有的数据库上读写数据的权限，只在admin 中可用</li>
-<li>userAdminAnyDatabase：授权在所有的数据库上管理User的权限，只在admin中可用</li>
-<li>dbAdminAnyDatabase： 授权管理所有数据库的权限，只在admin 中可用</li>
-</ul>
-<h2 id="集群管理角色（Cluster-Administration-Roles"><a href="#集群管理角色（Cluster-Administration-Roles" class="headerlink" title="集群管理角色（Cluster Administration Roles)"></a><strong>集群管理角色（Cluster Administration Roles)</strong></h2><ul>
-<li>clusterAdmin：授权管理集群的最高权限，只在admin中可用</li>
-<li>clusterManager：授权管理和监控集群的权限</li>
-<li>clusterMonoitor：授权监控集群的权限，对监控工具具有readonly的权限</li>
-<li>hostManager：管理server</li>
-</ul>
-<h2 id="超级角色（super-master-Roles"><a href="#超级角色（super-master-Roles" class="headerlink" title="超级角色（super master  Roles)"></a><strong>超级角色（super master  Roles)</strong></h2><ul>
-<li>root ：超级账户和权限，只在admin中可用le</li>
-</ul>
-<h1 id="单机开启认证"><a href="#单机开启认证" class="headerlink" title="单机开启认证"></a>单机开启认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  authorization: enabled</span><br></pre></td></tr></table></figure>
-
-<h1 id="单机创建用户并授予角色权限"><a href="#单机创建用户并授予角色权限" class="headerlink" title="单机创建用户并授予角色权限"></a>单机创建用户并授予角色权限</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line"><span class="comment">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span></span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: <span class="string">&quot;shijiange&quot;</span>,</span><br><span class="line">  <span class="built_in">pwd</span>: <span class="string">&quot;mypwd&quot;</span>,</span><br><span class="line">  roles: [ &#123; role: <span class="string">&quot;root&quot;</span>, db: <span class="string">&quot;admin&quot;</span>&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<h1 id="副本集开启认证"><a href="#副本集开启认证" class="headerlink" title="副本集开启认证"></a>副本集开启认证</h1><h2 id="副本集开启认证集群必须开启秘钥通讯"><a href="#副本集开启认证集群必须开启秘钥通讯" class="headerlink" title="副本集开启认证集群必须开启秘钥通讯"></a>副本集开启认证集群必须开启秘钥通讯</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#生成key 所有节点key必须一致</span></span><br><span class="line">openssl rand -base64 756 &gt; /data/mongodb/shijiange.key</span><br><span class="line">chmod 700 /data/mongodb/shijiange.key</span><br><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line"></span><br><span class="line">systemLog:</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line"><span class="comment">#认证相关配置</span></span><br><span class="line">security:</span><br><span class="line">  keyFile: /data/mongodb/shijiange.key</span><br><span class="line">  authorization: enabled</span><br><span class="line">  </span><br><span class="line"><span class="comment">#配置调试集群 以及优先级</span></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
-
-<h2 id="创建用户并赋予角色"><a href="#创建用户并赋予角色" class="headerlink" title="创建用户并赋予角色"></a>创建用户并赋予角色</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">#创建一个用户shijiange 并设置密码 授予root权限 以及操作的库</span><br><span class="line">db.createUser(&#123;</span><br><span class="line">  user: &quot;shijiange&quot;,</span><br><span class="line">  pwd: &quot;mypwd&quot;,</span><br><span class="line">  roles: [ &#123; role: &quot;root&quot;, db: &quot;admin&quot;&#125;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<h1 id="登录并认证"><a href="#登录并认证" class="headerlink" title="登录并认证"></a>登录并认证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#开启认证后 必须登录 否则不能进行读写操作</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#登录方法1</span></span><br><span class="line">~]<span class="comment"># mongo</span></span><br><span class="line">&gt;use admin</span><br><span class="line">&gt;db.auth(<span class="string">&#x27;shijiange&#x27;</span>, <span class="string">&#x27;mypwd&#x27;</span>)</span><br><span class="line"><span class="comment">#登录方法2</span></span><br><span class="line">~]<span class="comment"># mongo -ushijiange -pmypwd --authenticationDatabase admin</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-ConfigMap"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/ConfigMap/"
-    >ConfigMap</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/ConfigMap/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/">K8S资源清单</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h2><p>configmap 是一个标准的K8S资源,其功能通常作为某个pod的文件(通常是配置文件) 或 变量传输</p>
-<p>内部是由单个或多个KV形式的键值对组成  </p>
-<p>作为配置文件挂在到pod的时候 键是文件名称 值是文件内容</p>
-<p>作为变量传输时 可以传输configmap中某个K的值左右某个pod的环境变量的值</p>
-<p>需要注意的事如果你的pod已经启动并引用了configmap 此时你修改configmap的内容 pod中是不会及时同步(但会同步时间一般1分钟左右)  就算同步一般的pod没有检查配置  文件变更自动重载的功能 所以最有效 的方法还是重新 启动pod</p>
-<p>confmap最大作用在于 如果一个pod 有10个副本 且pod具有自动重载配置的功能 此时使用configmap作为配置文件就可以批量的修改配置文件而且实现不中断任何pod 使其生效</p>
-<h2 id="创建ConfigMap的方式"><a href="#创建ConfigMap的方式" class="headerlink" title="创建ConfigMap的方式"></a>创建ConfigMap的方式</h2><h3 id="1-陈述式"><a href="#1-陈述式" class="headerlink" title="1 陈述式"></a>1 陈述式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns]  --from-literal=[k]=[v] --from-literal=[k]=[v]</span><br><span class="line"><span class="comment">#定义configmap的k/v 通常用于传输环境变量 --from-literal 可以多个</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[conf_file] </span><br><span class="line"><span class="comment">#k/v来自于文件 文件名称作为K 文件内容作为V --from-file 可以多个</span></span><br><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[键名]=[conf_file] </span><br><span class="line"><span class="comment">#v来自于文件内容 而K是自定义的  --from-file 可以多个</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-声明式"><a href="#2-声明式" class="headerlink" title="2 声明式"></a>2 声明式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: configmap_name</span><br><span class="line">  namespace: ns</span><br><span class="line">data:</span><br><span class="line">  <span class="comment">#这个语法相当于 --from-literal</span></span><br><span class="line">  k: <span class="string">&quot;v&quot;</span></span><br><span class="line">  <span class="comment">#这个语法相当于 --from-file</span></span><br><span class="line">  key_name.cnf: |-</span><br><span class="line">    <span class="comment">#[配置文件内容]</span></span><br><span class="line">    &#123;</span><br><span class="line">    server_name www.abc.com;</span><br><span class="line">    listen       80;</span><br><span class="line">    location / &#123;</span><br><span class="line">      </span><br><span class="line">    	&#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ConfigMap的引用"><a href="#ConfigMap的引用" class="headerlink" title="ConfigMap的引用"></a>ConfigMap的引用</h2><h3 id="1变量传输"><a href="#1变量传输" class="headerlink" title="1变量传输"></a>1变量传输</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name:</span><br><span class="line">  labels:</span><br><span class="line">    app:</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name:</span><br><span class="line">      image:</span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      env:</span><br><span class="line">         <span class="comment"># 容器环境变量 可以定义多个</span></span><br><span class="line">        - name: REDIS_HOST</span><br><span class="line">         <span class="comment"># 值来自哪里</span></span><br><span class="line">          valueFrom:</span><br><span class="line">            <span class="comment">#引用configmap的键</span></span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              <span class="comment">#来自哪个configmap中的哪个键的值</span></span><br><span class="line">              name: configmap_name               </span><br><span class="line">              key: REDIS_HOST</span><br><span class="line">            <span class="comment">#或 引用secret的键</span></span><br><span class="line">            secretKeyRef:</span><br><span class="line">              key:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="2文件挂载"><a href="#2文件挂载" class="headerlink" title="2文件挂载"></a>2文件挂载</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: <span class="built_in">test</span></span><br><span class="line">  labels:</span><br><span class="line">    app: <span class="built_in">test</span></span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: <span class="built_in">test</span></span><br><span class="line">      image: <span class="built_in">test</span>:<span class="built_in">test</span></span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      volumeMounts:</span><br><span class="line">        <span class="comment">#挂载点</span></span><br><span class="line">        - mountPath: /etc/nginx/</span><br><span class="line">          name: conf</span><br><span class="line">  volumes:</span><br><span class="line">    - name: conf</span><br><span class="line">      configMap:</span><br><span class="line">        <span class="comment">#引用configmap</span></span><br><span class="line">        name: configmap_name</span><br><span class="line">        <span class="comment">#默认权限</span></span><br><span class="line">        defaultMode: 0644</span><br><span class="line">        <span class="comment">#items 字段可以不写 默认使用K作为文件名称V作为文件内容使用默认权限</span></span><br><span class="line">        items:</span><br><span class="line">            <span class="comment">#使用哪个K</span></span><br><span class="line">          - key: server.conf</span><br><span class="line">            <span class="comment">#文件存放位置 相对于上面的挂载点</span></span><br><span class="line">            path: conf.d/nginx.conf</span><br><span class="line">            <span class="comment">#文件权限 如果不写 使用上面的默认权限</span></span><br><span class="line">            mode: 0644</span><br><span class="line">          - key: server2.conf</span><br><span class="line">            path: conf.d/nginx2.conf</span><br><span class="line">            mode: 0777</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-安装与配置"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/"
-    >配置</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ansible/">ansible</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><h2 id="配置文件优先级"><a href="#配置文件优先级" class="headerlink" title="配置文件优先级"></a>配置文件优先级</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#从高到低</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#变量</span></span><br><span class="line"><span class="variable">$ANSIBLE_CONFIG</span></span><br><span class="line"><span class="comment">#当前目录</span></span><br><span class="line">ansible.cfg </span><br><span class="line"><span class="comment">#家目录</span></span><br><span class="line">.ansible.cfg </span><br><span class="line"><span class="comment">#etc</span></span><br><span class="line">/etc/ansible/ansible.cfg </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="常用配置"><a href="#常用配置" class="headerlink" title="常用配置"></a>常用配置</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/etc/ansible/ansible.cfg</span><br><span class="line"></span><br><span class="line">inventory      = /etc/ansible/hosts       <span class="comment">#主机列表配置文件</span></span><br><span class="line">library        = /usr/share/my_modules/   <span class="comment">#库文件存放目录</span></span><br><span class="line">remote_tmp     = ~/.ansible/tmp           <span class="comment">#临时py文件存放在远程主机目录</span></span><br><span class="line">local_tmp      = ~/.ansible/tmp           <span class="comment">#本机的临时执行目录</span></span><br><span class="line">forks          = 5                        <span class="comment">#默认并发数(同时操作主机的数量)命令行可以使用-f单次临时更改</span></span><br><span class="line">sudo_user      = root                     <span class="comment">#默认sudo用户</span></span><br><span class="line">ask_sudo_pass = True                      <span class="comment">#每次执行是否询问sudo的ssh密码</span></span><br><span class="line">ask_pass      = True                      <span class="comment">#每次执行是否询问ssh密码</span></span><br><span class="line">remote_port    = 22                       <span class="comment">#远程主机端口</span></span><br><span class="line">host_key_checking = False                 <span class="comment">#跳过检查主机指纹</span></span><br><span class="line">log_path = /var/<span class="built_in">log</span>/ansible.log           <span class="comment">#ansible日志</span></span><br><span class="line">host_key_checking = False                 <span class="comment">#是否检查host指纹信息 如果是false 就跳过了第一次连接的yes/no的交互操作</span></span><br><span class="line">[privilege_escalation]					<span class="comment">#如果被控是普通用户则需要配置提权</span></span><br><span class="line"><span class="comment">#become=True</span></span><br><span class="line"><span class="comment">#become_method=sudo</span></span><br><span class="line"><span class="comment">#become_user=root</span></span><br><span class="line"><span class="comment">#become_ask_pass=False</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="inventory"><a href="#inventory" class="headerlink" title="inventory"></a>inventory</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#默认会加载/etc/ansible/hosts 或使用 -i 指定位置</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#组名称</span></span><br><span class="line">[group_name]</span><br><span class="line">ip或者域名  配置 配置 ....</span><br><span class="line"></span><br><span class="line"><span class="comment">#示例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#基于密码的连接 ansible_ssh_port可省略默认22 </span></span><br><span class="line"><span class="comment">#这三行可以简化为一行 192.168.1.9[1:3] ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=&#x27;123456&#x27;</span></span><br><span class="line">[nginx_server]</span><br><span class="line">192.168.1.91 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=<span class="string">&#x27;123456&#x27;</span></span><br><span class="line">192.168.1.92 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=<span class="string">&#x27;123456&#x27;</span></span><br><span class="line">192.168.1.93 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=<span class="string">&#x27;123456&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#host别名</span></span><br><span class="line">[nginx_server]</span><br><span class="line">web01 ansible_ssh_host=192.168.1.91</span><br><span class="line">web02 ansible_ssh_host=192.168.1.92</span><br><span class="line">web03 ansible_ssh_host=192.168.1.93</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#通常不会使用密码连接 基本都是用秘钥连接 </span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-常用模块"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/"
-    >常用模块</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/ansible/">ansible</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="常用模块"><a href="#常用模块" class="headerlink" title="常用模块"></a>常用模块</h1><ul>
-<li>command                 # 执行shell命令(不支持管道等特殊字符)</li>
-<li>shell                           # 执行shell命令</li>
-<li>scripts                        # 执行shell脚本</li>
-<li>yum_repository      # 配置yum仓库</li>
-<li>联网下载        get_url</li>
-<li>安装            yum</li>
-<li>配置            copy</li>
-<li>启动            service、systemd</li>
-<li>创建用户与组    user、group</li>
-<li>授权            file</li>
-<li>定时任务        crond</li>
-<li>挂载            mount</li>
-<li>firewalld        firewall</li>
-<li>selinux            selinux</li>
-</ul>
-<h2 id="ad-hoc"><a href="#ad-hoc" class="headerlink" title="ad-hoc"></a>ad-hoc</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看帮助</span></span><br><span class="line">ansible-doc -l        <span class="comment"># 查看所有模块说明</span></span><br><span class="line">ansible-doc copy      <span class="comment"># 表示指定模块方法</span></span><br><span class="line">ansible-doc -s copy   <span class="comment"># 表示指定模块参数</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m shell -a <span class="string">&#x27;df -h&#x27;</span>    </span><br></pre></td></tr></table></figure>
-
-<h2 id="script"><a href="#script" class="headerlink" title="script"></a>script</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#执行脚本</span></span><br><span class="line">ansible all -m script -a <span class="string">&quot;./test.sh&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=wget &#x27;</span></span><br><span class="line"><span class="comment">#卸载</span></span><br><span class="line">ansible all -m yum -a <span class="string">&#x27;name=wget state=absent&#x27;</span></span><br><span class="line"><span class="comment">#更新所有软件包</span></span><br><span class="line">ansible all -m yum -a <span class="string">&quot;name=* state=latest&quot;</span></span><br><span class="line"><span class="comment">#name可以是一个rpm包的url下载路径或者本地绝对路径</span></span><br><span class="line"><span class="comment">#state 指定使用yum的方法 present安装软件包 absent移除软件包 latest安装最新软件包 </span></span><br><span class="line"><span class="comment">#默认state=present</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="copy"><a href="#copy" class="headerlink" title="copy"></a>copy</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#复制</span></span><br><span class="line">ansible all -m copy -a <span class="string">&quot;src=./anaconda-ks.cfg dest=/tmp/ owner=root group=root mode=0600 backup=yes&quot;</span></span><br><span class="line"><span class="comment">#backup默认是no 将直接覆盖目标路径 backup=yes时 将在目标目录生成文件名加日期的文件作为备份</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#使用content直接指定文本内容 并在目标主机生成文件</span></span><br><span class="line">ansible all -m copy -a <span class="string">&#x27;content=&quot;/data 192.168.1.0/24(rw,sync,no_all_squash)&quot; dest=/etc/exports&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="file"><a href="#file" class="headerlink" title="file"></a>file</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改权限 recurse 是递归 默认recurse=no , state=directory 声明此路径是目录默认是文件</span></span><br><span class="line">ansible all -m file -a <span class="string">&quot;path=/app state=directory mode=0600 owner=www group=www recurse=yes&quot;</span></span><br><span class="line"><span class="comment">#创建一个空文件</span></span><br><span class="line">ansible all -m file -a <span class="string">&quot;path=/app/file1 state=touch  ...&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">directory <span class="comment">#目录</span></span><br><span class="line">touch <span class="comment">#创建</span></span><br><span class="line">link  <span class="comment">#软连接</span></span><br><span class="line">absent <span class="comment">#删除</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="get-url"><a href="#get-url" class="headerlink" title="get_url"></a>get_url</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#长用于下载一些文件dist可以是目录 也可以是文件</span></span><br><span class="line">ansible all -m get_url -a <span class="string">&quot;url=https://.../file.rpm dist=/usr/local/src mode=0600 checksum =md5:lkixjhdiujjdldljj&quot;</span></span><br><span class="line"></span><br><span class="line">checksum <span class="comment">#用于哈希验证 可省略 </span></span><br></pre></td></tr></table></figure>
-
-<h2 id="systemd"><a href="#systemd" class="headerlink" title="systemd"></a>systemd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m systemd -a <span class="string">&quot; name=nginx state=stopped enabled=no&quot;</span></span><br><span class="line"><span class="comment">#enabled是设定此服务是否开机自动启动</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">startde <span class="comment">#启动</span></span><br><span class="line">restarted <span class="comment">#重新启动</span></span><br><span class="line">stopped <span class="comment">#停止</span></span><br><span class="line">reload <span class="comment">#重载服务</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="group"><a href="#group" class="headerlink" title="group"></a>group</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#删除组</span></span><br><span class="line">ansible all -m group -a <span class="string">&quot;name=test state=absent&quot;</span></span><br><span class="line"><span class="comment">#创建组</span></span><br><span class="line">ansible all -m group -a <span class="string">&quot;name=test gid=8888 &quot;</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">absent <span class="comment">#删除</span></span><br><span class="line">present <span class="comment">#创建 默认就是创建</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建用户</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero comment=&#x27;nidelaofuqin&#x27; uid=8888 group=root create_home=no&quot;</span></span><br><span class="line"><span class="comment">#删除用户</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero state=absent remove=yes&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加秘钥对</span></span><br><span class="line">ansible all -m user -a <span class="string">&quot;name=nero generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa&quot;</span></span><br><span class="line"></span><br><span class="line">create_home <span class="comment">#是否创建家目录默认创建</span></span><br><span class="line">remove <span class="comment">#是否删除家目录</span></span><br><span class="line">name <span class="comment">#名称</span></span><br><span class="line">shell <span class="comment">#指定shell 如 shell=/bin/bash</span></span><br><span class="line">comment <span class="comment">#描述</span></span><br><span class="line">uid <span class="comment">#uid</span></span><br><span class="line">group <span class="comment">#加入那个组 这个组必须事先存在</span></span><br><span class="line">groups <span class="comment">#附加组 如 groups=www,root</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加密码</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#给密码做哈希  salt 是盐</span></span><br><span class="line">╰─➤  ansible localhost -m debug -a <span class="string">&quot;msg=&#123;&#123; &#x27;123456&#x27; | password_hash(&#x27;sha512&#x27;, &#x27;salt&#x27;) &#125;&#125;&quot;</span> </span><br><span class="line">localhost | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">&quot;msg&quot;</span>: <span class="string">&quot;<span class="variable">$6</span><span class="variable">$salt</span><span class="variable">$MktMKPZJ6t59GfxcJU20DwcwQzfMvOlHFVZiOVD71w</span>.igcOo1R7vBYR65JquIQ/7siC7VRpmteKvZmfSkNc69.&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#给用户添加密码 注意一定要单引号</span></span><br><span class="line">ansible all -m user -a <span class="string">&#x27;name=nero password=$6$salt$MktMKPZJ6t59GfxcJU20DwcwQzfMvOlHFVZiOVD71w.igcOo1R7vBYR65JquIQ/7siC7VRpmteKvZmfSkNc69.&#x27;</span></span><br><span class="line"><span class="comment">#也可以在创建用户的时候直接给定密码</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="cron"><a href="#cron" class="headerlink" title="cron"></a>cron</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加定时任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test minute=0 hour=5,2 job=&#x27;/bin/bash test.sh &amp;&gt;/dev/null&#x27;&quot;</span></span><br><span class="line"><span class="comment">#删除定时任务</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test state=absent&quot;</span></span><br><span class="line"><span class="comment">#注释定时任务 必须跟job</span></span><br><span class="line">ansible all -m cron -a <span class="string">&quot;name=test disable=yes job=&#x27;/bin/bash test.sh &amp;&gt;/dev/null&#x27;&quot;</span></span><br><span class="line">╰─➤  crontab -l</span><br><span class="line"><span class="comment">#Ansible: test</span></span><br><span class="line"><span class="comment">#* * * * * /bin/bash test.sh &amp;&gt;/dev/null</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#name 可以自定义 且建议都写上 因为 ansible删除的时候也是基于name的值 </span></span><br><span class="line">minute hour day month weekday <span class="comment">#分,时,日,月,星期</span></span><br><span class="line"><span class="comment">#如果是*可以省略</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ansible all -m mount -a <span class="string">&quot;src=172.16.1.7:/data path=/data fstype=nfs opts=defaults state=mounted&quot;</span></span><br><span class="line"><span class="comment">#state</span></span><br><span class="line">present     <span class="comment"># 开机挂载，仅将挂载配置写入/etc/fstab</span></span><br><span class="line">mounted     <span class="comment"># 挂载设备，并将配置写入/etc/fstab</span></span><br><span class="line">unmounted   <span class="comment"># 卸载设备，不会清除/etc/fstab写入的配置</span></span><br><span class="line">absent      <span class="comment"># 卸载设备，会清理/etc/fstab写入的配置</span></span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ansible/" rel="tag">ansible</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
+      <section class="outer">
+  <article
   id="post-playbook"
   class="article article-type-post"
   itemscope
@@ -484,10 +59,9 @@
     
     <header class="article-header">
        
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/playbook/"
-    >配置</a> 
-</h2>
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  配置
+</h1>
  
 
     </header>
@@ -502,6 +76,12 @@
  
     </div>
       
+    <div class="tocbot"></div>
+
+
+
+
+  
     <div class="article-entry" itemprop="articleBody">
        
   <h1 id="Playbook"><a href="#Playbook" class="headerlink" title="Playbook"></a>Playbook</h1><h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#语法1</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="comment">#安装一个httpd 并启动</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="comment">#yum模块 安装httpd</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">install</span> <span class="string">httpd</span></span><br><span class="line">      <span class="attr">yum:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">httpd</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">present</span></span><br><span class="line">    <span class="comment">#systemd模块 启动并设置开机启动</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">start</span> <span class="string">httpd</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">httpd</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">startde</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span> </span><br><span class="line"><span class="bullet">-</span> <span class="attr">hosts:</span> <span class="string">web1</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">web1</span> <span class="string">file</span></span><br><span class="line">      <span class="attr">copy:</span> </span><br><span class="line">        <span class="attr">content:</span> <span class="string">&#x27;this is the web1&#x27;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">/var/www/html/index.html</span></span><br><span class="line">    </span><br><span class="line"><span class="bullet">-</span> <span class="attr">hosts:</span> <span class="string">web2</span></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">web2</span> <span class="string">file</span></span><br><span class="line">      <span class="attr">copy:</span></span><br><span class="line">        <span class="attr">content:</span> <span class="string">&#x27;this is the web2&#x27;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">/var/www/html/index.html</span></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
@@ -650,264 +230,79 @@
     </footer>
   </div>
 
-    
- 
    
-</article>
-
+  <nav class="article-nav">
     
-    <article
-  id="post-1-指标类型"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
+      <a href="/2019/05/13/%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            常用模块
+          
+        </div>
+      </a>
     
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
-    >1.指标类型</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
- 
-      <!-- reward -->
-      
-    </div>
     
-
-    <!-- copyright -->
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">1.指标类型</div>
+      </a>
     
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-10-alertmanager部署"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
-    >10.alertmanager部署</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-2-作业和实例"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
-    >2.作业和实例</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
-<li><p>实例</p>
-<p>   可以抓取的目标称为实例（Instances）</p>
-</li>
-<li><p>作业</p>
-<p>具有相同目标的实例集合称为作业（Job）</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-11-告警规则与告警"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/"
-    >11.告警规则与告警</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="告警规则"><a href="#告警规则" class="headerlink" title="告警规则"></a>告警规则</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##prometheus.yml </span></span><br><span class="line"><span class="comment">#配置加载的文件  这个文件只要主配置中存在 就会定期去加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - <span class="string">&quot;rules/*.yml&quot;</span></span><br><span class="line"><span class="comment">##rules/node.yml 编写告警规则</span></span><br><span class="line">groups:</span><br><span class="line"><span class="comment"># 报警规则组名称</span></span><br><span class="line">- name: example   </span><br><span class="line">  rules:</span><br><span class="line">  <span class="comment">#规则名称</span></span><br><span class="line">  - alert: InstanceDown</span><br><span class="line">    <span class="comment">#指标阀值表达式</span></span><br><span class="line">    expr: up == 0</span><br><span class="line">    <span class="comment">#持续时间 ， 表示连续触发阀值达5分钟才触发报警</span></span><br><span class="line">    <span class="keyword">for</span>: 5m </span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment"># 自定义标签</span></span><br><span class="line">      severity: page</span><br><span class="line">    <span class="comment">#消息体</span></span><br><span class="line">    annotations:</span><br><span class="line">      <span class="comment"># 自定义摘要&#123;&#123; $labels.instance &#125;&#125; 是引用指标标签instance的值</span></span><br><span class="line">      summary: <span class="string">&quot;Instance &#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; down&quot;</span></span><br><span class="line">      <span class="comment"># 自定义具体描述 &#123;&#123; $labels.job &#125;&#125; 表示引用指标标签job的值</span></span><br><span class="line">      description: <span class="string">&quot;&#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; of job &#123;&#123; <span class="variable">$labels</span>.job &#125;&#125; has been down for more than 5 minutes.&quot;</span> </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="告警状态"><a href="#告警状态" class="headerlink" title="告警状态"></a>告警状态</h2><p>在prometheus 的web页面  alerts选项中可以常看状态</p>
-<p>⦁    Inactive：这里什么都没有发生。<br>⦁    Pending：已触发阈值，但未满足告警持续时间（即rule中的for字段）<br>⦁    Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，经过处理，发送给接受者。</p>
-<h2 id="用过标签分类告警以及分组告警"><a href="#用过标签分类告警以及分组告警" class="headerlink" title="用过标签分类告警以及分组告警"></a>用过标签分类告警以及分组告警</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">route:</span><br><span class="line">  <span class="comment">#通过标签进行分组 标签K/V结构 ,当K的值相等的时候将划分为一组一并发出</span></span><br><span class="line">  <span class="comment">#alertname是默认标签,表示告警名称</span></span><br><span class="line">  group_by: [cluster, alertname]</span><br><span class="line">  <span class="comment"># 告警等待时间 如果等待过程又收到告警并且属同一组将一并发出</span></span><br><span class="line">  group_wait: 10s</span><br><span class="line">  <span class="comment"># 告警间隔 如告警后又出现告警将判断间隔时间延迟发出</span></span><br><span class="line">  group_interval: 10s</span><br><span class="line">  <span class="comment"># 重复告警周期 同一个告警最少间隔时间 </span></span><br><span class="line">  repeat_interval: 20m</span><br><span class="line"><span class="comment"># 标签不匹配的告警都将保留在根节点，并发送到“default-receiver”</span></span><br><span class="line">  receiver: <span class="string">&#x27;default-receiver&#x27;</span> </span><br><span class="line">  routes: <span class="comment">#路由匹配标签来决定将告警发送到那个接收器上 接收器执行发送告警</span></span><br><span class="line"><span class="comment"># 标签service=mysql或者service=cassandra的告警分配到数据库接收端</span></span><br><span class="line">  - receiver: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">    group_wait: 10s</span><br><span class="line">    <span class="comment">#正则匹配标签</span></span><br><span class="line">    match_re:</span><br><span class="line">      service: mysql|cassandra</span><br><span class="line"><span class="comment"># 标签team=frontend的告警都与此子路由匹配</span></span><br><span class="line">  - receiver: <span class="string">&#x27;frontend-pager&#x27;</span></span><br><span class="line">    group_by: [product, environment]</span><br><span class="line">    <span class="comment">#精确匹配标签</span></span><br><span class="line">    match:</span><br><span class="line">      team: frontend </span><br><span class="line"><span class="comment">#定义接收器名称以及发送告警方式</span></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: <span class="string">&#x27;http://127.0.0.1:5001/&#x27;</span></span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">    - to: <span class="string">&#x27;******@163.com&#x27;</span> </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-  </article>
-  
-
-  
-  <nav class="page-nav">
-    
-    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
   </nav>
-  
-</section>
-</div>
 
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
       <footer class="footer">
   <div class="outer">
     <ul>
@@ -1029,6 +424,23 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">

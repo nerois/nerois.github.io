@@ -108,6 +108,66 @@
     
     
     <article
+  id="post-3 master准备"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3%20master%E5%87%86%E5%A4%87/"
+    >3master准备</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3%20master%E5%87%86%E5%A4%87/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="所有master节点下载server端二进制包"><a href="#所有master节点下载server端二进制包" class="headerlink" title="所有master节点下载server端二进制包"></a>所有master节点下载server端二进制包</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wget https://dl.k8s.io/v1.15.2/kubernetes-server-linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line">tar xvf kubernetes-server-linux-amd64.tar.gz &amp;&amp; \</span><br><span class="line">mkdir -p /opt/kube/bin/ &amp;&amp; \</span><br><span class="line">cp -p kubernetes/server/bin/kube&#123;<span class="built_in">let</span>,ctl,-apiserver,-controller-manager,-scheduler,-proxy&#125;  /opt/kube/bin/</span><br><span class="line"></span><br><span class="line">vim /etc/profile.d/k8s.sh</span><br><span class="line"><span class="built_in">export</span> PATH=/opt/kube/bin/:<span class="variable">$PATH</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">source</span> /etc/profile.d/k8s.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="证书创建"><a href="#证书创建" class="headerlink" title="**证书创建"></a>**证书创建</h2><p>所有的操作都在master01的节点上进行<br>在master01上创建证书，然后分发到各个节点<br>#所有节点创建相关目录</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/kubernetes/pki/etcd &amp;&amp; \</span><br><span class="line"><span class="built_in">cd</span> /etc/kubernetes/pki/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cat &gt; /etc/kubernetes/pki/openssl.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[ req ]</span><br><span class="line">default_bits = 2048</span><br><span class="line">default_md = sha256</span><br><span class="line">distinguished_name = req_distinguished_name</span><br><span class="line"></span><br><span class="line">[req_distinguished_name]</span><br><span class="line"></span><br><span class="line">[ v3_ca ]</span><br><span class="line">basicConstraints = critical, CA:TRUE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign</span><br><span class="line"></span><br><span class="line">[ v3_req_server ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_client ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = clientAuth</span><br><span class="line"></span><br><span class="line">[ v3_req_apiserver ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line">subjectAltName = @alt_names_cluster</span><br><span class="line"></span><br><span class="line">[ v3_req_etcd ]</span><br><span class="line">basicConstraints = CA:FALSE</span><br><span class="line">keyUsage = critical, digitalSignature, keyEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth, clientAuth</span><br><span class="line">subjectAltName = @alt_names_etcd</span><br><span class="line"></span><br><span class="line">[ alt_names_cluster ]</span><br><span class="line">DNS.1 = kubernetes</span><br><span class="line">DNS.2 = kubernetes.default</span><br><span class="line">DNS.3 = kubernetes.default.svc</span><br><span class="line">DNS.4 = kubernetes.default.svc.cluster.local</span><br><span class="line">DNS.5 = localhost</span><br><span class="line">IP.1 = 10.96.0.1  <span class="comment">##kubernetes.default.svc.cluster.local</span></span><br><span class="line">IP.2 = 127.0.0.1  <span class="comment">##localhost</span></span><br><span class="line">IP.3 = 192.168.1.77    <span class="comment">##vip</span></span><br><span class="line">IP.4 = 192.168.1.71  <span class="comment">##master01</span></span><br><span class="line">IP.5 = 192.168.1.81  <span class="comment">##node1</span></span><br><span class="line">IP.6 = 192.168.1.82</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[ alt_names_etcd ]</span><br><span class="line">DNS.1 = localhost</span><br><span class="line">IP.1 = 127.0.0.1</span><br><span class="line">IP.2 = 192.168.1.71   <span class="comment">##etcd节点</span></span><br><span class="line">IP.3 = 192.168.1.81</span><br><span class="line">IP.4 = 192.168.1.82</span><br><span class="line">EOF</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-3.2 生成kubeconfig"
   class="article article-type-post"
   itemscope
@@ -712,92 +772,6 @@
 </article>
 
     
-    <article
-  id="post-7.1 Node节点 kube-proxy"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/7.1%20Node%E8%8A%82%E7%82%B9%20kube-proxy/"
-    >7.1NODE节点kube-proxy</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/7.1%20Node%E8%8A%82%E7%82%B9%20kube-proxy/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <p>#安装到所有节点</p>
-<h2 id="创建一个-kube-proxy-的-service-account"><a href="#创建一个-kube-proxy-的-service-account" class="headerlink" title="**创建一个 kube-proxy 的 service account"></a>**创建一个 kube-proxy 的 service account</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system create serviceaccount kube-proxy</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="将-kube-proxy-的-serviceaccount-绑定到-clusterrole-system-node-proxier以允许-RBAC"><a href="#将-kube-proxy-的-serviceaccount-绑定到-clusterrole-system-node-proxier以允许-RBAC" class="headerlink" title="**将 kube-proxy 的 serviceaccount 绑定到 clusterrole system:node-proxier以允许 RBAC"></a>**将 kube-proxy 的 serviceaccount 绑定到 clusterrole system:node-proxier以允许 RBAC</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl create clusterrolebinding kubeadm:kube-proxy \</span><br><span class="line">        --clusterrole system:node-proxier \</span><br><span class="line">        --serviceaccount kube-system:kube-proxy</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="创建kube-proxy的kubeconfig"><a href="#创建kube-proxy的kubeconfig" class="headerlink" title="**创建kube-proxy的kubeconfig"></a>**创建kube-proxy的kubeconfig</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#变量</span></span><br><span class="line">CLUSTER_NAME=<span class="string">&quot;kubernetes&quot;</span></span><br><span class="line">KUBE_CONFIG=<span class="string">&quot;kube-proxy.kubeconfig&quot;</span></span><br><span class="line"></span><br><span class="line">SECRET=$(kubectl -n kube-system get sa/kube-proxy --output=jsonpath=<span class="string">&#x27;&#123;.secrets[0].name&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">JWT_TOKEN=$(kubectl -n kube-system get secret/<span class="variable">$SECRET</span> --output=jsonpath=<span class="string">&#x27;&#123;.data.token&#125;&#x27;</span> | base64 -d)</span><br><span class="line">KUBE_APISERVER=<span class="string">&quot;https://192.168.1.71:6443&quot;</span></span><br><span class="line"><span class="comment">#KUBE_APISERVER 可以是vip</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#设置集群参数</span></span><br><span class="line">kubectl config set-cluster <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --certificate-authority=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --embed-certs=<span class="literal">true</span> \</span><br><span class="line">  --server=<span class="variable">$&#123;KUBE_APISERVER&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置客户端认证参数</span></span><br><span class="line">kubectl config set-credentials <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --token=<span class="variable">$&#123;JWT_TOKEN&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置上下文参数</span></span><br><span class="line">kubectl config set-context <span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --cluster=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --user=<span class="variable">$&#123;CLUSTER_NAME&#125;</span> \</span><br><span class="line">  --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"><span class="comment">#设置当前使用的上下文</span></span><br><span class="line">kubectl config use-context <span class="variable">$&#123;CLUSTER_NAME&#125;</span> --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#验证文件</span></span><br><span class="line">kubectl config view --kubeconfig=/etc/kubernetes/<span class="variable">$&#123;KUBE_CONFIG&#125;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="kube-proxy-conf"><a href="#kube-proxy-conf" class="headerlink" title="**kube-proxy.conf"></a>**kube-proxy.conf</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/etc/kubernetes/kube-proxy.conf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">apiVersion: kubeproxy.config.k8s.io/v1alpha1</span><br><span class="line">bindAddress: &#123;&#123;LISTEN_IP&#125;&#125;</span><br><span class="line">clientConnection:</span><br><span class="line">    acceptContentTypes: <span class="string">&quot;&quot;</span></span><br><span class="line">    burst: 10</span><br><span class="line">    contentType: application/vnd.kubernetes.protobuf</span><br><span class="line">    kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig</span><br><span class="line">    qps: 5</span><br><span class="line">clusterCIDR: <span class="string">&quot;10.244.0.0/16&quot;</span></span><br><span class="line">configSyncPeriod: 15m0s</span><br><span class="line">conntrack:</span><br><span class="line">    max: null</span><br><span class="line">    maxPerCore: 32768</span><br><span class="line">    min: 131072</span><br><span class="line">    tcpCloseWaitTimeout: 1h0m0s</span><br><span class="line">    tcpEstablishedTimeout: 24h0m0s</span><br><span class="line">enableProfiling: <span class="literal">false</span></span><br><span class="line">healthzBindAddress: &#123;&#123;LISTEN_IP&#125;&#125;:10256</span><br><span class="line">hostnameOverride: <span class="string">&quot;&quot;</span></span><br><span class="line">iptables:</span><br><span class="line">    masqueradeAll: <span class="literal">true</span></span><br><span class="line">    masqueradeBit: 14</span><br><span class="line">    minSyncPeriod: 0s</span><br><span class="line">    syncPeriod: 30s</span><br><span class="line">ipvs:</span><br><span class="line">    excludeCIDRs: null</span><br><span class="line">    minSyncPeriod: 0s</span><br><span class="line">    scheduler: <span class="string">&quot;&quot;</span></span><br><span class="line">    syncPeriod: 30s</span><br><span class="line">kind: KubeProxyConfiguration</span><br><span class="line">metricsBindAddress: 127.0.0.1:10249</span><br><span class="line">mode: <span class="string">&quot;ipvs&quot;</span></span><br><span class="line">nodePortAddresses: null</span><br><span class="line">oomScoreAdj: -999</span><br><span class="line">portRange: <span class="string">&quot;&quot;</span></span><br><span class="line">resourceContainer: /kube-proxy</span><br><span class="line">udpIdleTimeout: 250ms</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="UnitFile"><a href="#UnitFile" class="headerlink" title="**UnitFile"></a>**UnitFile</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-proxy.service&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes Kube Proxy</span><br><span class="line">Documentation=https://github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-proxy \</span><br><span class="line">  --config=/etc/kubernetes/kube-proxy.conf \</span><br><span class="line">  --v=2</span><br><span class="line">Restart=always</span><br><span class="line">RestartSec=10s</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="分发"><a href="#分发" class="headerlink" title="**分发"></a>**分发</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scp /etc/kubernetes/kube-proxy.conf k-n1:/etc/kubernetes/kube-proxy.conf</span><br><span class="line">scp /etc/kubernetes/kube-proxy.kubeconfig k-n1:/etc/kubernetes/kube-proxy.kubeconfig</span><br><span class="line">scp /usr/lib/systemd/system/kube-proxy.service k-n1:/usr/lib/systemd/system/kube-proxy.service</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="所有节点替换配置为自己的ip"><a href="#所有节点替换配置为自己的ip" class="headerlink" title="**所有节点替换配置为自己的ip"></a>**所有节点替换配置为自己的ip</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/&#123;&#123;LISTEN_IP&#125;&#125;/192.168.1.71/g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br><span class="line">sed -i <span class="string">&#x27;s#&#123;&#123;LISTEN_IP&#125;&#125;#192.168.1.81#g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br><span class="line">sed -i <span class="string">&#x27;s#&#123;&#123;LISTEN_IP&#125;&#125;#192.168.1.82#g&#x27;</span> /etc/kubernetes/kube-proxy.conf</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-proxy &amp;&amp; systemctl start kube-proxy </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ipvsadm -ln                                                                                                                        127 ↵</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  10.96.0.1:443 rr</span><br><span class="line">  -&gt; 192.168.1.71:6443            Masq    1      0          0     </span><br></pre></td></tr></table></figure>
-
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
@@ -815,7 +789,7 @@
     <ul>
       <li>
         Copyrights &copy;
-        2015-2020
+        2015-2021
         <i class="ri-heart-fill heart_icon"></i> Nero
       </li>
     </ul>
