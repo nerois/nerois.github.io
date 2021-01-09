@@ -108,6 +108,68 @@
     
     
     <article
+  id="post-9 coredns"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/9%20coredns/"
+    >9coredns</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/9%20coredns/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="部署coredns"><a href="#部署coredns" class="headerlink" title="**部署coredns"></a>**部署coredns</h2><h3 id="1-下载清单"><a href="#1-下载清单" class="headerlink" title="1 下载清单"></a>1 下载清单</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir coredns &amp;&amp; <span class="built_in">cd</span> coredns</span><br><span class="line">wget https://raw.githubusercontent.com/coredns/deployment/master/kubernetes/coredns.yaml.sed</span><br><span class="line">wget https://raw.githubusercontent.com/coredns/deployment/master/kubernetes/deploy.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-将镜像下载到本地-推送到内网harbor，可选-但推荐"><a href="#2-将镜像下载到本地-推送到内网harbor，可选-但推荐" class="headerlink" title="2 将镜像下载到本地 推送到内网harbor，可选 但推荐"></a>2 将镜像下载到本地 推送到内网harbor，可选 但推荐</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#你下载的coredns.yaml.sed 中并不一定是此版本 按照coredns.yaml.sed文件中的版本操作</span></span><br><span class="line"> docker pull coredns/coredns:1.7.0</span><br><span class="line">    docker tag coredns/coredns:1.7.0 hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">    docker push hb.sp.com/coredns/coredns:1.7.0</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">将image地址改为本地库 事先去harbor创建好项目：</span><br><span class="line">  原：coredns/coredns:1.7.0</span><br><span class="line">  新: hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">  </span><br><span class="line">  sed -i <span class="string">&quot;s@coredns/coredns:1.7.0@hb.sp.com/coredns/coredns:1.7.0@g&quot;</span> coredns.yaml.sed</span><br><span class="line">  <span class="comment">##验证</span></span><br><span class="line">  cat coredns.yaml.sed |grep image</span><br><span class="line">    image: hb.sp.com/coredns/coredns:1.7.0</span><br><span class="line">    imagePullPolicy: IfNotPresent</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-部署"><a href="#3-部署" class="headerlink" title="3  部署"></a>3  部署</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里的IP 需要与apiserver 启动参数--service-cluster-ip-range=10.96.0.0/12 中的一样</span></span><br><span class="line"><span class="comment">#10.96.0.10 是coredns 的svc地址</span></span><br><span class="line">bash deploy.sh -i 10.96.0.10 -r <span class="string">&quot;10.96.0.0/12&quot;</span> -s -t coredns.yaml.sed |kubectl apply -f -</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-7.1 Node节点 kube-proxy"
   class="article article-type-post"
   itemscope
