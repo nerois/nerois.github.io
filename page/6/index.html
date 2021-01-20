@@ -108,6 +108,70 @@
     
     
     <article
+  id="post-1-指标类型"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
+    >1.指标类型</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
+<li><p>时间序列格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
+<li>Counter：递增的计数器 </li>
+<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
+<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
+<li>Summary：与Histogram类似</li>
+</ol>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-10-alertmanager部署"
   class="article article-type-post"
   itemscope
@@ -659,62 +723,6 @@
 <h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ss -tnl |grep 3000</span><br><span class="line">LISTEN     0      128       [::]:3000                  [::]:* </span><br></pre></td></tr></table></figure>
 
 <p>此时可以使用浏览器访问了  默认账号密码 admin  admin   首次登陆必须修改密码</p>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-9-mysqld_exporter部署与监控"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/9-mysqld_exporter%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%9B%91%E6%8E%A7/"
-    >9.mysqld_exporter部署与监控</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/9-mysqld_exporter%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%9B%91%E6%8E%A7/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="mysqld-exporter"><a href="#mysqld-exporter" class="headerlink" title="mysqld_exporter"></a>mysqld_exporter</h2><p>用于输出mysql指标</p>
-<p>部署</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/mysqld_exporter/releases/download/v0.12.1/mysqld_exporter-0.12.1.linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line">tar xf mysqld_exporter-0.12.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/mysqld_exporter-0.12.1.linux-amd64 /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line"><span class="comment">#官方github要求版本如下</span></span><br><span class="line"><span class="comment">#MySQL &gt;= 5.6.</span></span><br><span class="line"><span class="comment">#MariaDB &gt;= 10.1</span></span><br><span class="line"><span class="comment">#创建用户</span></span><br><span class="line">MariaDB [(none)]&gt; CREATE USER <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span> IDENTIFIED BY <span class="string">&#x27;888888&#x27;</span> WITH MAX_USER_CONNECTIONS 3;</span><br><span class="line">MariaDB [(none)]&gt; GRANT PROCESS, REPLICATION SLAVE ADMIN, SELECT ON *.* TO <span class="string">&#x27;exporter&#x27;</span>@<span class="string">&#x27;127.0.0.1&#x27;</span>;</span><br><span class="line"><span class="comment">#创建配置文件</span></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysqld_exporter</span><br><span class="line">cat &gt; .my.cnf &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[client]</span><br><span class="line">host=127.0.0.1</span><br><span class="line">user=exporter</span><br><span class="line">password=888888</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/mysqld_exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=mysqld_exporter</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">#user=mysql</span></span><br><span class="line"><span class="string">Type=simple</span></span><br><span class="line"><span class="string">Restart=on-failure</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/mysqld_exporter/mysqld_exporter --config.my-cnf=/usr/local/mysqld_exporter/.my.cnf</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> mysqld_exporter &amp;&amp; systemctl start mysqld_exporter</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">ss -tnl|grep 9104</span><br><span class="line">LISTEN     0      20480     [::]:9104                  [::]:*  </span><br><span class="line"><span class="comment">#随后去prometheus 添加上对应的job target </span></span><br><span class="line"><span class="comment">#Grafana 模板  推荐 7362  如果你是Galera 集群 的mariadb 推荐13106 </span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">主要关注几个指标 </span><br><span class="line">连接数   </span><br><span class="line">利用率</span><br><span class="line">InnoDB Buffer Pool Data</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
  
       <!-- reward -->
       

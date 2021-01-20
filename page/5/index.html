@@ -939,7 +939,7 @@
 
     
     <article
-  id="post-1-指标类型"
+  id="post-nginx"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -950,37 +950,59 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
-    >1.指标类型</a> 
+  <a class="article-title" href="/2019/05/13/nginx/"
+    >Nginx优化和常用全局配置</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/nginx/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Nginx/">Nginx</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
-
-</li>
+  <h1 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h1><ul>
+<li>官方网站: nginx.org</li>
 </ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
+<h2 id="性能优化相关配置"><a href="#性能优化相关配置" class="headerlink" title="性能优化相关配置"></a>性能优化相关配置</h2><h3 id="worker-processes"><a href="#worker-processes" class="headerlink" title="worker_processes"></a>worker_processes</h3><ul>
+<li>用来设置worker进程数量 通常是小于等于本机cpu核心或cpu线程数量  </li>
+<li>也可以设置为 auto 为当前cpu核心数量</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#可以是auto 可以是数字 auto等于设置与当前cpu核心数量相同</span><br><span class="line">worker_processes  16;</span><br><span class="line">events &#123;</span><br><span class="line">    #单个worker进程最大的并发连接数</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">http &#123;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<h3 id="worker-cpu-affinity"><a href="#worker-cpu-affinity" class="headerlink" title="worker_cpu_affinity"></a>worker_cpu_affinity</h3><ul>
+<li>worker与cpu的亲和 设置哪个work对应使用哪个cpu</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#2核心2work设置</span><br><span class="line">worker_processes     2;</span><br><span class="line">worker_cpu_affinity 01 10;</span><br><span class="line">#2核心4work</span><br><span class="line">worker_processes     2;</span><br><span class="line">worker_cpu_affinity 01 10 01 10;</span><br><span class="line">#4核心4work</span><br><span class="line">worker_processes     4;</span><br><span class="line">worker_cpu_affinity 0001 0010 0100 1000;</span><br></pre></td></tr></table></figure>
+
+<h3 id="worker-priority"><a href="#worker-priority" class="headerlink" title="worker_priority"></a>worker_priority</h3><ul>
+<li>在Linux和Unix中，当许多进程都处于可执行状态时，按照优先级来决定本次内核选择哪一个进程执行。进程分配的CPU时间片大小也与优先级有关，优先级越高，时间片越长（例如，在默认情况下，最小时间片是5ms，最大则有800ms）。优先级由静态优先级和内核根据进程的执行情况所做的动态调整（目前只有+-5的调整）共同决定。nice是进程的优先级，他的取值范围是-20~+19，-20是最高优先级，+19是最低优先级。不建议把nice的值设为比内核进程（t通常为-5）还要小</li>
+<li>指明worker进程的nice值：数字越小,优先级越高</li>
+<li>worker的优先级是通过worker_priority参数调整的，其取值范围为[-20, 20]</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">worker_priority -19;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="work-rlimit-nofile-number"><a href="#work-rlimit-nofile-number" class="headerlink" title="work_rlimit_nofile_number"></a>work_rlimit_nofile_number</h3><ul>
+<li>每一个worker进程打开文件的数量</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">worker_rlimit_nofile 65535;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="event"><a href="#event" class="headerlink" title="event{}"></a>event{}</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">events &#123;</span><br><span class="line">    #单个worker进程最大的并发连接数</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">    #使用epoll模型</span><br><span class="line">    use epoll;</span><br><span class="line">    #互斥锁 默认是 on 当所有worker处于睡眠态 来了一个请求就只唤醒一个worker </span><br><span class="line">    #如果off 即便来了一个请求 也要唤醒所有worker(惊群) 会导致负载上升 但最求吞吐量的话建议off</span><br><span class="line">    accept_mutex on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="http字段常用配置"><a href="#http字段常用配置" class="headerlink" title="http字段常用配置"></a>http字段常用配置</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    #打开或关闭错误页面中的nginx版本号</span><br><span class="line">    server_tokens off;</span><br><span class="line">    #优化磁盘IO设置，指定nginx是否调用sendfile函数来输出文件，普通应用设为on，下载等磁盘IO高的应用，可设为off</span><br><span class="line">    sendfile on;</span><br><span class="line">    #设置nginx在一个数据包里发送所有头文件，而不是一个接一个的发送</span><br><span class="line">    tcp_nopush on;</span><br><span class="line">    #长连接的超时时长，默认为75s</span><br><span class="line">    keepalive_timeout 30;</span><br><span class="line">    #在一个长连接所能够允许请求的最大资源数 不常用</span><br><span class="line">    keepalive_requests 20;</span><br><span class="line">    #设置默认字符集</span><br><span class="line">    charset UTF-8;</span><br><span class="line">    #设置nginx采用gzip压缩的形式发送数据，减少发送数据量，但会增加请求处理时间及CPU处理时间，需要权衡</span><br><span class="line">    gzip on;</span><br><span class="line">    #加vary给代理服务器使用，针对有的浏览器支持压缩，有个不支持，根据客户端的HTTP头来判断是否需要压缩</span><br><span class="line">    gzip_vary on;</span><br><span class="line">    #nginx在压缩资源之前，先查找是否有预先gzip处理过的资源 不常用</span><br><span class="line">    gzip_static on;</span><br><span class="line">    #设置对数据启用压缩的最少字节数，如果请求小于10240字节则不压缩，会影响请求速度</span><br><span class="line">    gzip_min_length 10240;</span><br><span class="line">    #设置数据压缩等级，1-9之间，9最慢压缩比最大</span><br><span class="line">    gzip_comp_level 2;</span><br><span class="line">    #设置需要压缩的数据格式</span><br><span class="line">    gzip_types text/plain text/css text/xml text/javascript  application/json application/x-javascript application/xml application/xml+rss; </span><br><span class="line">    #开发缓存的同时也指定了缓存文件的最大数量，20s如果文件没有请求则删除缓存</span><br><span class="line">    open_file_cache max=100000 inactive=20s;</span><br><span class="line">    #指多长时间检查一次缓存的有效信息</span><br><span class="line">    open_file_cache_valid 60s;</span><br><span class="line">    #文件缓存最小的访问次数，只有访问超过5次的才会被缓存</span><br><span class="line">    open_file_cache_min_uses 5;</span><br><span class="line">    #允许客户端请求的最大单文件字节数</span><br><span class="line">    client_max_body_size 8m;</span><br><span class="line">    #冲区代理缓冲用户端请求的最大字节数</span><br><span class="line">    client_header_buffer_size 32k;</span><br><span class="line">    #引用/etc/nginx/vhosts下的所有配置文件，如果主机名众多的情况下可以每个主机名建立一个文件，以方便管理</span><br><span class="line">    include /etc/nginx/vhosts/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
  
       <!-- reward -->
       
@@ -991,7 +1013,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a></li></ul>
 
     </footer>
   </div>
