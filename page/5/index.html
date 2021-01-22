@@ -354,74 +354,6 @@
 
     
     <article
-  id="post-ConfigMap"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/ConfigMap/"
-    >ConfigMap</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/ConfigMap/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/">K8S资源清单</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h2><p>configmap 是一个标准的K8S资源,其功能通常作为某个pod的文件(通常是配置文件) 或 变量传输</p>
-<p>内部是由单个或多个KV形式的键值对组成  </p>
-<p>作为配置文件挂在到pod的时候 键是文件名称 值是文件内容</p>
-<p>作为变量传输时 可以传输configmap中某个K的值左右某个pod的环境变量的值</p>
-<p>需要注意的事如果你的pod已经启动并引用了configmap 此时你修改configmap的内容 pod中是不会及时同步(但会同步时间一般1分钟左右)  就算同步一般的pod没有检查配置  文件变更自动重载的功能 所以最有效 的方法还是重新 启动pod</p>
-<p>confmap最大作用在于 如果一个pod 有10个副本 且pod具有自动重载配置的功能 此时使用configmap作为配置文件就可以批量的修改配置文件而且实现不中断任何pod 使其生效</p>
-<h2 id="创建ConfigMap的方式"><a href="#创建ConfigMap的方式" class="headerlink" title="创建ConfigMap的方式"></a>创建ConfigMap的方式</h2><h3 id="1-陈述式"><a href="#1-陈述式" class="headerlink" title="1 陈述式"></a>1 陈述式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns]  --from-literal=[k]=[v] --from-literal=[k]=[v]</span><br><span class="line"><span class="comment">#定义configmap的k/v 通常用于传输环境变量 --from-literal 可以多个</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[conf_file] </span><br><span class="line"><span class="comment">#k/v来自于文件 文件名称作为K 文件内容作为V --from-file 可以多个</span></span><br><span class="line">kubectl create configmap [configmap_name] -n [ns] --from-file=[键名]=[conf_file] </span><br><span class="line"><span class="comment">#v来自于文件内容 而K是自定义的  --from-file 可以多个</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-声明式"><a href="#2-声明式" class="headerlink" title="2 声明式"></a>2 声明式</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: configmap_name</span><br><span class="line">  namespace: ns</span><br><span class="line">data:</span><br><span class="line">  <span class="comment">#这个语法相当于 --from-literal</span></span><br><span class="line">  k: <span class="string">&quot;v&quot;</span></span><br><span class="line">  <span class="comment">#这个语法相当于 --from-file</span></span><br><span class="line">  key_name.cnf: |-</span><br><span class="line">    <span class="comment">#[配置文件内容]</span></span><br><span class="line">    &#123;</span><br><span class="line">    server_name www.abc.com;</span><br><span class="line">    listen       80;</span><br><span class="line">    location / &#123;</span><br><span class="line">      </span><br><span class="line">    	&#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ConfigMap的引用"><a href="#ConfigMap的引用" class="headerlink" title="ConfigMap的引用"></a>ConfigMap的引用</h2><h3 id="1变量传输"><a href="#1变量传输" class="headerlink" title="1变量传输"></a>1变量传输</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name:</span><br><span class="line">  labels:</span><br><span class="line">    app:</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name:</span><br><span class="line">      image:</span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      env:</span><br><span class="line">         <span class="comment"># 容器环境变量 可以定义多个</span></span><br><span class="line">        - name: REDIS_HOST</span><br><span class="line">         <span class="comment"># 值来自哪里</span></span><br><span class="line">          valueFrom:</span><br><span class="line">            <span class="comment">#引用configmap的键</span></span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              <span class="comment">#来自哪个configmap中的哪个键的值</span></span><br><span class="line">              name: configmap_name               </span><br><span class="line">              key: REDIS_HOST</span><br><span class="line">            <span class="comment">#或 引用secret的键</span></span><br><span class="line">            secretKeyRef:</span><br><span class="line">              key:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="2文件挂载"><a href="#2文件挂载" class="headerlink" title="2文件挂载"></a>2文件挂载</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: <span class="built_in">test</span></span><br><span class="line">  labels:</span><br><span class="line">    app: <span class="built_in">test</span></span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: <span class="built_in">test</span></span><br><span class="line">      image: <span class="built_in">test</span>:<span class="built_in">test</span></span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">      volumeMounts:</span><br><span class="line">        <span class="comment">#挂载点</span></span><br><span class="line">        - mountPath: /etc/nginx/</span><br><span class="line">          name: conf</span><br><span class="line">  volumes:</span><br><span class="line">    - name: conf</span><br><span class="line">      configMap:</span><br><span class="line">        <span class="comment">#引用configmap</span></span><br><span class="line">        name: configmap_name</span><br><span class="line">        <span class="comment">#默认权限</span></span><br><span class="line">        defaultMode: 0644</span><br><span class="line">        <span class="comment">#items 字段可以不写 默认使用K作为文件名称V作为文件内容使用默认权限</span></span><br><span class="line">        items:</span><br><span class="line">            <span class="comment">#使用哪个K</span></span><br><span class="line">          - key: server.conf</span><br><span class="line">            <span class="comment">#文件存放位置 相对于上面的挂载点</span></span><br><span class="line">            path: conf.d/nginx.conf</span><br><span class="line">            <span class="comment">#文件权限 如果不写 使用上面的默认权限</span></span><br><span class="line">            mode: 0644</span><br><span class="line">          - key: server2.conf</span><br><span class="line">            path: conf.d/nginx2.conf</span><br><span class="line">            mode: 0777</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
   id="post-安装与配置"
   class="article article-type-post"
   itemscope
@@ -1002,6 +934,64 @@
 <h3 id="event"><a href="#event" class="headerlink" title="event{}"></a>event{}</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">events &#123;</span><br><span class="line">    #单个worker进程最大的并发连接数</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">    #使用epoll模型</span><br><span class="line">    use epoll;</span><br><span class="line">    #互斥锁 默认是 on 当所有worker处于睡眠态 来了一个请求就只唤醒一个worker </span><br><span class="line">    #如果off 即便来了一个请求 也要唤醒所有worker(惊群) 会导致负载上升 但最求吞吐量的话建议off</span><br><span class="line">    accept_mutex on;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="http字段常用配置"><a href="#http字段常用配置" class="headerlink" title="http字段常用配置"></a>http字段常用配置</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    #打开或关闭错误页面中的nginx版本号</span><br><span class="line">    server_tokens off;</span><br><span class="line">    #优化磁盘IO设置，指定nginx是否调用sendfile函数来输出文件，普通应用设为on，下载等磁盘IO高的应用，可设为off</span><br><span class="line">    sendfile on;</span><br><span class="line">    #设置nginx在一个数据包里发送所有头文件，而不是一个接一个的发送</span><br><span class="line">    tcp_nopush on;</span><br><span class="line">    #长连接的超时时长，默认为75s</span><br><span class="line">    keepalive_timeout 30;</span><br><span class="line">    #在一个长连接所能够允许请求的最大资源数 不常用</span><br><span class="line">    keepalive_requests 20;</span><br><span class="line">    #设置默认字符集</span><br><span class="line">    charset UTF-8;</span><br><span class="line">    #设置nginx采用gzip压缩的形式发送数据，减少发送数据量，但会增加请求处理时间及CPU处理时间，需要权衡</span><br><span class="line">    gzip on;</span><br><span class="line">    #加vary给代理服务器使用，针对有的浏览器支持压缩，有个不支持，根据客户端的HTTP头来判断是否需要压缩</span><br><span class="line">    gzip_vary on;</span><br><span class="line">    #nginx在压缩资源之前，先查找是否有预先gzip处理过的资源 不常用</span><br><span class="line">    gzip_static on;</span><br><span class="line">    #设置对数据启用压缩的最少字节数，如果请求小于10240字节则不压缩，会影响请求速度</span><br><span class="line">    gzip_min_length 10240;</span><br><span class="line">    #设置数据压缩等级，1-9之间，9最慢压缩比最大</span><br><span class="line">    gzip_comp_level 2;</span><br><span class="line">    #设置需要压缩的数据格式</span><br><span class="line">    gzip_types text/plain text/css text/xml text/javascript  application/json application/x-javascript application/xml application/xml+rss; </span><br><span class="line">    #开发缓存的同时也指定了缓存文件的最大数量，20s如果文件没有请求则删除缓存</span><br><span class="line">    open_file_cache max=100000 inactive=20s;</span><br><span class="line">    #指多长时间检查一次缓存的有效信息</span><br><span class="line">    open_file_cache_valid 60s;</span><br><span class="line">    #文件缓存最小的访问次数，只有访问超过5次的才会被缓存</span><br><span class="line">    open_file_cache_min_uses 5;</span><br><span class="line">    #允许客户端请求的最大单文件字节数</span><br><span class="line">    client_max_body_size 8m;</span><br><span class="line">    #冲区代理缓冲用户端请求的最大字节数</span><br><span class="line">    client_header_buffer_size 32k;</span><br><span class="line">    #引用/etc/nginx/vhosts下的所有配置文件，如果主机名众多的情况下可以每个主机名建立一个文件，以方便管理</span><br><span class="line">    include /etc/nginx/vhosts/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-Nginx变量的使用"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/"
+    >Nginx变量的使用和日志</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Nginx/">Nginx</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Nginx变量的使用"><a href="#Nginx变量的使用" class="headerlink" title="Nginx变量的使用"></a>Nginx变量的使用</h1><h2 id="内置变量"><a href="#内置变量" class="headerlink" title="内置变量"></a>内置变量</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#存放了客户端的地址，注意是客户端的公网IP，也就是一家人访问一个网站，则会显示为路由器的公网IP。</span></span><br><span class="line"><span class="variable">$remote_addr</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#变量中存放了URL中的指令，例如http://www.magedu.net/main/index.do? id=20190221&amp;partner=search中的id=20190221&amp;partner=search</span></span><br><span class="line"><span class="variable">$args</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了针对当前资源的请求的系统根目录，如/apps/nginx/html。</span></span><br><span class="line"><span class="variable">$document_root</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了当前请求中不包含指令的URI，注意是不包含请求的指令，比如 http://www.magedu.net/main/index.do?id=20190221&amp;partner=search会被定义为/main/index.do</span></span><br><span class="line"><span class="variable">$document_uri</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#存放了请求的host名称。</span></span><br><span class="line"><span class="variable">$host</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端浏览器的详细信息</span></span><br><span class="line"><span class="variable">$http_user_agent</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端的cookie信息。</span></span><br><span class="line"><span class="variable">$http_cookie</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端请求Nginx服务器时随机打开的端口，这是每个客户端自己的端口。</span></span><br><span class="line"><span class="variable">$remote_port</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#已经经过Auth Basic Module验证的用户名。</span></span><br><span class="line"><span class="variable">$remote_user</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#做反向代理时发给后端服务器的本地资源的名称。</span></span><br><span class="line"><span class="variable">$request_body_file</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#请求资源的方式，GET/PUT/DELETE等</span></span><br><span class="line"><span class="variable">$request_method</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#当前请求的资源文件的路径名称，由root或alias指令与URI请求生成的文件绝对路径， 如/apps/nginx/html/main/index.html</span></span><br><span class="line"><span class="variable">$request_filename</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#包含请求参数的原始URI，不包含主机名，如：/main/index.do?id=20190221&amp;partner=search 。</span></span><br><span class="line"><span class="variable">$request_uri</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的协议，如ftp，https，http等。</span></span><br><span class="line"><span class="variable">$scheme</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了客户端请求资源使用的协议的版本，如HTTP/1.0，HTTP/1.1，HTTP/2.0等。</span></span><br><span class="line"><span class="variable">$server_protocol</span>；</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了服务器的IP地址。</span></span><br><span class="line"><span class="variable">$server_addr</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的服务器的主机名。</span></span><br><span class="line"><span class="variable">$server_name</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的服务器的端口号</span></span><br><span class="line"><span class="variable">$server_port</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="自定义变量"><a href="#自定义变量" class="headerlink" title="自定义变量"></a>自定义变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set $name magedu;</span><br><span class="line">echo $name;</span><br><span class="line">set $my_port $server_port;</span><br><span class="line">echo $my_port; </span><br><span class="line">echo &quot;$server_name:$server_port&quot;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用内置变量定义日志格式"><a href="#利用内置变量定义日志格式" class="headerlink" title="利用内置变量定义日志格式"></a>利用内置变量定义日志格式</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#json访问日志</span></span><br><span class="line">log_format access_json <span class="string">&#x27;&#123;&quot;@timestamp&quot;:&quot;$time_iso8601&quot;,&#x27;</span> <span class="string">&#x27;&quot;host&quot;:&quot;$server_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;clientip&quot;:&quot;$remote_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;size&quot;:$body_bytes_sent,&#x27;</span> <span class="string">&#x27;&quot;responsetime&quot;:$request_time,&#x27;</span> <span class="string">&#x27;&quot;upstreamtime&quot;:&quot;$upstream_response_time&quot;,&#x27;</span> <span class="string">&#x27;&quot;upstreamhost&quot;:&quot;$upstream_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;http_host&quot;:&quot;$host&quot;,&#x27;</span> <span class="string">&#x27;&quot;uri&quot;:&quot;$uri&quot;,&#x27;</span> <span class="string">&#x27;&quot;domain&quot;:&quot;$host&quot;,&#x27;</span> <span class="string">&#x27;&quot;xff&quot;:&quot;$http_x_forwarded_for&quot;,&#x27;</span> <span class="string">&#x27;&quot;referer&quot;:&quot;$http_referer&quot;,&#x27;</span> <span class="string">&#x27;&quot;tcp_xff&quot;:&quot;$proxy_protocol_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;http_user_agent&quot;:&quot;$http_user_agent&quot;,&#x27;</span> <span class="string">&#x27;&quot;status&quot;:&quot;$status&quot;&#125;&#x27;</span>; </span><br><span class="line"></span><br><span class="line">access_log /apps/nginx/logs/access_json.log access_json;</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
