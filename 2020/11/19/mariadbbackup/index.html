@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    logstash同步mysql到es |  Nero 的个人博客
+    Mariadb10-galera集群配置 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-logstash 同步mysql到es"
+  id="post-mariadbbackup"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  logstash同步mysql到es
+  Mariadb10-galera集群配置
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2020/11/19/logstash%20%E5%90%8C%E6%AD%A5mysql%E5%88%B0es/" class="article-date">
+      <a href="/2020/11/19/mariadbbackup/" class="article-date">
   <time datetime="2020-11-19T02:24:23.000Z" itemprop="datePublished">2020-11-19</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/ELK7/">ELK7</a>
+    <a class="article-category-link" href="/categories/Mariadb/">Mariadb</a>
   </div>
  
     </div>
@@ -84,10 +84,36 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://artifacts.elastic.co/downloads/logstash/logstash-7.4.1.rpm</span><br><span class="line">yum install -y logstash-7.9.3.rpm</span><br><span class="line"><span class="comment">#测试配置文件语法</span></span><br><span class="line">/usr/share/logstash/bin/logstash -t -f [conf_file]</span><br><span class="line"><span class="comment">#简单启动 用于测试配置文件</span></span><br><span class="line">/usr/share/logstash/bin/logstash -f  [conf_file] -r</span><br></pre></td></tr></table></figure>
+  <h1 id="MariaDB物理备份工具Mariabackup"><a href="#MariaDB物理备份工具Mariabackup" class="headerlink" title="MariaDB物理备份工具Mariabackup"></a>MariaDB物理备份工具Mariabackup</h1><h2 id="Mariabackup"><a href="#Mariabackup" class="headerlink" title="Mariabackup"></a>Mariabackup</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Mariabackup是MariaDB提供的一个开源工具，用于对InnoDB，Aria和MyISAM表进行物理在线备份。这个工具是基于Percona的XtraBackup（版本2.3.8）的解决方案。<br>这里有一点需要注意，在MariaDB10.3.x及以上的版本用Percona XtraBackup工具会有问题。原因可能是MariaDB10.3以上版本的redo日志格式和之前不同了。</p>
+<p>Percona的官方文档：<a target="_blank" rel="noopener" href="https://www.percona.com/doc/percona-xtrabackup/2.4/index.html">https://www.percona.com/doc/percona-xtrabackup/2.4/index.html</a><br>Mariabackup的官方文档：<a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/library/mariabackup-overview/">https://mariadb.com/kb/en/library/mariabackup-overview/</a><br>Percona XtraBackup： <a target="_blank" rel="noopener" href="https://blog.csdn.net/L835311324/article/details/83628339">https://blog.csdn.net/L835311324/article/details/83628339</a></p>
+<p>这个物理备份工具的原理可以参考这篇文章: <a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2016/03/07/">http://mysql.taobao.org/monthly/2016/03/07/</a></p>
+<h3 id="语法格式："><a href="#语法格式：" class="headerlink" title="语法格式："></a>语法格式：</h3><p>mariabackup [–defaults-file=#] [–backup | –prepare | –copy-back | –move-back] [OPTIONS]<br>1</p>
+<h3 id="常用选项"><a href="#常用选项" class="headerlink" title="常用选项"></a>常用选项</h3><ul>
+<li>-backup<br>备份数据库。<br>使用此命令选项，Mariabackup会对您的数据库执行备份操作。备份将写入目标目录，由- -target-dir选项设置。</li>
+<li>-copy-back<br>将备份还原到数据目录。<br>使用此命令，Mariabackup将备份从目标目录复制到数据目录，如- -datadir选项所定义。您必须在运行此命令之前停止MariaDB服务器。数据目录必须为空。如果要使用备份覆盖数据目录，请使用该- -force-non-empty-directories选项。<br>请记住，在恢复备份之前，首先需要使用该- -prepare选项运行Mariabackup 。在完全备份的情况下，这使得文件的时间点保持一致。使用增量备份，这会将增量应用于基本备份。准备好备份后，您可以运行- -copy-back将其应用于MariaDB Server。<br>运行该- -copy-back命令会将备份文件复制到数据目录。如果要保存备份以供日后使用，请使用此命令。如果您不想保存备份以供日后使用，请使用该- -move-back命令。</li>
+<li>-defaults-file<br>定义包含默认配置的文件的路径。</li>
+<li>H, –host<br>定义要备份的MariaDB服务器的主机</li>
+<li>-incremental-basedir<br>定义是否要增加备份</li>
+<li>-incremental-dir<br>定义是否要增加准备好的备份<br>将此选项与- -prepare命令选项一起使用会导致Mariabackup增加准备好的备份，而不是从头开始复制。增量将.delta文件和日志文件应用到目标目录中。</li>
+<li>-move-back<br>将备份还原到数据目录。<br>使用此命令，Mariabackup将备份从目标目录移动到数据目录，如–datadir选项所定义。您必须在运行此命令之前停止MariaDB服务器。数据目录必须为空。如果要使用备份覆盖数据目录，请使用该–force-non-empty-directories选项。<br>请记住，在恢复备份之前，首先需要使用该–prepare选项运行Mariabackup 。在完全备份的情况下，这使得文件的时间点保持一致。使用增量备份，这会将增量应用于基本备份。准备好备份后，您可以运行–move-back将其应用于MariaDB Server。</li>
+<li>p, –password<br>定义用于连接MariaDB Server的密码。</li>
+<li>P, –port<br>定义要连接的服务器端口</li>
+<li>-prepare<br>准备现有备份以还原到MariaDB服务器 。<br>Mariabackup –backup在目标目录中的操作期间生成的文件尚未准备好在服务器上使用。在将数据还原到MariaDB之前，首先需要准备备份。<br>在完全备份的情况下，文件不是时间点一致的，因为它们是在不同时间拍摄的。如果您尝试在未先准备数据的情况下还原数据库，InnoDB会将新数据拒绝为损坏。使用该–prepare命令运行Mariabackup 会使数据准备就绪，因此您可以将其还原到MariaDB Server。使用增量备份时，需要使用–prepare命令和–incremental-dir选项通过增量备份中的增量更新基本备份。</li>
+<li>S, –socket<br>定义用于连接本地数据库的套接字</li>
+<li>-user<br>定义用于连接MariaDB服务器的用户名</li>
+<li>-version-check<br>启用版本检查。<br>使用此选项，您可以启用Mariabackup版本检查</li>
+<li>-version<br>打印版本信息。<br>完全备份与恢复<br>备份<br>用户名为root<br>密码为centos<br>备份到目录/backup/$(date ‘+%y-%m-%d’)_fullbackup 这里的$(date ‘+%y-%m-%d’)_fullbackup目录会自动创建，而backup需要自己创建</li>
+</ul>
+<p>mariabackup –backup –target-dir /backup/$(date ‘+%y-%m-%d’)_fullbackup  –user root  –password centos</p>
+<h2 id="准备全备数据"><a href="#准备全备数据" class="headerlink" title="准备全备数据"></a>准备全备数据</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mariabackup --prepare --target-dir   --user backup_user --password backup_passwd</span><br></pre></td></tr></table></figure>
 
-<p>#/etc/logstash/<br>conf.d</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#/etc/logstash/conf.d/ 下以conf结尾配置文件自动加载</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#单表同步</span></span><br><span class="line">input &#123;</span><br><span class="line">	jdbc &#123;</span><br><span class="line">		jdbc_connection_string =&gt; <span class="string">&quot;jdbc:mariadb://192.168.1.100:3306/sp2001&quot;</span></span><br><span class="line">		jdbc_user =&gt; <span class="string">&quot;java&quot;</span></span><br><span class="line">		jdbc_password =&gt; <span class="string">&quot;java123456&quot;</span></span><br><span class="line">		jdbc_driver_library =&gt; <span class="string">&quot;/etc/logstash/mysql/mariadb-java-client-2.6.2.jar&quot;</span></span><br><span class="line">		jdbc_driver_class =&gt; <span class="string">&quot;Java::org.mariadb.jdbc.Driver&quot;</span></span><br><span class="line">		jdbc_validate_connection =&gt; <span class="literal">true</span>		</span><br><span class="line">		sql_log_level =&gt; debug</span><br><span class="line">		record_last_run =&gt; <span class="literal">true</span></span><br><span class="line">		use_column_value =&gt; <span class="literal">true</span></span><br><span class="line">        tracking_column =&gt; <span class="string">&quot;updatedat&quot;</span></span><br><span class="line">		tracking_column_type =&gt; <span class="string">&quot;numeric&quot;</span></span><br><span class="line">        statement_filepath =&gt; <span class="string">&quot;/etc/logstash/sql/sp_betslips_ae_king_maker.sql&quot;</span></span><br><span class="line">		last_run_metadata_path =&gt; <span class="string">&quot;/etc/logstash/mysql/sp_betslips_ae_king_maker.sql.txt&quot;</span></span><br><span class="line">		schedule =&gt; <span class="string">&quot;*/1 * * * *&quot;</span></span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">	elasticsearch &#123;</span><br><span class="line">		hosts =&gt; [<span class="string">&quot;192.168.1.101:9200&quot;</span>]</span><br><span class="line">		index =&gt; <span class="string">&quot;sp_betslips_ae_king_maker&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#多表同步</span></span><br><span class="line">input &#123;</span><br><span class="line">	jdbc &#123;</span><br><span class="line">	...</span><br><span class="line">		<span class="built_in">type</span> =&gt; <span class="string">&quot;sp_betslips_ae_king_maker.sql&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">	jdbc &#123;</span><br><span class="line">	....</span><br><span class="line">	    <span class="built_in">type</span> =&gt;   ....</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">	<span class="keyword">if</span> [<span class="built_in">type</span>] == <span class="string">&quot;sp_betslips_ae_king_maker.sql&quot;</span> &#123;</span><br><span class="line">		elasticsearch &#123;</span><br><span class="line">			hosts =&gt; [<span class="string">&quot;192.168.1.101:9200&quot;</span>]</span><br><span class="line">			index =&gt; <span class="string">&quot;sp_betslips_ae_king_maker&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> [<span class="built_in">type</span>] ==   .... &#123;</span><br><span class="line">	   elasticsearch &#123;</span><br><span class="line">	   ....</span><br><span class="line">	   &#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="还原数据-（保证要还原的数据库服务器的data目录为空）"><a href="#还原数据-（保证要还原的数据库服务器的data目录为空）" class="headerlink" title="还原数据 （保证要还原的数据库服务器的data目录为空）"></a>还原数据 （保证要还原的数据库服务器的data目录为空）</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mariabackup --copy-back --target-dir /backup/18-07-30_fullbackup  --user root  --password centos </span><br><span class="line"></span><br><span class="line"><span class="comment">#因为备份的用户是root，还原过去的时候属主没有变化，所以要吧还原过去的数据的属主和属组修改一下</span></span><br><span class="line"></span><br><span class="line">chown -R mysql:mysql /usr/<span class="built_in">local</span>/mariadb/data</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="增量备份与还原"><a href="#增量备份与还原" class="headerlink" title="增量备份与还原"></a>增量备份与还原</h2><h3 id="完全备份"><a href="#完全备份" class="headerlink" title="完全备份"></a>完全备份</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mariabackup --backup --target-dir /backup/fullbackup  --user root  --password centos</span><br></pre></td></tr></table></figure>
+
+<h3 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mariabackup --backup --target-dir /backup/inc1   --incremental-basedir /backup/fullbackup --user root --password centos</span><br><span class="line"><span class="comment">#这里的 /backup/fullbackup表示基于全备做的增量备份</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="恢复"><a href="#恢复" class="headerlink" title="恢复"></a>恢复</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mariabackup --copy-back --target-dir /backup/fullbackup/ \</span><br><span class="line">--user root  --password centos </span><br><span class="line"><span class="comment">#或</span></span><br><span class="line"><span class="built_in">cd</span> /data/bak</span><br><span class="line">rsync -av . slave_hostip:/data/mysql</span><br><span class="line"><span class="comment">#修改属主属组</span></span><br><span class="line">chown -R mysql:mysql /usr/<span class="built_in">local</span>/mariadb/data</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -99,7 +125,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK7/" rel="tag">ELK7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/logstash7/" rel="tag">logstash7</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mariadb/" rel="tag">Mariadb</a></li></ul>
 
     </footer>
   </div>
@@ -107,19 +133,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2020/11/19/REDIS%E9%9B%86%E7%BE%A4/" class="article-nav-link">
+      <a href="/2020/11/19/%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            REDIS集群
+            Mariadb10-galera集群配置
           
         </div>
       </a>
     
     
-      <a href="/2020/11/19/Mariadb10galera%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE/" class="article-nav-link">
+      <a href="/2020/11/18/1%20k8s%20%E9%83%A8%E7%BD%B2jenkins/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Mariadb10-galera集群配置</div>
+        <div class="article-nav-title">1 K8S部署jenkins</div>
       </a>
     
   </nav>
