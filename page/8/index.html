@@ -108,6 +108,91 @@
     
     
     <article
+  id="post-3.1 生成证书"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/3.1%20%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6/"
+    >3.1生成证书</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/3.1%20%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="证书生成"><a href="#证书生成" class="headerlink" title="**证书生成"></a>**证书生成</h2><p>必须得在/etc/kubernetes/pki/这个目录下建所有证书</p>
+<h2 id="生成kubernetes-ca"><a href="#生成kubernetes-ca" class="headerlink" title="**生成kubernetes-ca"></a>**生成kubernetes-ca</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=kubernetes-ca&quot;</span> -extensions v3_ca -out ca.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="生成etcd"><a href="#生成etcd" class="headerlink" title="**生成etcd"></a>**生成etcd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key etcd/ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=etcd-ca&quot;</span> -extensions v3_ca -out etcd/ca.crt -days 10000</span><br><span class="line">**front-proxy-ca</span><br><span class="line">openssl genrsa -out front-proxy-ca.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -x509 -new -nodes -key front-proxy-ca.key -config openssl.cnf -subj <span class="string">&quot;/CN=kubernetes-ca&quot;</span> -extensions v3_ca -out front-proxy-ca.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># tree</span></span><br><span class="line">.</span><br><span class="line">├── ca.crt</span><br><span class="line">├── ca.key</span><br><span class="line">├── etcd</span><br><span class="line">│   ├── ca.crt</span><br><span class="line">│   └── ca.key</span><br><span class="line">├── front-proxy-ca.crt</span><br><span class="line">├── front-proxy-ca.key</span><br><span class="line">└── openssl.cnf</span><br></pre></td></tr></table></figure>
+
+<h2 id="apiserver-etcd-client"><a href="#apiserver-etcd-client" class="headerlink" title="**apiserver-etcd-client"></a>**apiserver-etcd-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out apiserver-etcd-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver-etcd-client.key -subj <span class="string">&quot;/CN=apiserver-etcd-client/O=system:masters&quot;</span> -out apiserver-etcd-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> apiserver-etcd-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out apiserver-etcd-client.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="kube-etcd"><a href="#kube-etcd" class="headerlink" title="** kube-etcd"></a>** kube-etcd</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/server.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/server.key -subj <span class="string">&quot;/CN=etcd-server&quot;</span> -out etcd/server.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="kube-etcd-peer"><a href="#kube-etcd-peer" class="headerlink" title="**kube-etcd-peer"></a>**kube-etcd-peer</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/peer.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/peer.key -subj <span class="string">&quot;/CN=etcd-peer&quot;</span> -out etcd/peer.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="kube-etcd-healthcheck-client"><a href="#kube-etcd-healthcheck-client" class="headerlink" title="**kube-etcd-healthcheck-client"></a>**kube-etcd-healthcheck-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out etcd/healthcheck-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key etcd/healthcheck-client.key -subj <span class="string">&quot;/CN=etcd-client&quot;</span> -out etcd/healthcheck-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -<span class="keyword">in</span> etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="kube-apiserver"><a href="#kube-apiserver" class="headerlink" title="**kube-apiserver"></a>**kube-apiserver</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out apiserver.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver.key -subj <span class="string">&quot;/CN=kube-apiserver&quot;</span> -config openssl.cnf -out apiserver.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_apiserver -extfile openssl.cnf -out apiserver.crt</span><br></pre></td></tr></table></figure>
+
+<h2 id="apiserver-kubelet-client"><a href="#apiserver-kubelet-client" class="headerlink" title="**apiserver-kubelet-client"></a>**apiserver-kubelet-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  apiserver-kubelet-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key apiserver-kubelet-client.key -subj <span class="string">&quot;/CN=apiserver-kubelet-client/O=system:masters&quot;</span> -out apiserver-kubelet-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> apiserver-kubelet-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out apiserver-kubelet-client.crt</span><br></pre></td></tr></table></figure>
+
+<h2 id="front-proxy-client"><a href="#front-proxy-client" class="headerlink" title="**front-proxy-client"></a>**front-proxy-client</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  front-proxy-client.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key front-proxy-client.key -subj <span class="string">&quot;/CN=front-proxy-client&quot;</span> -out front-proxy-client.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> front-proxy-client.csr -CA front-proxy-ca.crt -CAkey front-proxy-ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out front-proxy-client.crt</span><br></pre></td></tr></table></figure>
+
+<h2 id="kube-scheduler"><a href="#kube-scheduler" class="headerlink" title="**kube-scheduler"></a>**kube-scheduler</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  kube-scheduler.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key kube-scheduler.key -subj <span class="string">&quot;/CN=system:kube-scheduler&quot;</span> -out kube-scheduler.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out kube-scheduler.crt</span><br></pre></td></tr></table></figure>
+
+<h2 id="sa-pub-sa-key"><a href="#sa-pub-sa-key" class="headerlink" title="**sa.pub sa.key"></a>**sa.pub sa.key</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  sa.key 2048 &amp;&amp; \</span><br><span class="line">openssl ecparam -name secp521r1 -genkey -noout -out sa.key &amp;&amp; \</span><br><span class="line">openssl ec -<span class="keyword">in</span> sa.key -outform PEM -pubout -out sa.pub &amp;&amp; \</span><br><span class="line">openssl req -new -sha256 -key sa.key -subj <span class="string">&quot;/CN=system:kube-controller-manager&quot;</span> -out sa.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out sa.crt</span><br></pre></td></tr></table></figure>
+
+<h2 id="admin"><a href="#admin" class="headerlink" title="**admin"></a>**admin</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out  admin.key 2048 &amp;&amp; \</span><br><span class="line">openssl req -new -key admin.key -subj <span class="string">&quot;/CN=kubernetes-admin/O=system:masters&quot;</span> -out admin.csr &amp;&amp; \</span><br><span class="line">openssl x509 -req -<span class="keyword">in</span> admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out admin.crt</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-4 ETCD部署"
   class="article article-type-post"
   itemscope
@@ -723,74 +808,13 @@
 </article>
 
     
-    <article
-  id="post-9.1 dashboard"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/9.1%20dashboard/"
-    >9.1dashboard</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/9.1%20dashboard/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="清单"><a href="#清单" class="headerlink" title="**清单"></a>**清单</h2><p>#dashboard 清单 修改其中的service </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.1/aio/deploy/recommended.yaml</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>#RBAC</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">cat &gt; dashboard.yaml&lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1beta1</span><br><span class="line">metadata:</span><br><span class="line">  name: admin</span><br><span class="line">  annotations:</span><br><span class="line">    rbac.authorization.kubernetes.io/autoupdate: <span class="string">&quot;true&quot;</span></span><br><span class="line">roleRef:</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: cluster-admin</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  </span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  labels:</span><br><span class="line">    kubernetes.io/cluster-service: <span class="string">&quot;true&quot;</span></span><br><span class="line">    addonmanager.kubernetes.io/mode: Reconcile</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-<h2 id="获取token"><a href="#获取token" class="headerlink" title="##获取token"></a>##获取token</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># kubectl get sa admin -n kubernetes-dashboard -o yaml </span></span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    kubectl.kubernetes.io/last-applied-configuration: |</span><br><span class="line">      &#123;<span class="string">&quot;apiVersion&quot;</span>:<span class="string">&quot;v1&quot;</span>,<span class="string">&quot;kind&quot;</span>:<span class="string">&quot;ServiceAccount&quot;</span>,<span class="string">&quot;metadata&quot;</span>:&#123;<span class="string">&quot;annotations&quot;</span>:&#123;&#125;,<span class="string">&quot;labels&quot;</span>:&#123;<span class="string">&quot;addonmanager.kubernetes.io/mode&quot;</span>:<span class="string">&quot;Reconcile&quot;</span>,<span class="string">&quot;kubernetes.io/cluster-service&quot;</span>:<span class="string">&quot;true&quot;</span>&#125;,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;admin&quot;</span>,<span class="string">&quot;namespace&quot;</span>:<span class="string">&quot;kubernetes-dashboard&quot;</span>&#125;&#125;</span><br><span class="line">  creationTimestamp: <span class="string">&quot;2020-10-26T13:47:39Z&quot;</span></span><br><span class="line">  labels:</span><br><span class="line">    addonmanager.kubernetes.io/mode: Reconcile</span><br><span class="line">    kubernetes.io/cluster-service: <span class="string">&quot;true&quot;</span></span><br><span class="line">  name: admin</span><br><span class="line">  namespace: kubernetes-dashboard</span><br><span class="line">  resourceVersion: <span class="string">&quot;1212698&quot;</span></span><br><span class="line">  selfLink: /api/v1/namespaces/kubernetes-dashboard/serviceaccounts/admin</span><br><span class="line">  uid: 8edb9d0a-af03-47e0-94fe-4692d46ff3f3</span><br><span class="line">secrets:</span><br><span class="line"><span class="comment">#这个是 这个sa对应的secret名字</span></span><br><span class="line">- name: admin-token-sgxhb</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># kubectl describe secrets admin-token-sgxhb -n kubernetes-dashboard </span></span><br><span class="line">Name:         admin-token-sgxhb</span><br><span class="line">Namespace:    kubernetes-dashboard</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  kubernetes.io/service-account.name: admin</span><br><span class="line">              kubernetes.io/service-account.uid: 8edb9d0a-af03-47e0-94fe-4692d46ff3f3</span><br><span class="line"></span><br><span class="line">Type:  kubernetes.io/service-account-token</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">ca.crt:     1046 bytes</span><br><span class="line">namespace:  20 bytes</span><br><span class="line">token:      eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia</span><br><span class="line">3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV</span><br><span class="line">0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2</span><br><span class="line">VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291b</span><br><span class="line">nQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5</span><br><span class="line">c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-q</span><br><span class="line">J5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBg</span><br><span class="line">JM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ</span><br></pre></td></tr></table></figure>
-<h2 id="生成kubeconfig"><a href="#生成kubeconfig" class="headerlink" title="##生成kubeconfig"></a>##生成kubeconfig</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">kubectl config set-cluster kubernetes \</span><br><span class="line">--server=192.168.1.71:6443 \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config set-credentials admin \</span><br><span class="line">--token=eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-qJ5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBgJM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config set-context admin@kubernetes \</span><br><span class="line">--cluster=kubernetes \</span><br><span class="line">--user=admin \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br><span class="line"></span><br><span class="line">kubectl config use-context admin@kubernetes \</span><br><span class="line">--kubeconfig=/etc/kubernetes/dashboard.kubeconfig</span><br></pre></td></tr></table></figure>
-
-<h2 id="验证"><a href="#验证" class="headerlink" title="##验证"></a>##验证</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">clusters:</span><br><span class="line">- cluster:</span><br><span class="line">    server: 192.168.1.71:6443</span><br><span class="line">  name: kubernetes</span><br><span class="line">contexts:</span><br><span class="line">- context:</span><br><span class="line">    cluster: kubernetes</span><br><span class="line">    user: admin</span><br><span class="line">  name: admin@kubernetes</span><br><span class="line">current-context: admin@kubernetes</span><br><span class="line">kind: Config</span><br><span class="line">preferences: &#123;&#125;</span><br><span class="line">users:</span><br><span class="line">- name: admin</span><br><span class="line">  user:</span><br><span class="line">    token: eyJhbGciOiJFUzUxMiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi10b2tlbi1zZ3hoYiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJhZG1pbiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjhlZGI5ZDBhLWFmMDMtNDdlMC05NGZlLTQ2OTJkNDZmZjNmMyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlcm5ldGVzLWRhc2hib2FyZDphZG1pbiJ9.AAEsHWGNtiTzhyZS7p8o9s5t0MT9-qJ5ucXmx_YGtyrsu-t0gvvnjhkPV4BQ4yQQTJhmtZGwT3pexmopmdndv7dbAKT2i_grehinostVtkSXiown6Pn5pz4lxlViBgJM-Syd29bKBnzUcPidYOPFvbY4oBy8-cUPCnzIdtlW0_Gh0WQJ</span><br></pre></td></tr></table></figure>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/7/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span>
+    <a class="extend prev" rel="prev" href="/page/7/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/9/">下一页</a>
   </nav>
   
 </section>

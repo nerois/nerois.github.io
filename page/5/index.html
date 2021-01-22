@@ -108,6 +108,64 @@
     
     
     <article
+  id="post-mongodb索引"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/"
+    >MongoDB索引</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/18/mongodb%E7%B4%A2%E5%BC%95/" class="article-date">
+  <time datetime="2019-05-18T02:24:23.000Z" itemprop="datePublished">2019-05-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/MongoDB/">MongoDB</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="慢查询"><a href="#慢查询" class="headerlink" title="慢查询"></a>慢查询</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#慢查询状态 默认超过100毫秒 视为慢查询 会写入日志</span></span><br><span class="line">&gt; db.getProfilingStatus()</span><br><span class="line">&#123; <span class="string">&quot;was&quot;</span> : 0, <span class="string">&quot;slowms&quot;</span> : 100, <span class="string">&quot;sampleRate&quot;</span> : 1 &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查询过程详情 多用于查看此语句是否全表扫描</span></span><br><span class="line">&gt; db.myuser.find( &#123;age:9999&#125; ).explain(<span class="literal">true</span>)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">&quot;queryPlanner&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;plannerVersion&quot;</span> : 1,</span><br><span class="line">                <span class="string">&quot;namespace&quot;</span> : <span class="string">&quot;shijiange.myuser&quot;</span>,</span><br><span class="line">                <span class="string">&quot;indexFilterSet&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">                <span class="string">&quot;parsedQuery&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;winningPlan&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;stage&quot;</span> : <span class="string">&quot;COLLSCAN&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;filter&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                        <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        <span class="string">&quot;direction&quot;</span> : <span class="string">&quot;forward&quot;</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;rejectedPlans&quot;</span> : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;executionStats&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;executionSuccess&quot;</span> : <span class="literal">true</span>,</span><br><span class="line">                <span class="string">&quot;nReturned&quot;</span> : 1,</span><br><span class="line">                <span class="comment">#查询时间 毫秒</span></span><br><span class="line">                <span class="string">&quot;executionTimeMillis&quot;</span> : 198,</span><br><span class="line">                <span class="string">&quot;totalKeysExamined&quot;</span> : 0,</span><br><span class="line">                <span class="comment">#总查询条目数条目数过大 可能就是全表查询</span></span><br><span class="line">                <span class="string">&quot;totalDocsExamined&quot;</span> : 500000,</span><br><span class="line">                <span class="string">&quot;executionStages&quot;</span> : &#123;</span><br><span class="line">                        <span class="string">&quot;stage&quot;</span> : <span class="string">&quot;COLLSCAN&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;filter&quot;</span> : &#123;</span><br><span class="line">                                <span class="string">&quot;age&quot;</span> : &#123;</span><br><span class="line">                                        <span class="string">&quot;<span class="variable">$eq</span>&quot;</span> : 9999</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        <span class="string">&quot;nReturned&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;executionTimeMillisEstimate&quot;</span> : 0,</span><br><span class="line">                        <span class="string">&quot;works&quot;</span> : 500002,</span><br><span class="line">                        <span class="string">&quot;advanced&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;needTime&quot;</span> : 500000,</span><br><span class="line">                        <span class="string">&quot;needYield&quot;</span> : 0,</span><br><span class="line">                        <span class="string">&quot;saveState&quot;</span> : 3906,</span><br><span class="line">                        <span class="string">&quot;restoreState&quot;</span> : 3906,</span><br><span class="line">                        <span class="string">&quot;isEOF&quot;</span> : 1,</span><br><span class="line">                        <span class="string">&quot;direction&quot;</span> : <span class="string">&quot;forward&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;docsExamined&quot;</span> : 500000</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;allPlansExecution&quot;</span> : [ ]</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;serverInfo&quot;</span> : &#123;</span><br><span class="line">                <span class="string">&quot;host&quot;</span> : <span class="string">&quot;k-n1.sp.com&quot;</span>,</span><br><span class="line">                <span class="string">&quot;port&quot;</span> : 27017,</span><br><span class="line">                <span class="string">&quot;version&quot;</span> : <span class="string">&quot;4.2.11&quot;</span>,</span><br><span class="line">                <span class="string">&quot;gitVersion&quot;</span> : <span class="string">&quot;ea38428f0c6742c7c2c7f677e73d79e17a2aab96&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;ok&quot;</span> : 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="建立索引"><a href="#建立索引" class="headerlink" title="建立索引"></a>建立索引</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#对某一个字段添加索引</span></span><br><span class="line">db.myuser.ensureIndex( &#123;name:1&#125; )</span><br><span class="line"><span class="comment">#添加唯一索引  &#123;unique:true&#125; 唯一索引仅适用于字段值没有相等条目的情况</span></span><br><span class="line">db.myuser.ensureIndex( &#123;userid:1&#125;,&#123;unique:<span class="literal">true</span>&#125; ) </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MongoDB/" rel="tag">MongoDB</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-mongo基础"
   class="article article-type-post"
   itemscope
@@ -956,71 +1014,13 @@
 </article>
 
     
-    <article
-  id="post-Nginx变量的使用"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/"
-    >Nginx变量的使用和日志</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Nginx/">Nginx</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h1 id="Nginx变量的使用"><a href="#Nginx变量的使用" class="headerlink" title="Nginx变量的使用"></a>Nginx变量的使用</h1><h2 id="内置变量"><a href="#内置变量" class="headerlink" title="内置变量"></a>内置变量</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#存放了客户端的地址，注意是客户端的公网IP，也就是一家人访问一个网站，则会显示为路由器的公网IP。</span></span><br><span class="line"><span class="variable">$remote_addr</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#变量中存放了URL中的指令，例如http://www.magedu.net/main/index.do? id=20190221&amp;partner=search中的id=20190221&amp;partner=search</span></span><br><span class="line"><span class="variable">$args</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了针对当前资源的请求的系统根目录，如/apps/nginx/html。</span></span><br><span class="line"><span class="variable">$document_root</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了当前请求中不包含指令的URI，注意是不包含请求的指令，比如 http://www.magedu.net/main/index.do?id=20190221&amp;partner=search会被定义为/main/index.do</span></span><br><span class="line"><span class="variable">$document_uri</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#存放了请求的host名称。</span></span><br><span class="line"><span class="variable">$host</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端浏览器的详细信息</span></span><br><span class="line"><span class="variable">$http_user_agent</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端的cookie信息。</span></span><br><span class="line"><span class="variable">$http_cookie</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#客户端请求Nginx服务器时随机打开的端口，这是每个客户端自己的端口。</span></span><br><span class="line"><span class="variable">$remote_port</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#已经经过Auth Basic Module验证的用户名。</span></span><br><span class="line"><span class="variable">$remote_user</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#做反向代理时发给后端服务器的本地资源的名称。</span></span><br><span class="line"><span class="variable">$request_body_file</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">#请求资源的方式，GET/PUT/DELETE等</span></span><br><span class="line"><span class="variable">$request_method</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#当前请求的资源文件的路径名称，由root或alias指令与URI请求生成的文件绝对路径， 如/apps/nginx/html/main/index.html</span></span><br><span class="line"><span class="variable">$request_filename</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#包含请求参数的原始URI，不包含主机名，如：/main/index.do?id=20190221&amp;partner=search 。</span></span><br><span class="line"><span class="variable">$request_uri</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的协议，如ftp，https，http等。</span></span><br><span class="line"><span class="variable">$scheme</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了客户端请求资源使用的协议的版本，如HTTP/1.0，HTTP/1.1，HTTP/2.0等。</span></span><br><span class="line"><span class="variable">$server_protocol</span>；</span><br><span class="line"></span><br><span class="line"><span class="comment">#保存了服务器的IP地址。</span></span><br><span class="line"><span class="variable">$server_addr</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的服务器的主机名。</span></span><br><span class="line"><span class="variable">$server_name</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求的服务器的端口号</span></span><br><span class="line"><span class="variable">$server_port</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="自定义变量"><a href="#自定义变量" class="headerlink" title="自定义变量"></a>自定义变量</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">set $name magedu;</span><br><span class="line">echo $name;</span><br><span class="line">set $my_port $server_port;</span><br><span class="line">echo $my_port; </span><br><span class="line">echo &quot;$server_name:$server_port&quot;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="利用内置变量定义日志格式"><a href="#利用内置变量定义日志格式" class="headerlink" title="利用内置变量定义日志格式"></a>利用内置变量定义日志格式</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#json访问日志</span></span><br><span class="line">log_format access_json <span class="string">&#x27;&#123;&quot;@timestamp&quot;:&quot;$time_iso8601&quot;,&#x27;</span> <span class="string">&#x27;&quot;host&quot;:&quot;$server_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;clientip&quot;:&quot;$remote_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;size&quot;:$body_bytes_sent,&#x27;</span> <span class="string">&#x27;&quot;responsetime&quot;:$request_time,&#x27;</span> <span class="string">&#x27;&quot;upstreamtime&quot;:&quot;$upstream_response_time&quot;,&#x27;</span> <span class="string">&#x27;&quot;upstreamhost&quot;:&quot;$upstream_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;http_host&quot;:&quot;$host&quot;,&#x27;</span> <span class="string">&#x27;&quot;uri&quot;:&quot;$uri&quot;,&#x27;</span> <span class="string">&#x27;&quot;domain&quot;:&quot;$host&quot;,&#x27;</span> <span class="string">&#x27;&quot;xff&quot;:&quot;$http_x_forwarded_for&quot;,&#x27;</span> <span class="string">&#x27;&quot;referer&quot;:&quot;$http_referer&quot;,&#x27;</span> <span class="string">&#x27;&quot;tcp_xff&quot;:&quot;$proxy_protocol_addr&quot;,&#x27;</span> <span class="string">&#x27;&quot;http_user_agent&quot;:&quot;$http_user_agent&quot;,&#x27;</span> <span class="string">&#x27;&quot;status&quot;:&quot;$status&quot;&#125;&#x27;</span>; </span><br><span class="line"></span><br><span class="line">access_log /apps/nginx/logs/access_json.log access_json;</span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
+    <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
   </nav>
   
 </section>
