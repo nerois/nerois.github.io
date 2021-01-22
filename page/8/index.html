@@ -108,6 +108,69 @@
     
     
     <article
+  id="post-5 Master节点 APIserver"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2017/05/26/5%20Master%E8%8A%82%E7%82%B9%20APIserver/"
+    >5master节点组件apiserver</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2017/05/26/5%20Master%E8%8A%82%E7%82%B9%20APIserver/" class="article-date">
+  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E9%83%A8%E7%BD%B2/">K8S部署</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="准备"><a href="#准备" class="headerlink" title="**准备"></a>**准备</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#kubectl 链接api</span></span><br><span class="line">mkdir -p ~/.kube/;</span><br><span class="line">   cp /etc/kubernetes/admin.kubeconfig ~/.kube/config</span><br><span class="line"><span class="comment">#kubectl子命令补全</span></span><br><span class="line">   yum install -y bash-completion</span><br><span class="line">   <span class="built_in">source</span> &lt;(kubectl completion bash)</span><br><span class="line">   <span class="built_in">echo</span> <span class="string">&#x27;source &lt;(kubectl completion bash)&#x27;</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="comment">#如果你是zsh 将bash替换为zsh即可</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="UnitFILE"><a href="#UnitFILE" class="headerlink" title="**UnitFILE"></a>**UnitFILE</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/kube-apiserver.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Kubernetes API Server</span><br><span class="line">Documentation=https:/github.com/kubernetes/kubernetes</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/opt/kube/bin/kube-apiserver \</span><br><span class="line">  --authorization-mode=Node,RBAC \</span><br><span class="line">  --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeClaimResize,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority,PodPreset \</span><br><span class="line">  --advertise-address=&#123;&#123; NODE_IP &#125;&#125; \</span><br><span class="line">  --bind-address=&#123;&#123; NODE_IP &#125;&#125;  \</span><br><span class="line">  --insecure-port=0 \</span><br><span class="line">  --secure-port=6443 \</span><br><span class="line">  --allow-privileged=<span class="literal">true</span> \</span><br><span class="line">  --apiserver-count=1 \</span><br><span class="line">  --audit-log-maxage=30 \</span><br><span class="line">  --audit-log-maxbackup=3 \</span><br><span class="line">  --audit-log-maxsize=100 \</span><br><span class="line">  --audit-log-path=/data/kubelog/apiserver/audit.log \</span><br><span class="line">  --enable-swagger-ui=<span class="literal">true</span> \</span><br><span class="line">  --storage-backend=etcd3 \</span><br><span class="line">  --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt \</span><br><span class="line">  --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt \</span><br><span class="line">  --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key \</span><br><span class="line">  --etcd-servers=https://192.168.1.71:2379,https://192.168.1.81:2379,https://192.168.1.82:2379 \</span><br><span class="line">  --event-ttl=1h \</span><br><span class="line">  --enable-bootstrap-token-auth \</span><br><span class="line">  --client-ca-file=/etc/kubernetes/pki/ca.crt \</span><br><span class="line">  --kubelet-https \</span><br><span class="line">  --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt \</span><br><span class="line">  --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key \</span><br><span class="line">  --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \</span><br><span class="line">  --runtime-config=api/all,settings.k8s.io/v1alpha1=<span class="literal">true</span> \</span><br><span class="line">  --service-cluster-ip-range=10.96.0.0/12 \</span><br><span class="line">  --service-node-port-range=30000-32767 \</span><br><span class="line">  --service-account-key-file=/etc/kubernetes/pki/sa.pub \</span><br><span class="line">  --tls-cert-file=/etc/kubernetes/pki/apiserver.crt \</span><br><span class="line">  --tls-private-key-file=/etc/kubernetes/pki/apiserver.key \</span><br><span class="line">  --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt \</span><br><span class="line">  --requestheader-username-headers=X-Remote-User \</span><br><span class="line">  --requestheader-group-headers=X-Remote-Group \</span><br><span class="line">  --requestheader-allowed-names=front-proxy-client \</span><br><span class="line">  --requestheader-extra-headers-prefix=X-Remote-Extra- \</span><br><span class="line">  --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt \</span><br><span class="line">  --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key \</span><br><span class="line">  --feature-gates=PodShareProcessNamespace=<span class="literal">true</span> \</span><br><span class="line">  --v=2</span><br><span class="line"></span><br><span class="line">Restart=on-failure</span><br><span class="line">RestartSec=10s</span><br><span class="line">LimitNOFILE=65535</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<p>##–apiserver-count=1 是apiserver进程在集群中运行的数量 是一个整数 记得根据情况修改</p>
+<h2 id="各节点替换内容"><a href="#各节点替换内容" class="headerlink" title="**各节点替换内容"></a>**各节点替换内容</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##替换当前节点的ip</span></span><br><span class="line">sed -i <span class="string">&#x27;s/&#123;&#123; NODE_IP &#125;&#125;/192.168.1.71/g&#x27;</span> /usr/lib/systemd/system/kube-apiserver.service </span><br><span class="line"></span><br><span class="line"><span class="comment">## </span></span><br></pre></td></tr></table></figure>
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="**启动"></a>**启动</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /etc/kubernetes/manifests /var/lib/kubelet /var/<span class="built_in">log</span>/kubernetes /data/kubelog/apiserver/</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> kube-apiserver &amp;&amp; systemctl start kube-apiserver</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E9%83%A8%E7%BD%B2/" rel="tag">K8S部署</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-5.1 Master节点 controller-manager"
   class="article article-type-post"
   itemscope

@@ -210,6 +210,106 @@
 
     
     <article
+  id="post-K8S元数据传输"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/K8S%E5%85%83%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93/"
+    >K8S元数据传输</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/K8S%E5%85%83%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/">K8S资源清单</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="元数据传输"><a href="#元数据传输" class="headerlink" title="元数据传输"></a>元数据传输</h1><ul>
+<li>通过cm 或者secert可以传输变量 和配置文件甚至是tls证书文件,但一些只有pod创建后才有的元数据是不能传输的所以今天想要说的就是元数据的传输</li>
+</ul>
+<h2 id="可传输的元数据列表"><a href="#可传输的元数据列表" class="headerlink" title="可传输的元数据列表"></a>可传输的元数据列表</h2><ul>
+<li>metadata.name   <ul>
+<li>pod的名称</li>
+</ul>
+</li>
+<li>status.podIP<ul>
+<li>pod的IP</li>
+</ul>
+</li>
+<li>metadata.namespace<ul>
+<li>pod所在的命名空间</li>
+</ul>
+</li>
+<li>spec.nodeName<ul>
+<li>pod运行节点的名称</li>
+</ul>
+</li>
+<li>spec.serviceAccountName<ul>
+<li>pod运行所归属的服务账户的名称</li>
+</ul>
+</li>
+<li>requests.cpu   requests.memory<ul>
+<li>每个容器请求的CPU和内存的使用量</li>
+</ul>
+</li>
+<li>limits.cpu  limits.memory<ul>
+<li>每个容器可以使用的CPU和内存的限制</li>
+</ul>
+</li>
+<li>metadata.labels<ul>
+<li>pod的标签</li>
+</ul>
+</li>
+<li>metadata.annotations<ul>
+<li>pod的注解</li>
+</ul>
+</li>
+</ul>
+<h1 id="境变量形式传递元数据"><a href="#境变量形式传递元数据" class="headerlink" title="境变量形式传递元数据"></a>境变量形式传递元数据</h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-env</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">command:</span> [<span class="string">&quot;sh&quot;</span>, <span class="string">&quot;-c&quot;</span>, <span class="string">&quot;sleep 3600&quot;</span>]</span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="attr">requests:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">30m</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">1Mi</span></span><br><span class="line">      <span class="attr">limits:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">100m</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">5Mi</span></span><br><span class="line">    <span class="attr">env:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">POD_NAME</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.name</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">POD_NAMESPACE</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.namespace</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">POD_IP</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">status.podIP</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">NODE_NAME</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">spec.nodeName</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">SERVICE_ACCOUNT</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">spec.serviceAccountName</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">REQUEST_CPU</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">requests.cpu</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1m</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">REQUEST_MEMORY</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">requests.memory</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1Mi</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">CPUT_LIMIT</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">limits.cpu</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1m</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">MEMORY_LIMIT</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">limits.memory</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1Mi</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">test</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="comment">#取注解中哪个字段的值</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.annotations[&#x27;jarfile&#x27;]</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">test2</span></span><br><span class="line">      <span class="attr">valueFrom:</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="comment">#去标签中中哪个字段的值</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.labels[&#x27;jarfile&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Downward-API传递元数据"><a href="#Downward-API传递元数据" class="headerlink" title="Downward API传递元数据"></a>Downward API传递元数据</h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mydownward</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">prod:</span> <span class="string">dev</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">description:</span> <span class="string">this</span> <span class="string">is</span> <span class="string">description</span> <span class="string">for</span> <span class="string">downward</span></span><br><span class="line">    <span class="attr">date:</span> <span class="number">2020-10-18</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">command:</span> [<span class="string">&quot;sh&quot;</span>, <span class="string">&quot;-c&quot;</span>, <span class="string">&quot;sleep 3600&quot;</span>]</span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="attr">requests:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">30m</span> </span><br><span class="line">        <span class="attr">memory:</span> <span class="string">1Mi</span> </span><br><span class="line">      <span class="attr">limits:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">100m</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">5Mi</span> </span><br><span class="line">    <span class="attr">volumeMounts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">downward</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">/etc/downward</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">downward</span></span><br><span class="line">    <span class="attr">downwardAPI:</span></span><br><span class="line">      <span class="attr">items:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">podName</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.name</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">podNamespace</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.namespace</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">labels</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.labels</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">annotations</span></span><br><span class="line">        <span class="attr">fieldRef:</span></span><br><span class="line">          <span class="attr">fieldPath:</span> <span class="string">metadata.annotations</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">requst-cpu</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">containerName:</span> <span class="string">busybox</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">requests.cpu</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1m</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">limits-memory</span></span><br><span class="line">        <span class="attr">resourceFieldRef:</span></span><br><span class="line">          <span class="attr">containerName:</span> <span class="string">busybox</span></span><br><span class="line">          <span class="attr">resource:</span> <span class="string">limits.memory</span></span><br><span class="line">          <span class="attr">divisor:</span> <span class="string">1Mi</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master01 downward]<span class="comment"># kubectl exec mydownward -it -- /bin/sh</span></span><br><span class="line">/ <span class="comment"># cd /etc/</span></span><br><span class="line">/etc <span class="comment"># ls</span></span><br><span class="line">downward     group        hostname     hosts        localtime    mtab         network      passwd       resolv.conf  shadow</span><br><span class="line">/etc <span class="comment"># cd downward</span></span><br><span class="line">/etc/downward <span class="comment"># ls</span></span><br><span class="line">annotations    labels         limits-memory  podName        podNamespace   requst-cpu</span><br></pre></td></tr></table></figure>
+
+<h1 id="Downward-API比环境变量优势"><a href="#Downward-API比环境变量优势" class="headerlink" title="Downward API比环境变量优势"></a>Downward API比环境变量优势</h1><p>1、环境变量方式不可以暴露完整的labels和annotations两种元数据，而Downward API可以；<br>2、运行的pod修改标签和注解后，Downward API可以更新挂载卷中内容，获取最新修改的元数据，而环境变量的方式，标签和注解修改后，无法把新修改的值暴露到容器内部，所以环境变量方式不能传递标签和注解两种元数据。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8S%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95/" rel="tag">K8S资源清单</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-1-指标类型"
   class="article article-type-post"
   itemscope
@@ -710,62 +810,6 @@
 </ul>
 </li>
 </ul>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-5-node_exporter"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/5-node_exporter/"
-    >5.node_exporter部署</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/5-node_exporter/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="部署"><a href="#部署" class="headerlink" title="部署:"></a>部署:</h2><p>用于输出操作系统 指标 如 cpu负载 内存使用量等</p>
-<p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz</span><br><span class="line">tar xf node_exporter-1.0.1.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/node_exporter-1.0.1.linux-amd64 /usr/<span class="built_in">local</span>/node_exporter</span><br><span class="line"></span><br><span class="line">cat &gt;/usr/lib/systemd/system/node-exporter.service &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=Prometheus Server</span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/node_exporter/node_exporter</span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line">systemctl daemon-reload &amp;&amp; systemctl <span class="built_in">enable</span> node-exporter.service &amp;&amp; systemctl start node-exporter.service </span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证</span></span><br><span class="line">ss -tnlp |grep node_exporter</span><br><span class="line">LISTEN  0 128  [::]:9100   [::]:*   users:((<span class="string">&quot;node_exporter&quot;</span>,pid=4209,fd=3))</span><br><span class="line"><span class="comment">#部署两台服务器 用于下章 动态发现 以及后面的实验</span></span><br></pre></td></tr></table></figure>
-
  
       <!-- reward -->
       
