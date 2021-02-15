@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    1.指标类型 |  Nero 的个人博客
+    4镜像克隆机制 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-1-指标类型"
+  id="post-4 镜像克隆机制"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  1.指标类型
+  4镜像克隆机制
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/4%20%E9%95%9C%E5%83%8F%E5%85%8B%E9%9A%86%E6%9C%BA%E5%88%B6/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
   </div>
  
     </div>
@@ -84,18 +84,37 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
-
+  <h1 id="克隆-copy-on-write"><a href="#克隆-copy-on-write" class="headerlink" title="**克隆 copy-on-write"></a>**克隆 copy-on-write</h1><ul>
+<li>你会发现在公有云上创建一个虚拟机是非常块的<br>其实底层使用了克隆机制 实际上就是做好了一些公共基础镜像<br>然后按照需要克隆不同的镜像而已<br>克隆有两种机制<br>1 完整克隆<pre><code>占用空间大
+克隆时间长</code></pre>
+2 链接克隆 (默认)<pre><code>很像docker联合挂载机制
+克隆时间短</code></pre>
 </li>
 </ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
+<h1 id="克隆操作"><a href="#克隆操作" class="headerlink" title="**克隆操作"></a>**克隆操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#以当前镜像为例</span></span><br><span class="line">~]<span class="comment"># rbd -p mypool ls</span></span><br><span class="line">demo.img</span><br><span class="line">rbd-demo.img <span class="comment">#以这个镜像为例 假设上面已经装好了操作系统 打算以后创建虚拟机以这个镜像为标准</span></span><br><span class="line">test.img </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加快照</span></span><br><span class="line">~]<span class="comment"># rbd snap create mypool/rbd-demo.img@templat</span></span><br><span class="line"><span class="comment">#添加保护protect 使得快照删不掉</span></span><br><span class="line">~]<span class="comment"># rbd snap protect mypool/rbd-demo.img@template</span></span><br><span class="line"><span class="comment">#取消保护可以使用rbd snap unprotect 前提是没人链接这个快照 否则会报错</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证protect</span></span><br><span class="line">~]<span class="comment"># rbd snap rm mypool/rbd-demo.img@template</span></span><br><span class="line">2020-10-17 21:21:45.042 7f333e09dc80 -1 librbd::Operations: snapshot is protected</span><br><span class="line">Removing snap: 0% complete...failed.</span><br><span class="line">rbd: snapshot <span class="string">&#x27;template&#x27;</span> is protected from removal. <span class="comment">#因为有了protected 无法删除快照</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#克隆 </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm1-clone.img </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm2-clone.img </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm3-clone.img </span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#克隆可以克隆到其他pool</span></span><br><span class="line"><span class="comment">#查询镜像info</span></span><br><span class="line">~]<span class="comment"># rbd info  mypool/vm2-clone.img </span></span><br><span class="line">rbd image <span class="string">&#x27;vm2-clone.img&#x27;</span>:</span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 2d1263913f4a</span><br><span class="line">        block_name_prefix: rbd_data.2d1263913f4a</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        access_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        modify_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        parent: mypool/rbd-demo.img@template <span class="comment">#这里看到他是依赖快照的</span></span><br><span class="line">        overlap: 2 GiB</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># rbd -p mypool ls</span></span><br><span class="line">demo.img</span><br><span class="line">rbd-demo.img</span><br><span class="line">test.img</span><br><span class="line">vm1-clone.img</span><br><span class="line">vm2-clone.img</span><br><span class="line">vm3-clone.img</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="**依赖"></a>**依赖</h1><ul>
+<li>之前我们创建的克隆是链接克隆<br>这也意味着克隆出来的镜像是依赖于原镜像的<br>在企业中如果有担心源镜像会损坏导致成千的虚拟机损坏,可以解除依赖关系 继而转变成 完整克隆</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查询依赖</span></span><br><span class="line">~]<span class="comment"># rbd children mypool/rbd-demo.img@template</span></span><br><span class="line">mypool/vm1-clone.img</span><br><span class="line">mypool/vm2-clone.img</span><br><span class="line">mypool/vm3-clone.img</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#解除依赖</span></span><br><span class="line">~]<span class="comment"># rbd flatten mypool/vm3-clone.img</span></span><br><span class="line">Image flatten: 100% complete...done.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># rbd info mypool/vm3-clone.img </span></span><br><span class="line">rbd image <span class="string">&#x27;vm3-clone.img&#x27;</span>:</span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 2d21ffc2f50d</span><br><span class="line">        block_name_prefix: rbd_data.2d21ffc2f50d</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">        access_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">        modify_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">		<span class="comment">#可以看到依赖消失了</span></span><br></pre></td></tr></table></figure>
+
+
  
       <!-- reward -->
       
@@ -106,7 +125,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>
@@ -114,19 +133,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2019/05/13/4%20%E9%95%9C%E5%83%8F%E5%85%8B%E9%9A%86%E6%9C%BA%E5%88%B6/" class="article-nav-link">
+      <a href="/2019/05/13/3%20%E5%9D%97%E8%AE%BE%E5%A4%87%E6%89%A9%E5%AE%B9/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            4镜像克隆机制
+            3快设备扩容
           
         </div>
       </a>
     
     
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">10.alertmanager部署</div>
+        <div class="article-nav-title">1.指标类型</div>
       </a>
     
   </nav>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="摇旗呐喊的热情,携光阴渐远去,人世间悲喜烂剧,昼夜轮播不停,纷飞的滥情男女,情仇爱恨别离,一代人终将老去，但总有人正年轻" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    1 PG,PGP以及存储池 |  Nero 的个人博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-1 PG PGP 概念和存储池的创建修改"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  1 PG,PGP以及存储池
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/1%20PG%20PGP%20%E6%A6%82%E5%BF%B5%E5%92%8C%E5%AD%98%E5%82%A8%E6%B1%A0%E7%9A%84%E5%88%9B%E5%BB%BA%E4%BF%AE%E6%94%B9/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
+  </div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="存储过程"><a href="#存储过程" class="headerlink" title="**存储过程"></a>**存储过程</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#PG</span></span><br><span class="line">当一个文件想要存储在ceph中的时候流程如下</span><br><span class="line">1 把文件分成多个对象（object） 默认每个对象4M 当不足4M的时候也占用4M</span><br><span class="line">2 Ceph通过Crush算法，将若干个object映射到PG上，形成一个object与PG的逻辑集合</span><br><span class="line">	并以此作为object与OSD的中间层，将PG根据所在POOL的副本数，复制到多个OSD上。</span><br><span class="line"><span class="comment">#PGP</span></span><br><span class="line">pgp就是pg对应的osd排列组合数量。一般情况下，存储池的pg和pgp的数量设置相等，这样会让数据尽量散列</span><br></pre></td></tr></table></figure>
+
+<h1 id="存储池"><a href="#存储池" class="headerlink" title="**存储池"></a>**存储池</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建存储池</span></span><br><span class="line">~]<span class="comment"># ceph osd pool create  mypool 64 64</span></span><br><span class="line">pool <span class="string">&#x27;mypool&#x27;</span> created</span><br><span class="line"><span class="comment">#存储池初始化 </span></span><br><span class="line">ceph osd pool application <span class="built_in">enable</span>  mypool rbd  <span class="comment">#激活rbd接口</span></span><br><span class="line">rbd pool init -p mypool <span class="comment">#初始化</span></span><br><span class="line">ceph osd pool application get mypool <span class="comment">#验证查看</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#列出存储池</span></span><br><span class="line">~]<span class="comment"># ceph osd lspools</span></span><br><span class="line">1 mypool</span><br><span class="line"><span class="comment">#查看相关方参数</span></span><br><span class="line"><span class="comment">#pg数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool pg_num</span></span><br><span class="line">pg_num: 64</span><br><span class="line"><span class="comment">#pgp数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool pgp_num</span></span><br><span class="line">pgp_num: 64</span><br><span class="line"><span class="comment">#副本数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool size</span></span><br><span class="line">size: 3</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#其他参数</span></span><br><span class="line">osd pool get &lt;poolname&gt; size|min_size|pg_num|pgp_num|crush_rule|     get pool parameter &lt;var&gt;</span><br><span class="line"> hashpspool|nodelete|nopgchange|nosizechange|write_fadvise_dontneed| </span><br><span class="line"> noscrub|nodeep-scrub|hit_set_type|hit_set_period|hit_set_count|hit_ </span><br><span class="line"> set_fpp|use_gmt_hitset|target_max_objects|target_max_bytes|cache_   </span><br><span class="line"> target_dirty_ratio|cache_target_dirty_high_ratio|cache_target_full_ </span><br><span class="line"> ratio|cache_min_flush_age|cache_min_evict_age|erasure_code_profile| </span><br><span class="line"> min_read_recency_for_promote|all|min_write_recency_for_promote|     </span><br><span class="line"> fast_read|hit_set_grade_decay_rate|hit_set_search_last_n|scrub_min_ </span><br><span class="line"> interval|scrub_max_interval|deep_scrub_interval|recovery_priority|  </span><br><span class="line"> recovery_op_priority|scrub_priority|compression_mode|compression_   </span><br><span class="line"> algorithm|compression_required_ratio|compression_max_blob_size|     </span><br><span class="line"> compression_min_blob_size|csum_type|csum_min_block|csum_max_block|  </span><br><span class="line"> allow_ec_overwrites|fingerprint_algorithm|pg_autoscale_mode|pg_     </span><br><span class="line"> autoscale_bias|pg_num_min|target_size_bytes|target_size_ratio       </span><br><span class="line">osd pool get-quota &lt;poolname&gt;   </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改参数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#修改副本数</span></span><br><span class="line">~]<span class="comment"># ceph osd pool set mypool size 2</span></span><br><span class="line"><span class="built_in">set</span> pool 1 size to 2</span><br></pre></td></tr></table></figure>
+
+<h1 id="对象的查看"><a href="#对象的查看" class="headerlink" title="**对象的查看"></a>**对象的查看</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">rbd info mypool/demo.img</span><br><span class="line">rbd image <span class="string">&#x27;demo.img&#x27;</span>:</span><br><span class="line">        size 4 GiB <span class="keyword">in</span> 1024 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 120fe8ef575d</span><br><span class="line">		<span class="comment">#此文件存储对象前缀rbd_data.120fe8ef575d</span></span><br><span class="line">        block_name_prefix: rbd_data.120fe8ef575d</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering, exclusive-lock</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        access_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        modify_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line"><span class="comment">#查看对象</span></span><br><span class="line">~]<span class="comment"># rados -p mypool ls |grep  rbd_data.120fe8ef575d</span></span><br><span class="line">rbd_data.120fe8ef575d.00000000000001e0</span><br><span class="line">rbd_data.120fe8ef575d.00000000000002ff</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000240</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000182</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000360</span><br><span class="line">rbd_data.120fe8ef575d.00000000000003c0</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000300</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000181</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000001</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000180</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000120</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000060</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000000</span><br><span class="line">rbd_data.120fe8ef575d.00000000000002a0</span><br><span class="line">rbd_data.120fe8ef575d.00000000000000c0</span><br><span class="line"><span class="comment">#查看对象大小</span></span><br><span class="line">~]<span class="comment"># rados -p mypool stat rbd_data.120fe8ef575d.0000000000000300</span></span><br><span class="line">mypool/rbd_data.120fe8ef575d.0000000000000300 mtime 2020-10-14 20:00:39.000000, size 16384</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看对象在哪个PG上</span></span><br><span class="line"><span class="comment">#通过此命令可以清晰的看到哪个对象在哪个pg上又到了哪个osd上</span></span><br><span class="line">~]<span class="comment"># ceph osd map mypool  rbd_data.120fe8ef575d.0000000000000300</span></span><br><span class="line">osdmap e41 pool <span class="string">&#x27;mypool&#x27;</span> (1) object <span class="string">&#x27;rbd_data.120fe8ef575d.0000000000000300&#x27;</span> -&gt; pg 1.46cb151 (1.11) -&gt; up ([0,6], p0) acting ([0,6], p0)</span><br><span class="line">~]<span class="comment"># ceph osd tree</span></span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.23438 root default                          </span><br><span class="line">-3       0.05859     host ce1                          </span><br><span class="line"> 0   hdd 0.02930         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 4   hdd 0.02930         osd.4     up  1.00000 1.00000 </span><br><span class="line">-5       0.05859     host ce2                          </span><br><span class="line"> 1   hdd 0.02930         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 5   hdd 0.02930         osd.5     up  1.00000 1.00000 </span><br><span class="line">-7       0.05859     host ce3                          </span><br><span class="line"> 2   hdd 0.02930         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 6   hdd 0.02930         osd.6     up  1.00000 1.00000 </span><br><span class="line">-9       0.05859     host ce4                          </span><br><span class="line"> 3   hdd 0.02930         osd.3     up  1.00000 1.00000 </span><br><span class="line"> 7   hdd 0.02930         osd.7     up  1.00000 1.00000 </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/05/13/5%20mon%20%E8%8A%82%E7%82%B9%E6%89%A9%E5%B1%95/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            mon节点扩展
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/05/13/2%20%E5%9D%97%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">2块设备使用</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> Nero
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.png" alt="Nero 的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+</body>
+
+</html>

@@ -221,6 +221,283 @@
 
     
     <article
+  id="post-1 PG PGP 概念和存储池的创建修改"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/1%20PG%20PGP%20%E6%A6%82%E5%BF%B5%E5%92%8C%E5%AD%98%E5%82%A8%E6%B1%A0%E7%9A%84%E5%88%9B%E5%BB%BA%E4%BF%AE%E6%94%B9/"
+    >1 PG,PGP以及存储池</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/1%20PG%20PGP%20%E6%A6%82%E5%BF%B5%E5%92%8C%E5%AD%98%E5%82%A8%E6%B1%A0%E7%9A%84%E5%88%9B%E5%BB%BA%E4%BF%AE%E6%94%B9/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="存储过程"><a href="#存储过程" class="headerlink" title="**存储过程"></a>**存储过程</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#PG</span></span><br><span class="line">当一个文件想要存储在ceph中的时候流程如下</span><br><span class="line">1 把文件分成多个对象（object） 默认每个对象4M 当不足4M的时候也占用4M</span><br><span class="line">2 Ceph通过Crush算法，将若干个object映射到PG上，形成一个object与PG的逻辑集合</span><br><span class="line">	并以此作为object与OSD的中间层，将PG根据所在POOL的副本数，复制到多个OSD上。</span><br><span class="line"><span class="comment">#PGP</span></span><br><span class="line">pgp就是pg对应的osd排列组合数量。一般情况下，存储池的pg和pgp的数量设置相等，这样会让数据尽量散列</span><br></pre></td></tr></table></figure>
+
+<h1 id="存储池"><a href="#存储池" class="headerlink" title="**存储池"></a>**存储池</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建存储池</span></span><br><span class="line">~]<span class="comment"># ceph osd pool create  mypool 64 64</span></span><br><span class="line">pool <span class="string">&#x27;mypool&#x27;</span> created</span><br><span class="line"><span class="comment">#存储池初始化 </span></span><br><span class="line">ceph osd pool application <span class="built_in">enable</span>  mypool rbd  <span class="comment">#激活rbd接口</span></span><br><span class="line">rbd pool init -p mypool <span class="comment">#初始化</span></span><br><span class="line">ceph osd pool application get mypool <span class="comment">#验证查看</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#列出存储池</span></span><br><span class="line">~]<span class="comment"># ceph osd lspools</span></span><br><span class="line">1 mypool</span><br><span class="line"><span class="comment">#查看相关方参数</span></span><br><span class="line"><span class="comment">#pg数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool pg_num</span></span><br><span class="line">pg_num: 64</span><br><span class="line"><span class="comment">#pgp数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool pgp_num</span></span><br><span class="line">pgp_num: 64</span><br><span class="line"><span class="comment">#副本数量</span></span><br><span class="line">~]<span class="comment"># ceph osd pool get mypool size</span></span><br><span class="line">size: 3</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#其他参数</span></span><br><span class="line">osd pool get &lt;poolname&gt; size|min_size|pg_num|pgp_num|crush_rule|     get pool parameter &lt;var&gt;</span><br><span class="line"> hashpspool|nodelete|nopgchange|nosizechange|write_fadvise_dontneed| </span><br><span class="line"> noscrub|nodeep-scrub|hit_set_type|hit_set_period|hit_set_count|hit_ </span><br><span class="line"> set_fpp|use_gmt_hitset|target_max_objects|target_max_bytes|cache_   </span><br><span class="line"> target_dirty_ratio|cache_target_dirty_high_ratio|cache_target_full_ </span><br><span class="line"> ratio|cache_min_flush_age|cache_min_evict_age|erasure_code_profile| </span><br><span class="line"> min_read_recency_for_promote|all|min_write_recency_for_promote|     </span><br><span class="line"> fast_read|hit_set_grade_decay_rate|hit_set_search_last_n|scrub_min_ </span><br><span class="line"> interval|scrub_max_interval|deep_scrub_interval|recovery_priority|  </span><br><span class="line"> recovery_op_priority|scrub_priority|compression_mode|compression_   </span><br><span class="line"> algorithm|compression_required_ratio|compression_max_blob_size|     </span><br><span class="line"> compression_min_blob_size|csum_type|csum_min_block|csum_max_block|  </span><br><span class="line"> allow_ec_overwrites|fingerprint_algorithm|pg_autoscale_mode|pg_     </span><br><span class="line"> autoscale_bias|pg_num_min|target_size_bytes|target_size_ratio       </span><br><span class="line">osd pool get-quota &lt;poolname&gt;   </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改参数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#修改副本数</span></span><br><span class="line">~]<span class="comment"># ceph osd pool set mypool size 2</span></span><br><span class="line"><span class="built_in">set</span> pool 1 size to 2</span><br></pre></td></tr></table></figure>
+
+<h1 id="对象的查看"><a href="#对象的查看" class="headerlink" title="**对象的查看"></a>**对象的查看</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">rbd info mypool/demo.img</span><br><span class="line">rbd image <span class="string">&#x27;demo.img&#x27;</span>:</span><br><span class="line">        size 4 GiB <span class="keyword">in</span> 1024 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 120fe8ef575d</span><br><span class="line">		<span class="comment">#此文件存储对象前缀rbd_data.120fe8ef575d</span></span><br><span class="line">        block_name_prefix: rbd_data.120fe8ef575d</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering, exclusive-lock</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        access_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        modify_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line"><span class="comment">#查看对象</span></span><br><span class="line">~]<span class="comment"># rados -p mypool ls |grep  rbd_data.120fe8ef575d</span></span><br><span class="line">rbd_data.120fe8ef575d.00000000000001e0</span><br><span class="line">rbd_data.120fe8ef575d.00000000000002ff</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000240</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000182</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000360</span><br><span class="line">rbd_data.120fe8ef575d.00000000000003c0</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000300</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000181</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000001</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000180</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000120</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000060</span><br><span class="line">rbd_data.120fe8ef575d.0000000000000000</span><br><span class="line">rbd_data.120fe8ef575d.00000000000002a0</span><br><span class="line">rbd_data.120fe8ef575d.00000000000000c0</span><br><span class="line"><span class="comment">#查看对象大小</span></span><br><span class="line">~]<span class="comment"># rados -p mypool stat rbd_data.120fe8ef575d.0000000000000300</span></span><br><span class="line">mypool/rbd_data.120fe8ef575d.0000000000000300 mtime 2020-10-14 20:00:39.000000, size 16384</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看对象在哪个PG上</span></span><br><span class="line"><span class="comment">#通过此命令可以清晰的看到哪个对象在哪个pg上又到了哪个osd上</span></span><br><span class="line">~]<span class="comment"># ceph osd map mypool  rbd_data.120fe8ef575d.0000000000000300</span></span><br><span class="line">osdmap e41 pool <span class="string">&#x27;mypool&#x27;</span> (1) object <span class="string">&#x27;rbd_data.120fe8ef575d.0000000000000300&#x27;</span> -&gt; pg 1.46cb151 (1.11) -&gt; up ([0,6], p0) acting ([0,6], p0)</span><br><span class="line">~]<span class="comment"># ceph osd tree</span></span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.23438 root default                          </span><br><span class="line">-3       0.05859     host ce1                          </span><br><span class="line"> 0   hdd 0.02930         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 4   hdd 0.02930         osd.4     up  1.00000 1.00000 </span><br><span class="line">-5       0.05859     host ce2                          </span><br><span class="line"> 1   hdd 0.02930         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 5   hdd 0.02930         osd.5     up  1.00000 1.00000 </span><br><span class="line">-7       0.05859     host ce3                          </span><br><span class="line"> 2   hdd 0.02930         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 6   hdd 0.02930         osd.6     up  1.00000 1.00000 </span><br><span class="line">-9       0.05859     host ce4                          </span><br><span class="line"> 3   hdd 0.02930         osd.3     up  1.00000 1.00000 </span><br><span class="line"> 7   hdd 0.02930         osd.7     up  1.00000 1.00000 </span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-2 块设备的使用"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/2%20%E5%9D%97%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BD%BF%E7%94%A8/"
+    >2块设备使用</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/2%20%E5%9D%97%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="块设备接口"><a href="#块设备接口" class="headerlink" title="**块设备接口"></a>**块设备接口</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#创建</span></span><br><span class="line"><span class="comment">#语法1</span></span><br><span class="line">rbd create -p mypool -image demo.img --size 2G</span><br><span class="line"><span class="comment">#语法2</span></span><br><span class="line">rbd create mypool/demo.img --size 2G</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看存储池文件</span></span><br><span class="line">rbd -p mypool ls</span><br><span class="line">demo.img</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看文件概况</span></span><br><span class="line">rbd info mypool/demo.img</span><br><span class="line">rbd image <span class="string">&#x27;demo.img&#x27;</span>:</span><br><span class="line">		<span class="comment">#大小2G  512个对象</span></span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects </span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">		<span class="comment">#块设备id</span></span><br><span class="line">        id: 11c1433b4ae2</span><br><span class="line">        block_name_prefix: rbd_data.11c1433b4ae2</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering, exclusive-lock, object-map, fast-diff, deep-flatten</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Wed Oct 14 17:53:01 2020</span><br><span class="line">        access_timestamp: Wed  Oct 14 17:53:01 2020</span><br><span class="line">        modify_timestamp: Wed Oct 14 17:53:01 2020</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#删除文件</span></span><br><span class="line">rbd rm mypool/demo.img</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#挂载为块设备</span></span><br><span class="line"></span><br><span class="line">这个报错是因为centos7不支持一些特性</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># rbd map mypool/demo.img</span></span><br><span class="line">rbd: sysfs write failed</span><br><span class="line">RBD image feature <span class="built_in">set</span> mismatch. You can <span class="built_in">disable</span> features unsupported by the kernel with <span class="string">&quot;rbd feature disable mypool/demo.img object-map fast-diff deep-flatten&quot;</span>.</span><br><span class="line">In some cases useful info is found <span class="keyword">in</span> syslog - try <span class="string">&quot;dmesg | tail&quot;</span>.</span><br><span class="line">rbd: map failed: (6) No such device or address</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#根据上面提示解决报错 去掉不需要的特性</span></span><br><span class="line">rbd feature <span class="built_in">disable</span> mypool/demo.img object-map fast-diff deep-flatten</span><br><span class="line"><span class="comment">#也可以在配置文件中全局配置中添加以下配置 并推送 重启所有的mon节点 创建的镜像 就只有 layering 特性了</span></span><br><span class="line">rbd_default_features = 1</span><br><span class="line"></span><br><span class="line">~]<span class="comment"># ceph-deploy --overwrite-conf config  push ce1 ce2 ce3 ce4 </span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#确认特性</span></span><br><span class="line">~]<span class="comment"># rbd info mypool/demo.img</span></span><br><span class="line">rbd image <span class="string">&#x27;demo.img&#x27;</span>:</span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 120fe8ef575d</span><br><span class="line">        block_name_prefix: rbd_data.120fe8ef575d</span><br><span class="line">        format: 2</span><br><span class="line">		<span class="comment">#这里还有两个特性  通常只留 layering</span></span><br><span class="line">        features: layering, exclusive-lock</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        access_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        modify_timestamp: Wed Oct 14 19:07:26 2020</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#重新挂载后验证</span></span><br><span class="line">lsblk</span><br><span class="line">NAME                                                                                                  MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda                                                                                                   252:0    0  25G  0 disk </span><br><span class="line">├─vda1                                                                                                252:1    0   1G  0 part /boot</span><br><span class="line">└─vda2                                                                                                252:2    0  24G  0 part </span><br><span class="line">  ├─centos-root                                                                                       253:0    0  22G  0 lvm  /</span><br><span class="line">  └─centos-swap                                                                                       253:1    0   2G  0 lvm  [SWAP]</span><br><span class="line">vdb                                                                                                   252:16   0  30G  0 disk </span><br><span class="line">└─ceph--5b03f448--00c5--4197--b0d9--323e0772c306-osd--block--1b3720e3--1deb--42a7--b4fc--2839a1d51900 253:2    0  30G  0 lvm  </span><br><span class="line">vdc                                                                                                   252:32   0  30G  0 disk </span><br><span class="line">└─ceph--465a7a30--061d--4b34--9987--72b3a0165335-osd--block--289f7252--d1b0--417a--936d--32fc9283d7ac 253:3    0  30G  0 lvm  </span><br><span class="line">rbd0                                                                                                  251:0    0   2G  0 disk   <span class="comment">#这就是添加的设备 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#至此 此镜像就可以直接挂载当作正常的磁盘 分区使用了</span></span><br></pre></td></tr></table></figure>
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-3 块设备扩容"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/3%20%E5%9D%97%E8%AE%BE%E5%A4%87%E6%89%A9%E5%AE%B9/"
+    >3快设备扩容</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/3%20%E5%9D%97%E8%AE%BE%E5%A4%87%E6%89%A9%E5%AE%B9/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="块设备扩容"><a href="#块设备扩容" class="headerlink" title="**块设备扩容"></a>**块设备扩容</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#扩容到4G</span></span><br><span class="line">~]<span class="comment"># rbd resize mypool/demo.img --size 4G</span></span><br><span class="line">Resizing image: 100% complete...done.</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># rbd info mypool/demo.img</span></span><br><span class="line">rbd image <span class="string">&#x27;demo.img&#x27;</span>:</span><br><span class="line">        size 4 GiB <span class="keyword">in</span> 1024 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 120fe8ef575d</span><br><span class="line">        block_name_prefix: rbd_data.120fe8ef575d</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering, exclusive-lock</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line">        access_timestamp: Wed Oct 14 19:07:26 2020</span><br><span class="line"><span class="comment">#此时如果你已经使用挂载了的块设备显示空间还是之前的容量</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="文件系统扩容"><a href="#文件系统扩容" class="headerlink" title="**文件系统扩容"></a>**文件系统扩容</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#当格式化文件系统 并且已经挂载使用了的块设备 扩容后 并不能直接显示</span></span><br><span class="line">~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">devtmpfs                 736M     0  736M   0% /dev</span><br><span class="line">tmpfs                    748M     0  748M   0% /dev/shm</span><br><span class="line">tmpfs                    748M  8.6M  739M   2% /run</span><br><span class="line">tmpfs                    748M     0  748M   0% /sys/fs/cgroup</span><br><span class="line">/dev/mapper/centos-root   22G  1.9G   21G   9% /</span><br><span class="line">/dev/vda1               1014M  180M  835M  18% /boot</span><br><span class="line">tmpfs                    748M   52K  748M   1% /var/lib/ceph/osd/ceph-0</span><br><span class="line">tmpfs                    748M   52K  748M   1% /var/lib/ceph/osd/ceph-4</span><br><span class="line">tmpfs                    150M     0  150M   0% /run/user/0</span><br><span class="line">/dev/rbd0                2.0G   22M  2.0G   2% /data</span><br><span class="line"><span class="comment">#但是挂载点的设备已经识别到了容量</span></span><br><span class="line">lsblk                                                                                                                            1 ↵</span><br><span class="line">NAME                                                                                                  MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda                                                                                                   252:0    0  25G  0 disk </span><br><span class="line">├─vda1                                                                                                252:1    0   1G  0 part /boot</span><br><span class="line">└─vda2                                                                                                252:2    0  24G  0 part </span><br><span class="line">  ├─centos-root                                                                                       253:0    0  22G  0 lvm  /</span><br><span class="line">  └─centos-swap                                                                                       253:1    0   2G  0 lvm  [SWAP]</span><br><span class="line">vdb                                                                                                   252:16   0  30G  0 disk </span><br><span class="line">└─ceph--5b03f448--00c5--4197--b0d9--323e0772c306-osd--block--1b3720e3--1deb--42a7--b4fc--2839a1d51900 253:2    0  30G  0 lvm  </span><br><span class="line">vdc                                                                                                   252:32   0  30G  0 disk </span><br><span class="line">└─ceph--465a7a30--061d--4b34--9987--72b3a0165335-osd--block--289f7252--d1b0--417a--936d--32fc9283d7ac 253:3    0  30G  0 lvm  </span><br><span class="line">rbd0                                                                                                  251:0    0   4G  0 disk /data</span><br><span class="line"></span><br><span class="line"><span class="comment">#所以需要给文件系统进行扩容</span></span><br><span class="line"><span class="comment">#ext4 </span></span><br><span class="line">resize2fs /dev/rbd0 </span><br><span class="line"><span class="comment">#xfs</span></span><br><span class="line">xfs_growfs /data <span class="comment">#/data是挂载点</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">devtmpfs                 736M     0  736M   0% /dev</span><br><span class="line">tmpfs                    748M     0  748M   0% /dev/shm</span><br><span class="line">tmpfs                    748M  8.6M  739M   2% /run</span><br><span class="line">tmpfs                    748M     0  748M   0% /sys/fs/cgroup</span><br><span class="line">/dev/mapper/centos-root   22G  1.9G   21G   9% /</span><br><span class="line">/dev/vda1               1014M  180M  835M  18% /boot</span><br><span class="line">tmpfs                    748M   52K  748M   1% /var/lib/ceph/osd/ceph-0</span><br><span class="line">tmpfs                    748M   52K  748M   1% /var/lib/ceph/osd/ceph-4</span><br><span class="line">tmpfs                    150M     0  150M   0% /run/user/0</span><br><span class="line">/dev/rbd0                4.0G   33M  4.0G   1% /data</span><br></pre></td></tr></table></figure>
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-4 镜像克隆机制"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2019/05/13/4%20%E9%95%9C%E5%83%8F%E5%85%8B%E9%9A%86%E6%9C%BA%E5%88%B6/"
+    >4镜像克隆机制</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/4%20%E9%95%9C%E5%83%8F%E5%85%8B%E9%9A%86%E6%9C%BA%E5%88%B6/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/2%E5%9D%97%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3/">2块存储接口</a>
+  </div>
+ 
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="克隆-copy-on-write"><a href="#克隆-copy-on-write" class="headerlink" title="**克隆 copy-on-write"></a>**克隆 copy-on-write</h1><ul>
+<li>你会发现在公有云上创建一个虚拟机是非常块的<br>其实底层使用了克隆机制 实际上就是做好了一些公共基础镜像<br>然后按照需要克隆不同的镜像而已<br>克隆有两种机制<br>1 完整克隆<pre><code>占用空间大
+克隆时间长</code></pre>
+2 链接克隆 (默认)<pre><code>很像docker联合挂载机制
+克隆时间短</code></pre>
+</li>
+</ul>
+<h1 id="克隆操作"><a href="#克隆操作" class="headerlink" title="**克隆操作"></a>**克隆操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#以当前镜像为例</span></span><br><span class="line">~]<span class="comment"># rbd -p mypool ls</span></span><br><span class="line">demo.img</span><br><span class="line">rbd-demo.img <span class="comment">#以这个镜像为例 假设上面已经装好了操作系统 打算以后创建虚拟机以这个镜像为标准</span></span><br><span class="line">test.img </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加快照</span></span><br><span class="line">~]<span class="comment"># rbd snap create mypool/rbd-demo.img@templat</span></span><br><span class="line"><span class="comment">#添加保护protect 使得快照删不掉</span></span><br><span class="line">~]<span class="comment"># rbd snap protect mypool/rbd-demo.img@template</span></span><br><span class="line"><span class="comment">#取消保护可以使用rbd snap unprotect 前提是没人链接这个快照 否则会报错</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证protect</span></span><br><span class="line">~]<span class="comment"># rbd snap rm mypool/rbd-demo.img@template</span></span><br><span class="line">2020-10-17 21:21:45.042 7f333e09dc80 -1 librbd::Operations: snapshot is protected</span><br><span class="line">Removing snap: 0% complete...failed.</span><br><span class="line">rbd: snapshot <span class="string">&#x27;template&#x27;</span> is protected from removal. <span class="comment">#因为有了protected 无法删除快照</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#克隆 </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm1-clone.img </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm2-clone.img </span></span><br><span class="line">~]<span class="comment"># rbd clone mypool/rbd-demo.img@template mypool/vm3-clone.img </span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#克隆可以克隆到其他pool</span></span><br><span class="line"><span class="comment">#查询镜像info</span></span><br><span class="line">~]<span class="comment"># rbd info  mypool/vm2-clone.img </span></span><br><span class="line">rbd image <span class="string">&#x27;vm2-clone.img&#x27;</span>:</span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 2d1263913f4a</span><br><span class="line">        block_name_prefix: rbd_data.2d1263913f4a</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        access_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        modify_timestamp: Sat Oct 17 21:25:00 2020</span><br><span class="line">        parent: mypool/rbd-demo.img@template <span class="comment">#这里看到他是依赖快照的</span></span><br><span class="line">        overlap: 2 GiB</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># rbd -p mypool ls</span></span><br><span class="line">demo.img</span><br><span class="line">rbd-demo.img</span><br><span class="line">test.img</span><br><span class="line">vm1-clone.img</span><br><span class="line">vm2-clone.img</span><br><span class="line">vm3-clone.img</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="**依赖"></a>**依赖</h1><ul>
+<li>之前我们创建的克隆是链接克隆<br>这也意味着克隆出来的镜像是依赖于原镜像的<br>在企业中如果有担心源镜像会损坏导致成千的虚拟机损坏,可以解除依赖关系 继而转变成 完整克隆</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查询依赖</span></span><br><span class="line">~]<span class="comment"># rbd children mypool/rbd-demo.img@template</span></span><br><span class="line">mypool/vm1-clone.img</span><br><span class="line">mypool/vm2-clone.img</span><br><span class="line">mypool/vm3-clone.img</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#解除依赖</span></span><br><span class="line">~]<span class="comment"># rbd flatten mypool/vm3-clone.img</span></span><br><span class="line">Image flatten: 100% complete...done.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># rbd info mypool/vm3-clone.img </span></span><br><span class="line">rbd image <span class="string">&#x27;vm3-clone.img&#x27;</span>:</span><br><span class="line">        size 2 GiB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4 MiB objects)</span><br><span class="line">        snapshot_count: 0</span><br><span class="line">        id: 2d21ffc2f50d</span><br><span class="line">        block_name_prefix: rbd_data.2d21ffc2f50d</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering</span><br><span class="line">        op_features: </span><br><span class="line">        flags: </span><br><span class="line">        create_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">        access_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">        modify_timestamp: Sat Oct 17 21:25:03 2020</span><br><span class="line">		<span class="comment">#可以看到依赖消失了</span></span><br></pre></td></tr></table></figure>
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
   id="post-1-指标类型"
   class="article article-type-post"
   itemscope
@@ -460,295 +737,13 @@
 </article>
 
     
-    <article
-  id="post-3-二进制部署prometheus"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/"
-    >3.二进制部署Prometheus 服务端</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/3-%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2prometheus/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="相关包下载地址"><a href="#相关包下载地址" class="headerlink" title="相关包下载地址"></a>相关包下载地址</h2><p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">https://prometheus.io/download/</a></p>
-<h2 id="部署Prometheus-服务端"><a href="#部署Prometheus-服务端" class="headerlink" title="部署Prometheus 服务端"></a>部署Prometheus 服务端</h2><ol>
-<li><p>下载和部署</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/prometheus/releases/download/v2.22.0/prometheus-2.22.0.linux-amd64.tar.gz</span><br><span class="line">tar xf prometheus-2.22.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/prometheus-2.22.0.linux-amd64 /usr/<span class="built_in">local</span>/prometheus</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>准备UnitFile</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cat &gt;/usr/lib/systemd/system/prometheus.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Prometheus Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/prometheus/prometheus --config.file=/usr/<span class="built_in">local</span>/prometheus/prometheus.yml --storage.tsdb.retention=3d</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment">#这里只指定了一个配置文件选项,可以添加其它选项  使用 ./prometheus --help 查看其它选项</span></span><br><span class="line"><span class="comment">#常用选项</span></span><br><span class="line"><span class="comment"># --storage.tsdb.path=&quot;data/&quot; 指定数据目录 </span></span><br><span class="line"><span class="comment"># --storage.tsdb.retention=15d 指定留存数据时间范围</span></span><br><span class="line"><span class="comment"># --web.listen-address=&quot;0.0.0.0:9090&quot; 监听地址</span></span><br><span class="line"><span class="comment"># --web.max-connections=512 最大连接数</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<ol start="3">
-<li><p>配置文件</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/<span class="built_in">local</span>/prometheus/prometheus.yml</span><br><span class="line"><span class="comment"># my global config</span></span><br><span class="line">global:</span><br><span class="line">  scrape_interval:     15s <span class="comment"># Set the scrape interval to every 15 seconds. Default is every 1 minute.</span></span><br><span class="line">  evaluation_interval: 15s <span class="comment"># Evaluate rules every 15 seconds. The default is every 1 minute.</span></span><br><span class="line">  <span class="comment"># scrape_timeout is set to the global default (10s).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Alertmanager configuration</span></span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">      <span class="comment"># - alertmanager:9093</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load rules once and periodically evaluate them according to the global &#x27;evaluation_interval&#x27;.</span></span><br><span class="line">rule_files:</span><br><span class="line">  <span class="comment"># - &quot;first_rules.yml&quot;</span></span><br><span class="line">  <span class="comment"># - &quot;second_rules.yml&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="comment"># Here it&#x27;s Prometheus itself.</span></span><br><span class="line">scrape_configs:</span><br><span class="line">  <span class="comment"># The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.</span></span><br><span class="line">  <span class="comment">#作业 默认配置  用于监控prometheus自身</span></span><br><span class="line">  - job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># metrics_path defaults to &#x27;/metrics&#x27;</span></span><br><span class="line">    <span class="comment"># scheme defaults to &#x27;http&#x27;.</span></span><br><span class="line"></span><br><span class="line">    static_configs:</span><br><span class="line">    <span class="comment">#实例</span></span><br><span class="line">    - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>启动服务</p>
-</li>
-</ol>
-   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> prometheus &amp;&amp; systemctl start prometheus</span><br><span class="line"></span><br><span class="line">ss -tnl |grep 9090</span><br><span class="line">LISTEN     0      128       [::]:9090                  [::]:*  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-4-重写标签"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/"
-    >4.重写标签</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/4-%E9%87%8D%E5%86%99%E6%A0%87%E7%AD%BE/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="重写标签"><a href="#重写标签" class="headerlink" title="重写标签"></a>重写标签</h2><p>是配置文件中的一个字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">relabel_configs:</span><br><span class="line">	....</span><br><span class="line">	....</span><br></pre></td></tr></table></figure>
-
-<h2 id="action：重新标签动作"><a href="#action：重新标签动作" class="headerlink" title="action：重新标签动作"></a>action：重新标签动作</h2><ul>
-<li>replace：默认，通过regex匹配source_label的值，使用replacement来引用表达式匹配的分组</li>
-<li>keep：只保留regex匹配的目标 source_labels </li>
-<li>drop：删除regex匹配的目标 source_labels </li>
-<li>labeldrop：删除regex匹配的标签</li>
-<li>labelkeep：只保留regex匹配的标签</li>
-<li>hashmod：设置target_label为modulus连接的哈希值source_labels </li>
-<li>labelmap：匹配regex所有标签名称。然后复制匹配标签的值进行分组，replacement分组引用（${1},${2},…）替代</li>
-</ul>
-<h2 id="添加标签"><a href="#添加标签" class="headerlink" title="添加标签"></a>添加标签</h2><ul>
-<li><p>给作业中所有实例添加标签</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">  <span class="comment">#静态实例</span></span><br><span class="line">  static_configs:</span><br><span class="line">  - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment">#添加了IDC标签赋值BJ</span></span><br><span class="line">      IDC: <span class="string">&quot;BJ&quot;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看所有带有IDC:BJ标签实例的某指标的总和</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum(指标名称&#123;IDC:<span class="string">&quot;BJ&quot;</span>&#125;)</span><br><span class="line"><span class="comment">#在prometheus页面中填写公式 可获得总值</span></span><br><span class="line"><span class="comment">#sum() 求和</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="标签重写"><a href="#标签重写" class="headerlink" title="标签重写"></a>标签重写</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这个job命名方便识别机房</span></span><br><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#指定动作 默认replace 标签重写</span></span><br><span class="line">   - action: replace</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)</span><br><span class="line">     <span class="comment">#后向引用</span></span><br><span class="line">     replacement: <span class="variable">$1</span></span><br><span class="line">     <span class="comment">#标签的K被修改idc 原有标签还保留 多了一个 idc=&#x27;BJ-Prometheus&#x27;的标签</span></span><br><span class="line">     target_label: idc</span><br></pre></td></tr></table></figure>
-
-<h2 id="keep-和-drop"><a href="#keep-和-drop" class="headerlink" title="keep 和 drop"></a>keep 和 drop</h2><p>实现采集指标的过滤 使得指标是可以选择性采集的</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#keep 表示只采集有指定标签的指标</span></span><br><span class="line">   <span class="comment">#drop 表示不采集有此标签的的指标</span></span><br><span class="line">   - action: keep</span><br><span class="line">     <span class="comment">#指定源标签 job 是默认标签 值等于job_name</span></span><br><span class="line">     source_labels: [<span class="string">&#x27;job&#x27;</span>]</span><br><span class="line">     <span class="comment">#正则表达是默认(.*) 括号是为了后向引用</span></span><br><span class="line">     regex: (.*)     </span><br></pre></td></tr></table></figure>
-
-<h2 id="labeldrop和labelkeep"><a href="#labeldrop和labelkeep" class="headerlink" title="labeldrop和labelkeep"></a>labeldrop和labelkeep</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- job_name: <span class="string">&#x27;BJ-Prometheus&#x27;</span></span><br><span class="line">   static_configs:</span><br><span class="line">   - targets: [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line">   relable_configs:</span><br><span class="line">   <span class="comment">#labeldrop 删除匹配到的标签 配合标签重写 可以实现真正的重命名标签</span></span><br><span class="line">   <span class="comment">#labelkeep 只保留匹配到的标签 其余删除</span></span><br><span class="line">   - action: labeldrop</span><br><span class="line">     <span class="comment">#正则</span></span><br><span class="line">     regex: job</span><br><span class="line">     </span><br></pre></td></tr></table></figure> 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-6-基于文件的动态实例发现"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/"
-    >6.基于文件的动态实例发现</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/6-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A8%E6%80%81%E5%AE%9E%E4%BE%8B%E5%8F%91%E7%8E%B0/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="基于文件的动态实例发现"><a href="#基于文件的动态实例发现" class="headerlink" title="基于文件的动态实例发现"></a>基于文件的动态实例发现</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span><span class="bash">定义job名称</span></span><br><span class="line"> - job_name: &#x27;file&#x27;</span><br><span class="line"><span class="meta"> 	#</span><span class="bash">基于文件的动态发现</span></span><br><span class="line">    file_sd_configs:</span><br><span class="line">    #指明文件位置</span><br><span class="line">    - files: </span><br><span class="line">      - &#x27;/usr/local/prometheus/sd_config/*.yml&#x27;</span><br><span class="line">      #读取文件的间隔时间</span><br><span class="line">      refresh_interval: 5s</span><br><span class="line">      </span><br><span class="line">vim /usr/local/prometheus/sd_config/test.yml</span><br><span class="line">- targets:</span><br><span class="line"><span class="meta">  #</span><span class="bash">注意引号位置</span></span><br><span class="line">  - &quot;192.168.1.81:9100&quot;</span><br><span class="line">  - &quot;192.168.1.82:9100&quot;</span><br><span class="line">    #添加标签 可选</span><br><span class="line">    labels:</span><br><span class="line">      k: &quot;v&quot;</span><br><span class="line"></span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
-    <article
-  id="post-7-常用函数"
-  class="article article-type-post"
-  itemscope
-  itemprop="blogPost"
-  data-scroll-reveal
->
-  <div class="article-inner">
-    
-    <header class="article-header">
-       
-<h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/"
-    >7.常用函数</a> 
-</h2>
- 
-
-    </header>
-     
-    <div class="article-meta">
-      <a href="/2017/05/26/7-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
-</a> 
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
-  </div>
- 
-    </div>
-      
-    <div class="article-entry" itemprop="articleBody">
-       
-  <h2 id="常用函数"><a href="#常用函数" class="headerlink" title="常用函数"></a>常用函数</h2><ul>
-<li>rate()<ul>
-<li>函数计算某个时间序列范围内的每秒平均增长率。适合缓慢变化的计数器（counter）</li>
-</ul>
-</li>
-</ul>
-<p>这是一个非常重要的函数，专门配合counter类型数据，取counter在这个时间段中的平均每秒增量。比如监控网络接受字节数的情况，在9:10到9:20期间累计量增加了1000bytes，加入rate([1m])函数后就会使用1000除以60秒，计算出数据大约为16bytes。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rate( node_network_receive_bytes[1m] ) <span class="comment">#获取``1``分钟内每秒的增量</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>irate()<ul>
-<li>函数计算一段时间范围内某个时刻的每秒增长率。适合快速变化的计数器（counter）</li>
-</ul>
-</li>
-<li>sum()<ul>
-<li>求和</li>
-</ul>
-</li>
-<li>increase()<ul>
-<li>和rate()函数一样也是配合Counter使用。区别就是它是取其中一段时间的增量而不是平均值，</li>
-<li>比如</li>
-<li>increase(node_cpu[1m])    #获取CPU总使用时间1分钟的增量</li>
-</ul>
-</li>
-</ul>
- 
-      <!-- reward -->
-      
-    </div>
-    
-
-    <!-- copyright -->
-    
-    <footer class="article-footer">
-       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
-
-    </footer>
-  </div>
-
-    
- 
-   
-</article>
-
-    
   </article>
   
 
   
   <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/6/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/8/">下一页</a>
+    <a class="extend prev" rel="prev" href="/page/6/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/8/">下一页</a>
   </nav>
   
 </section>
