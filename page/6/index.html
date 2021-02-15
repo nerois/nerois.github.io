@@ -646,7 +646,7 @@
 
     
     <article
-  id="post-1-指标类型"
+  id="post-1 规划与准备"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -657,37 +657,41 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/"
-    >1.指标类型</a> 
+  <a class="article-title" href="/2019/05/13/1%20%E8%A7%84%E5%88%92%E4%B8%8E%E5%87%86%E5%A4%87/"
+    >规划以及准备</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/1%20%E8%A7%84%E5%88%92%E4%B8%8E%E5%87%86%E5%A4%87/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
+  <h1 id="节点规划"><a href="#节点规划" class="headerlink" title="**节点规划"></a>**节点规划</h1><ul>
+<li>ce1 192.168.1.91         10.1.1.91   管理节点<br>ce2 192.168.1.92        10.1.1.92<br>ce3 192.168.1.93         10.1.1.93<br>ce4 192.168.1.94         10.1.1.94</li>
+</ul>
+<h1 id="yum-仓库准备-所有节点"><a href="#yum-仓库准备-所有节点" class="headerlink" title="**yum 仓库准备 所有节点"></a>**yum 仓库准备 所有节点</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">cat &gt; /etc/yum.repos.d/Ceph.repo &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">[noarch]</span></span><br><span class="line"><span class="string">name=noarch</span></span><br><span class="line"><span class="string">baseurl=https://mirrors.aliyun.com/ceph/rpm-nautilus/el7/noarch/</span></span><br><span class="line"><span class="string">enabled=1</span></span><br><span class="line"><span class="string">gpgcheck=0</span></span><br><span class="line"><span class="string">[x86_64]</span></span><br><span class="line"><span class="string">name=x86_64</span></span><br><span class="line"><span class="string">baseurl=https://mirrors.aliyun.com/ceph/rpm-nautilus/el7/x86_64/</span></span><br><span class="line"><span class="string">enabled=1</span></span><br><span class="line"><span class="string">gpgcheck=0</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line">yum update -y &amp;&amp; yum install -y python-setuptools</span><br></pre></td></tr></table></figure>
+
+<h1 id="管理节点准备"><a href="#管理节点准备" class="headerlink" title="**管理节点准备"></a>**管理节点准备</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># yum install -y ceph-deploy</span></span><br><span class="line"><span class="comment">#验证版本</span></span><br><span class="line">~]<span class="comment"># yum list |grep ceph-deploy</span></span><br><span class="line">ceph-deploy.noarch                       2.0.1-0                       @noarch </span><br><span class="line">**初始化集群信息 管理节点</span><br><span class="line">~]<span class="comment"># mkdir ceph-cluster &amp;&amp; cd ceph-cluster</span></span><br><span class="line"><span class="comment">##生成配置 并指定mon节点</span></span><br><span class="line">~]<span class="comment"># ceph-deploy new --cluster-network 10.1.1.0/24 --public-network 192.168.1.0/24 ce1</span></span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># ll</span></span><br><span class="line">total 12K</span><br><span class="line">-rw-r--r-- 1 root root  255 Oct 14 14:59 ceph.conf				<span class="comment">#配置文件</span></span><br><span class="line">-rw-r--r-- 1 root root 3.0K Oct 14 14:59 ceph-deploy-ceph.log 	<span class="comment">#标准输出日志</span></span><br><span class="line">-rw------- 1 root root   73 Oct 14 14:59 ceph.mon.keyring  		<span class="comment">#身份验证密钥</span></span><br><span class="line"></span><br><span class="line">~]<span class="comment"># cat ceph.conf                                                                                                                    1 ↵</span></span><br><span class="line">[global]</span><br><span class="line">fsid = 6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">public_network = 192.168.1.0/24</span><br><span class="line">cluster_network = 10.1.1.0/24</span><br><span class="line">mon_initial_members = ce1</span><br><span class="line">mon_host = 192.168.1.91</span><br><span class="line">auth_cluster_required = cephx</span><br><span class="line">auth_service_required = cephx</span><br><span class="line">auth_client_required = cephx</span><br></pre></td></tr></table></figure>
+
+<h1 id="安装需要的包-所有节点"><a href="#安装需要的包-所有节点" class="headerlink" title="**安装需要的包 所有节点"></a>**安装需要的包 所有节点</h1><ul>
+<li><p>其实可以使用 ceph-deploy install [node] … 自动安装这些包 但是 他会自己替换你的yum源 为官方的 这样会导致下载很慢<br>所以这里是建议手动安装</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># yum install ceph ceph-mon ceph-mgr ceph-radosgw ceph-mds -y</span></span><br></pre></td></tr></table></figure>
+
+
+
 
 </li>
 </ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
  
       <!-- reward -->
       
@@ -698,7 +702,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>
@@ -710,7 +714,7 @@
 
     
     <article
-  id="post-10-alertmanager部署"
+  id="post-2 mon节点初始化"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -721,28 +725,35 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/"
-    >10.alertmanager部署</a> 
+  <a class="article-title" href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/"
+    >mon节点初始化</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz  </span><br><span class="line">tar xf alertmanager-0.21.0.linux-amd64.tar.gz -C /usr/<span class="built_in">local</span>/src/</span><br><span class="line">ln -s /usr/<span class="built_in">local</span>/src/alertmanager-0.21.0.linux-amd64 /usr/<span class="built_in">local</span>/alertmanager</span><br><span class="line"><span class="comment">#unitfile</span></span><br><span class="line">cat &gt;/usr/lib/systemd/system/alertmanager.service &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">[Unit]</span><br><span class="line">Description=alertmanager Server</span><br><span class="line">After=network.target</span><br><span class="line">[Service]</span><br><span class="line">Restart=on-failure</span><br><span class="line">ExecStart=/usr/<span class="built_in">local</span>/alertmanager/alertmanager --config.file=/usr/<span class="built_in">local</span>/alertmanager/alertmanager.yml</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">#启动</span></span><br><span class="line">systemctl <span class="built_in">enable</span> alertmanager &amp;&amp; systemctl start alertmanager</span><br><span class="line"><span class="comment">#验证</span></span><br><span class="line"> ss -tnlp |grep alertmanager </span><br><span class="line">LISTEN  0  128 [::]:9093   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=8))</span><br><span class="line">LISTEN  0  128 [::]:9094   [::]:*  users:((<span class="string">&quot;alertmanager&quot;</span>,pid=9080,fd=3))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  <h1 id="初始化-管理节点操作"><a href="#初始化-管理节点操作" class="headerlink" title="**初始化 管理节点操作"></a>**初始化 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#初始化mon 节点是配置文件中的节点 </span></span><br><span class="line">~]<span class="comment"># ceph-deploy mon create-initial </span></span><br><span class="line"><span class="comment">#验证 多了一些密钥文件</span></span><br><span class="line">~]<span class="comment"># ll</span></span><br><span class="line">total 44K</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-mds.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-mgr.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-osd.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-rgw.keyring</span><br><span class="line">-rw------- 1 root root 151 Oct 14 15:14 ceph.client.admin.keyring</span><br><span class="line">-rw-r--r-- 1 root root 255 Oct 14 14:59 ceph.conf</span><br><span class="line">-rw-r--r-- 1 root root 15K Oct 14 15:14 ceph-deploy-ceph.log</span><br><span class="line">-rw------- 1 root root  73 Oct 14 14:59 ceph.mon.keyring</span><br></pre></td></tr></table></figure>
 
-<h2 id="配置Prometheus与Alertmanager通信"><a href="#配置Prometheus与Alertmanager通信" class="headerlink" title="配置Prometheus与Alertmanager通信"></a>配置Prometheus与Alertmanager通信</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#prometheus.yml</span><br><span class="line">alerting:</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - static_configs:</span><br><span class="line">    - targets:</span><br><span class="line">       - 127.0.0.1:9093</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="推送密钥文件以及配置文件到-各个节点-管理节点操作"><a href="#推送密钥文件以及配置文件到-各个节点-管理节点操作" class="headerlink" title="**推送密钥文件以及配置文件到 各个节点 管理节点操作"></a>**推送密钥文件以及配置文件到 各个节点 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph-deploy admin ce1 ce2 ce3 ce4</span></span><br><span class="line">[ceph_deploy.conf][DEBUG ] found configuration file at: /root/.cephdeploy.conf</span><br><span class="line">[ceph_deploy.cli][INFO ] Invoked (2.0.1): /usr/bin/ceph-deploy admin ce1 ce2 ce3 ce4</span><br><span class="line">[ceph_deploy.cli][INFO ] ceph-deploy options:</span><br><span class="line">[ceph_deploy.cli][INFO ]  username                      : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  verbose                       : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  overwrite_conf                : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  quiet                         : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  cd_conf                       : &lt;ceph_deploy.conf.cephdeploy.Conf instance at 0x7f49747f9200&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  cluster                       : ceph</span><br><span class="line">[ceph_deploy.cli][INFO ]  client                        : [<span class="string">&#x27;ce1&#x27;</span>, <span class="string">&#x27;ce2&#x27;</span>, <span class="string">&#x27;ce3&#x27;</span>, <span class="string">&#x27;ce4&#x27;</span>]</span><br><span class="line">[ceph_deploy.cli][INFO ]  func                          : &lt;<span class="keyword">function</span> admin at 0x7f4975091230&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  ceph_conf                     : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  default_release               : False</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce1</span><br><span class="line">[ce1][DEBUG ] connected to host: ce1 </span><br><span class="line">[ce1][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce1][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce1][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce2</span><br><span class="line">[ce2][DEBUG ] connected to host: ce2 </span><br><span class="line">[ce2][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce2][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce2][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce3</span><br><span class="line">[ce3][DEBUG ] connected to host: ce3 </span><br><span class="line">[ce3][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce3][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce3][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce4</span><br><span class="line">[ce4][DEBUG ] connected to host: ce4 </span><br><span class="line">[ce4][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce4][DEBUG ] detect machine <span class="built_in">type</span></span><br></pre></td></tr></table></figure>
+
+<p>#验证</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph -s </span></span><br><span class="line">  cluster:</span><br><span class="line">    id:     6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">    health: HEALTH_OK</span><br><span class="line"></span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum ce1 (age 4m) <span class="comment">#可以看到mon节点已经运行了一个</span></span><br><span class="line">    mgr: no daemons active</span><br><span class="line">    osd: 0 osds: 0 up, 0 <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0 B</span><br><span class="line">    usage:   0 B used, 0 B / 0 B avail</span><br><span class="line">    pgs:     </span><br></pre></td></tr></table></figure>
+
+
 
  
       <!-- reward -->
@@ -754,7 +765,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>
@@ -766,7 +777,7 @@
 
     
     <article
-  id="post-2-作业和实例"
+  id="post-3 mgr 节点初始化"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -777,34 +788,28 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/"
-    >2.作业和实例</a> 
+  <a class="article-title" href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/"
+    >mgr节点初始化</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/2-%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="作业和实例"><a href="#作业和实例" class="headerlink" title="作业和实例"></a>作业和实例</h2><ul>
-<li><p>实例</p>
-<p>   可以抓取的目标称为实例（Instances）</p>
-</li>
-<li><p>作业</p>
-<p>具有相同目标的实例集合称为作业（Job）</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scrape_configs:</span><br><span class="line">  - job_name: &#39;prometheus&#39; #作业</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;localhost:9090&#39;] #实例</span><br><span class="line">  - job_name: &#39;node&#39;</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#39;192.168.1.10:9090&#39;]</span><br></pre></td></tr></table></figure>
+  <h1 id="mgr节点初始化-管理节点操作"><a href="#mgr节点初始化-管理节点操作" class="headerlink" title="**mgr节点初始化 管理节点操作"></a>**mgr节点初始化 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph-deploy mgr create ce1 </span></span><br><span class="line">[ceph_deploy.conf][DEBUG ] found configuration file at: /root/.cephdeploy.conf</span><br><span class="line">[ceph_deploy.cli][INFO ] Invoked (2.0.1): /usr/bin/ceph-deploy mgr create ce1</span><br><span class="line">[ceph_deploy.cli][INFO ] ceph-deploy options:</span><br><span class="line">[ceph_deploy.cli][INFO ]  username                      : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  verbose                       : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  mgr                           : [(<span class="string">&#x27;ce1&#x27;</span>, <span class="string">&#x27;ce1&#x27;</span>)]</span><br><span class="line">[ceph_deploy.cli][INFO ]  overwrite_conf                : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  subcommand                    : create</span><br><span class="line">[ceph_deploy.cli][INFO ]  quiet                         : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  cd_conf                       : &lt;ceph_deploy.conf.cephdeploy.Conf instance at 0x7f869a8e2680&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  cluster                       : ceph</span><br><span class="line">[ceph_deploy.cli][INFO ]  func                          : &lt;<span class="keyword">function</span> mgr at 0x7f869af47140&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  ceph_conf                     : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  default_release               : False</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] Deploying mgr, cluster ceph hosts ce1:ce1</span><br><span class="line">[ce1][DEBUG ] connected to host: ce1 </span><br><span class="line">[ce1][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce1][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ceph_deploy.mgr][INFO ] Distro info: CentOS Linux 7.8.2003 Core</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] remote host will use systemd</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] deploying mgr bootstrap to ce1</span><br><span class="line">[ce1][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ce1][WARNIN] mgr keyring does not exist yet, creating one</span><br><span class="line">[ce1][DEBUG ] create a keyring file</span><br><span class="line">[ce1][DEBUG ] create path recursively <span class="keyword">if</span> it doesn<span class="string">&#x27;t exist</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: ceph --cluster ceph --name client.bootstrap-mgr --keyring /var/lib/ceph/bootstrap-mgr/ceph.keyring auth get-or-create mgr.ce1 mon allow profile mgr osd allow * mds allow * -o /var/lib/ceph/mgr/ceph-ce1/keyring</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl enable ceph-mgr@ce1</span></span><br><span class="line"><span class="string">[ce1][WARNIN] Created symlink from /etc/systemd/system/ceph-mgr.target.wants/ceph-mgr@ce1.service to /usr/lib/systemd/system/ceph-mgr@.service.</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl start ceph-mgr@ce1</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl enable ceph.target</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># ceph -s </span></span><br><span class="line">  cluster:</span><br><span class="line">    id:     6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">    health: HEALTH_WARN</span><br><span class="line">            OSD count 0 &lt; osd_pool_default_size 3</span><br><span class="line"></span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum ce1 (age 10m)</span><br><span class="line">    mgr: ce1(active, since 41s)					<span class="comment">#这里可以看到已经有一个mgr运行在 ce1 节点</span></span><br><span class="line">    osd: 0 osds: 0 up, 0 <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0 B</span><br><span class="line">    usage:   0 B used, 0 B / 0 B avail</span><br><span class="line">    pgs:     </span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -816,7 +821,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>
@@ -828,7 +833,7 @@
 
     
     <article
-  id="post-11-告警规则与告警"
+  id="post-4 osd 节点部署"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -839,30 +844,32 @@
     <header class="article-header">
        
 <h2 itemprop="name">
-  <a class="article-title" href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/"
-    >11.告警规则与告警</a> 
+  <a class="article-title" href="/2019/05/13/4%20osd%20%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/"
+    >osd节点部署</a> 
 </h2>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/11-%E5%91%8A%E8%AD%A6%E8%A7%84%E5%88%99%E4%B8%8E%E5%91%8A%E8%AD%A6/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/4%20osd%20%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
   </div>
  
     </div>
       
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="告警规则"><a href="#告警规则" class="headerlink" title="告警规则"></a>告警规则</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##prometheus.yml </span></span><br><span class="line"><span class="comment">#配置加载的文件  这个文件只要主配置中存在 就会定期去加载</span></span><br><span class="line">rule_files:</span><br><span class="line">  - <span class="string">&quot;rules/*.yml&quot;</span></span><br><span class="line"><span class="comment">##rules/node.yml 编写告警规则</span></span><br><span class="line">groups:</span><br><span class="line"><span class="comment"># 报警规则组名称</span></span><br><span class="line">- name: example   </span><br><span class="line">  rules:</span><br><span class="line">  <span class="comment">#规则名称</span></span><br><span class="line">  - alert: InstanceDown</span><br><span class="line">    <span class="comment">#指标阀值表达式</span></span><br><span class="line">    expr: up == 0</span><br><span class="line">    <span class="comment">#持续时间 ， 表示连续触发阀值达5分钟才触发报警</span></span><br><span class="line">    <span class="keyword">for</span>: 5m </span><br><span class="line">    labels:</span><br><span class="line">      <span class="comment"># 自定义标签</span></span><br><span class="line">      severity: page</span><br><span class="line">    <span class="comment">#消息体</span></span><br><span class="line">    annotations:</span><br><span class="line">      <span class="comment"># 自定义摘要&#123;&#123; $labels.instance &#125;&#125; 是引用指标标签instance的值</span></span><br><span class="line">      summary: <span class="string">&quot;Instance &#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; down&quot;</span></span><br><span class="line">      <span class="comment"># 自定义具体描述 &#123;&#123; $labels.job &#125;&#125; 表示引用指标标签job的值</span></span><br><span class="line">      description: <span class="string">&quot;&#123;&#123; <span class="variable">$labels</span>.instance &#125;&#125; of job &#123;&#123; <span class="variable">$labels</span>.job &#125;&#125; has been down for more than 5 minutes.&quot;</span> </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+  <h1 id="存储概述"><a href="#存储概述" class="headerlink" title="**存储概述"></a>**存储概述</h1><p>~]# lsblk                                                                                                                            1 ↵<br>NAME            MAJ:MIN RM SIZE RO TYPE MOUNTPOINT<br>vda             252:0    0  25G  0 disk<br>├─vda1          252:1    0   1G  0 part /boot<br>└─vda2          252:2    0  24G  0 part<br>  ├─centos-root 253:0    0  22G  0 lvm  /<br>  └─centos-swap 253:1    0   2G  0 lvm  [SWAP]<br>vdb             252:16   0  30G  0 disk<br>vdc             252:32   0  30G  0 disk </p>
+<p>#我的环境是所有服务器一致的<br>#可以看到有三块硬盘  vd{a,b,c}<br>#a是系统使用 我们规划 bc为osd节点用户ceph的存储盘</p>
+<h1 id="初始化磁盘"><a href="#初始化磁盘" class="headerlink" title="**初始化磁盘"></a>**初始化磁盘</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#初始化</span></span><br><span class="line">~]<span class="comment"># for node in ce1 ce2 ce3 ce4 ;do;ceph-deploy disk zap $node /dev/vdb;done &amp;&amp; \</span></span><br><span class="line"><span class="keyword">for</span> node <span class="keyword">in</span> ce1 ce2 ce3 ce4 ;<span class="keyword">do</span>;ceph-deploy disk zap <span class="variable">$node</span> /dev/vdc;<span class="keyword">done</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="告警状态"><a href="#告警状态" class="headerlink" title="告警状态"></a>告警状态</h2><p>在prometheus 的web页面  alerts选项中可以常看状态</p>
-<p>⦁    Inactive：这里什么都没有发生。<br>⦁    Pending：已触发阈值，但未满足告警持续时间（即rule中的for字段）<br>⦁    Firing：已触发阈值且满足告警持续时间。警报发送到Notification Pipeline，经过处理，发送给接受者。</p>
-<h2 id="用过标签分类告警以及分组告警"><a href="#用过标签分类告警以及分组告警" class="headerlink" title="用过标签分类告警以及分组告警"></a>用过标签分类告警以及分组告警</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">route:</span><br><span class="line">  <span class="comment">#通过标签进行分组 标签K/V结构 ,当K的值相等的时候将划分为一组一并发出</span></span><br><span class="line">  <span class="comment">#alertname是默认标签,表示告警名称</span></span><br><span class="line">  group_by: [cluster, alertname]</span><br><span class="line">  <span class="comment"># 告警等待时间 如果等待过程又收到告警并且属同一组将一并发出</span></span><br><span class="line">  group_wait: 10s</span><br><span class="line">  <span class="comment"># 告警间隔 如告警后又出现告警将判断间隔时间延迟发出</span></span><br><span class="line">  group_interval: 10s</span><br><span class="line">  <span class="comment"># 重复告警周期 同一个告警最少间隔时间 </span></span><br><span class="line">  repeat_interval: 20m</span><br><span class="line"><span class="comment"># 标签不匹配的告警都将保留在根节点，并发送到“default-receiver”</span></span><br><span class="line">  receiver: <span class="string">&#x27;default-receiver&#x27;</span> </span><br><span class="line">  routes: <span class="comment">#路由匹配标签来决定将告警发送到那个接收器上 接收器执行发送告警</span></span><br><span class="line"><span class="comment"># 标签service=mysql或者service=cassandra的告警分配到数据库接收端</span></span><br><span class="line">  - receiver: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">    group_wait: 10s</span><br><span class="line">    <span class="comment">#正则匹配标签</span></span><br><span class="line">    match_re:</span><br><span class="line">      service: mysql|cassandra</span><br><span class="line"><span class="comment"># 标签team=frontend的告警都与此子路由匹配</span></span><br><span class="line">  - receiver: <span class="string">&#x27;frontend-pager&#x27;</span></span><br><span class="line">    group_by: [product, environment]</span><br><span class="line">    <span class="comment">#精确匹配标签</span></span><br><span class="line">    match:</span><br><span class="line">      team: frontend </span><br><span class="line"><span class="comment">#定义接收器名称以及发送告警方式</span></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - url: <span class="string">&#x27;http://127.0.0.1:5001/&#x27;</span></span><br><span class="line">- name: <span class="string">&#x27;database-pager&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">    - to: <span class="string">&#x27;******@163.com&#x27;</span> </span><br></pre></td></tr></table></figure>
+<h1 id="添加磁盘"><a href="#添加磁盘" class="headerlink" title="**添加磁盘"></a>**添加磁盘</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> ceph-deploy osd create</span><br><span class="line">--data <span class="comment">#数据存放 --block-db  #元数据存储  --block-wal #元数据日志</span></span><br><span class="line">--filestore <span class="comment">#使用文件存储方式 默认是 bluestore --journal 文件方式的日志位置</span></span><br><span class="line"><span class="comment">#这里全部存放在一起</span></span><br><span class="line">~]<span class="comment"># for node in ce1 ce2 ce3 ce4;do;ceph-deploy osd create --data /dev/vdb $node;done &amp;&amp; \</span></span><br><span class="line"><span class="keyword">for</span> node <span class="keyword">in</span> ce1 ce2 ce3 ce4;<span class="keyword">do</span>;ceph-deploy osd create --data /dev/vdc <span class="variable">$node</span>;<span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="验证"><a href="#验证" class="headerlink" title="**验证"></a>**验证</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph -s</span></span><br><span class="line">  cluster:</span><br><span class="line">    id:     6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">    health: HEALTH_OK</span><br><span class="line"></span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum ce1 (age 31m)</span><br><span class="line">    mgr: ce1(active, since 21m)</span><br><span class="line">	<span class="comment">#这里看到 osd 是8个  8个up状态的  8个in （in表示已经在集群内部）</span></span><br><span class="line">    osd: 8 osds: 8 up (since 32s), 8 <span class="keyword">in</span> (since 32s) </span><br><span class="line"></span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0 B</span><br><span class="line">    usage:   8.0 GiB used, 232 GiB / 240 GiB avail</span><br><span class="line">    pgs:     </span><br><span class="line">	</span><br><span class="line">~]<span class="comment"># ceph osd tree</span></span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.23438 root default  </span><br><span class="line"><span class="comment">#这里看到 节点ce1 中包含两个osd  id是 0 和 4                        </span></span><br><span class="line">-3       0.05859     host ce1                          </span><br><span class="line"> 0   hdd 0.02930         osd.0     up  1.00000 1.00000   </span><br><span class="line"> 4   hdd 0.02930         osd.4     up  1.00000 1.00000 </span><br><span class="line">-5       0.05859     host ce2                          </span><br><span class="line"> 1   hdd 0.02930         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 5   hdd 0.02930         osd.5     up  1.00000 1.00000 </span><br><span class="line">-7       0.05859     host ce3                          </span><br><span class="line"> 2   hdd 0.02930         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 6   hdd 0.02930         osd.6     up  1.00000 1.00000 </span><br><span class="line">-9       0.05859     host ce4                          </span><br><span class="line"> 3   hdd 0.02930         osd.3     up  1.00000 1.00000 </span><br><span class="line"> 7   hdd 0.02930         osd.7     up  1.00000 1.00000</span><br></pre></td></tr></table></figure>
 
  
       <!-- reward -->
@@ -874,7 +881,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>

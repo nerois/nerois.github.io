@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    1.指标类型 |  Nero 的个人博客
+    mon节点初始化 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -49,7 +49,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-1-指标类型"
+  id="post-2 mon节点初始化"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -60,18 +60,18 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  1.指标类型
+  mon节点初始化
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2017/05/26/1-%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B/" class="article-date">
-  <time datetime="2017-05-26T04:12:57.000Z" itemprop="datePublished">2017-05-26</time>
+      <a href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/prometheus/">prometheus</a>
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
   </div>
  
     </div>
@@ -84,18 +84,17 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h2><ul>
-<li><p>时间序列格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;&#x3D;&lt;label value&gt;, ...&#125;</span><br><span class="line">#示例:</span><br><span class="line">api_http_requests_total&#123;method&#x3D;&quot;POST&quot;, handler&#x3D;&quot;&#x2F;messages&quot;&#125;</span><br><span class="line">注:</span><br><span class="line">Prometheus将所有数据存储为时间序列</span><br><span class="line">具有相同度量名称以及标签属于同一个指标。</span><br><span class="line">每个时间序列都由度量标准名称和一组键值对（也成为标签）唯一标识</span><br></pre></td></tr></table></figure>
+  <h1 id="初始化-管理节点操作"><a href="#初始化-管理节点操作" class="headerlink" title="**初始化 管理节点操作"></a>**初始化 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#初始化mon 节点是配置文件中的节点 </span></span><br><span class="line">~]<span class="comment"># ceph-deploy mon create-initial </span></span><br><span class="line"><span class="comment">#验证 多了一些密钥文件</span></span><br><span class="line">~]<span class="comment"># ll</span></span><br><span class="line">total 44K</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-mds.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-mgr.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-osd.keyring</span><br><span class="line">-rw------- 1 root root 113 Oct 14 15:14 ceph.bootstrap-rgw.keyring</span><br><span class="line">-rw------- 1 root root 151 Oct 14 15:14 ceph.client.admin.keyring</span><br><span class="line">-rw-r--r-- 1 root root 255 Oct 14 14:59 ceph.conf</span><br><span class="line">-rw-r--r-- 1 root root 15K Oct 14 15:14 ceph-deploy-ceph.log</span><br><span class="line">-rw------- 1 root root  73 Oct 14 14:59 ceph.mon.keyring</span><br></pre></td></tr></table></figure>
 
-</li>
-</ul>
-<h2 id="指标类型"><a href="#指标类型" class="headerlink" title="指标类型"></a>指标类型</h2><ol>
-<li>Counter：递增的计数器 </li>
-<li>Gauge：可以任意变化的数值 如cpu的负载数值</li>
-<li>Histogram：对一段时间范围内数据进行采样，并对所有数值求和与统计数量</li>
-<li>Summary：与Histogram类似</li>
-</ol>
+
+
+<h1 id="推送密钥文件以及配置文件到-各个节点-管理节点操作"><a href="#推送密钥文件以及配置文件到-各个节点-管理节点操作" class="headerlink" title="**推送密钥文件以及配置文件到 各个节点 管理节点操作"></a>**推送密钥文件以及配置文件到 各个节点 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph-deploy admin ce1 ce2 ce3 ce4</span></span><br><span class="line">[ceph_deploy.conf][DEBUG ] found configuration file at: /root/.cephdeploy.conf</span><br><span class="line">[ceph_deploy.cli][INFO ] Invoked (2.0.1): /usr/bin/ceph-deploy admin ce1 ce2 ce3 ce4</span><br><span class="line">[ceph_deploy.cli][INFO ] ceph-deploy options:</span><br><span class="line">[ceph_deploy.cli][INFO ]  username                      : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  verbose                       : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  overwrite_conf                : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  quiet                         : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  cd_conf                       : &lt;ceph_deploy.conf.cephdeploy.Conf instance at 0x7f49747f9200&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  cluster                       : ceph</span><br><span class="line">[ceph_deploy.cli][INFO ]  client                        : [<span class="string">&#x27;ce1&#x27;</span>, <span class="string">&#x27;ce2&#x27;</span>, <span class="string">&#x27;ce3&#x27;</span>, <span class="string">&#x27;ce4&#x27;</span>]</span><br><span class="line">[ceph_deploy.cli][INFO ]  func                          : &lt;<span class="keyword">function</span> admin at 0x7f4975091230&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  ceph_conf                     : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  default_release               : False</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce1</span><br><span class="line">[ce1][DEBUG ] connected to host: ce1 </span><br><span class="line">[ce1][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce1][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce1][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce2</span><br><span class="line">[ce2][DEBUG ] connected to host: ce2 </span><br><span class="line">[ce2][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce2][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce2][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce3</span><br><span class="line">[ce3][DEBUG ] connected to host: ce3 </span><br><span class="line">[ce3][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce3][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ce3][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ceph_deploy.admin][DEBUG ] Pushing admin keys and conf to ce4</span><br><span class="line">[ce4][DEBUG ] connected to host: ce4 </span><br><span class="line">[ce4][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce4][DEBUG ] detect machine <span class="built_in">type</span></span><br></pre></td></tr></table></figure>
+
+<p>#验证</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph -s </span></span><br><span class="line">  cluster:</span><br><span class="line">    id:     6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">    health: HEALTH_OK</span><br><span class="line"></span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum ce1 (age 4m) <span class="comment">#可以看到mon节点已经运行了一个</span></span><br><span class="line">    mgr: no daemons active</span><br><span class="line">    osd: 0 osds: 0 up, 0 <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0 B</span><br><span class="line">    usage:   0 B used, 0 B / 0 B avail</span><br><span class="line">    pgs:     </span><br></pre></td></tr></table></figure>
+
+
+
  
       <!-- reward -->
       
@@ -106,7 +105,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/prometheus/" rel="tag">prometheus</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
 
     </footer>
   </div>
@@ -114,19 +113,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2019/05/13/5%20mon%20%E8%8A%82%E7%82%B9%E6%89%A9%E5%B1%95/" class="article-nav-link">
+      <a href="/2019/05/13/1%20%E8%A7%84%E5%88%92%E4%B8%8E%E5%87%86%E5%A4%87/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            mon节点扩展
+            规划以及准备
           
         </div>
       </a>
     
     
-      <a href="/2017/05/26/10-alertmanager%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+      <a href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">10.alertmanager部署</div>
+        <div class="article-nav-title">mgr节点初始化</div>
       </a>
     
   </nav>

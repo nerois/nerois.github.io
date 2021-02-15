@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    归档 |  Nero 的个人博客
+    mgr节点初始化 |  Nero 的个人博客
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -48,245 +48,133 @@
       
     <main class="content on">
       <section class="outer">
-  
-  <article class="articles">
+  <article
+  id="post-3 mgr 节点初始化"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
     
-    
-    <h1 class="page-type-title">归档</h1>
-    
-    
-  
-  
-  
-  
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2019" class="archive-year">2019</a>
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  mgr节点初始化
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-date">
+  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">2019-05-13</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Ceph/">Ceph</a> / <a class="article-category-link" href="/categories/Ceph/1%E9%9B%86%E7%BE%A4%E8%A7%84%E5%88%92%E4%B8%8Erados%E9%83%A8%E7%BD%B2/">1集群规划与rados部署</a>
+  </div>
+ 
     </div>
-    <div class="archives">
       
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/nginx-ingress/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/nginx-ingress/"
-    >ingress-nginx</a> 
-</h2>
- 
+    <div class="tocbot"></div>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/nginx/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/nginx/"
-    >Nginx优化和常用全局配置</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/Nginx%E5%8F%98%E9%87%8F%E7%9A%84%E4%BD%BF%E7%94%A8/"
-    >Nginx变量的使用和日志</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/ConfigMap%E5%92%8Csecert/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/ConfigMap%E5%92%8Csecert/"
-    >ConfigMap和secret</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
   
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/K8S%E5%85%83%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
        
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/K8S%E5%85%83%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93/"
-    >K8S元数据传输</a> 
-</h2>
- 
+  <h1 id="mgr节点初始化-管理节点操作"><a href="#mgr节点初始化-管理节点操作" class="headerlink" title="**mgr节点初始化 管理节点操作"></a>**mgr节点初始化 管理节点操作</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">~]<span class="comment"># ceph-deploy mgr create ce1 </span></span><br><span class="line">[ceph_deploy.conf][DEBUG ] found configuration file at: /root/.cephdeploy.conf</span><br><span class="line">[ceph_deploy.cli][INFO ] Invoked (2.0.1): /usr/bin/ceph-deploy mgr create ce1</span><br><span class="line">[ceph_deploy.cli][INFO ] ceph-deploy options:</span><br><span class="line">[ceph_deploy.cli][INFO ]  username                      : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  verbose                       : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  mgr                           : [(<span class="string">&#x27;ce1&#x27;</span>, <span class="string">&#x27;ce1&#x27;</span>)]</span><br><span class="line">[ceph_deploy.cli][INFO ]  overwrite_conf                : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  subcommand                    : create</span><br><span class="line">[ceph_deploy.cli][INFO ]  quiet                         : False</span><br><span class="line">[ceph_deploy.cli][INFO ]  cd_conf                       : &lt;ceph_deploy.conf.cephdeploy.Conf instance at 0x7f869a8e2680&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  cluster                       : ceph</span><br><span class="line">[ceph_deploy.cli][INFO ]  func                          : &lt;<span class="keyword">function</span> mgr at 0x7f869af47140&gt;</span><br><span class="line">[ceph_deploy.cli][INFO ]  ceph_conf                     : None</span><br><span class="line">[ceph_deploy.cli][INFO ]  default_release               : False</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] Deploying mgr, cluster ceph hosts ce1:ce1</span><br><span class="line">[ce1][DEBUG ] connected to host: ce1 </span><br><span class="line">[ce1][DEBUG ] detect platform information from remote host</span><br><span class="line">[ce1][DEBUG ] detect machine <span class="built_in">type</span></span><br><span class="line">[ceph_deploy.mgr][INFO ] Distro info: CentOS Linux 7.8.2003 Core</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] remote host will use systemd</span><br><span class="line">[ceph_deploy.mgr][DEBUG ] deploying mgr bootstrap to ce1</span><br><span class="line">[ce1][DEBUG ] write cluster configuration to /etc/ceph/&#123;cluster&#125;.conf</span><br><span class="line">[ce1][WARNIN] mgr keyring does not exist yet, creating one</span><br><span class="line">[ce1][DEBUG ] create a keyring file</span><br><span class="line">[ce1][DEBUG ] create path recursively <span class="keyword">if</span> it doesn<span class="string">&#x27;t exist</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: ceph --cluster ceph --name client.bootstrap-mgr --keyring /var/lib/ceph/bootstrap-mgr/ceph.keyring auth get-or-create mgr.ce1 mon allow profile mgr osd allow * mds allow * -o /var/lib/ceph/mgr/ceph-ce1/keyring</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl enable ceph-mgr@ce1</span></span><br><span class="line"><span class="string">[ce1][WARNIN] Created symlink from /etc/systemd/system/ceph-mgr.target.wants/ceph-mgr@ce1.service to /usr/lib/systemd/system/ceph-mgr@.service.</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl start ceph-mgr@ce1</span></span><br><span class="line"><span class="string">[ce1][INFO ] Running command: systemctl enable ceph.target</span></span><br></pre></td></tr></table></figure>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/K8S_NACOS/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/K8S_NACOS/"
-    >K8S部署nacos</a> 
-</h2>
- 
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#验证</span></span><br><span class="line">~]<span class="comment"># ceph -s </span></span><br><span class="line">  cluster:</span><br><span class="line">    id:     6b1a201b-9afe-42ce-bfc7-b00c91a54741</span><br><span class="line">    health: HEALTH_WARN</span><br><span class="line">            OSD count 0 &lt; osd_pool_default_size 3</span><br><span class="line"></span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum ce1 (age 10m)</span><br><span class="line">    mgr: ce1(active, since 41s)					<span class="comment">#这里可以看到已经有一个mgr运行在 ce1 节点</span></span><br><span class="line">    osd: 0 osds: 0 up, 0 <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0 B</span><br><span class="line">    usage:   0 B used, 0 B / 0 B avail</span><br><span class="line">    pgs:     </span><br></pre></td></tr></table></figure>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/1%20%E8%A7%84%E5%88%92%E4%B8%8E%E5%87%86%E5%A4%87/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/1%20%E8%A7%84%E5%88%92%E4%B8%8E%E5%87%86%E5%A4%87/"
-    >规划以及准备</a> 
-</h2>
  
-
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/"
-    >mon节点初始化</a> 
-</h2>
- 
-
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/3%20mgr%20%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/"
-    >mgr节点初始化</a> 
-</h2>
- 
-
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/05/13/4%20osd%20%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/" class="archive-article-date">
-  <time datetime="2019-05-13T03:14:26.000Z" itemprop="datePublished">05/13</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2019/05/13/4%20osd%20%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/"
-    >osd节点部署</a> 
-</h2>
- 
-
-    </header>
-    
-    
-  </div>
-</article>
-      
+      <!-- reward -->
       
     </div>
-  </div>
-  
-  
-
-  
-  <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/archives/page/5/">上一页</a><a class="page-number" href="/archives/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/4/">4</a><a class="page-number" href="/archives/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/archives/page/7/">7</a><a class="page-number" href="/archives/page/8/">8</a><a class="page-number" href="/archives/page/9/">9</a><a class="extend next" rel="next" href="/archives/page/7/">下一页</a>
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ceph/" rel="tag">Ceph</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/05/13/2%20mon%E8%8A%82%E7%82%B9%E5%88%9D%E5%A7%8B%E5%8C%96/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            mon节点初始化
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/05/13/4%20osd%20%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">osd节点部署</div>
+      </a>
+    
   </nav>
-  
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
 </section>
       <footer class="footer">
   <div class="outer">
@@ -409,6 +297,23 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
